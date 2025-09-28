@@ -1,0 +1,8 @@
+.sidebar-menu-item:hover:not(.active) {
+  background-color: #f5f5f5 !important;
+  border-left-color: #e0e0e0 !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
