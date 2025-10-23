@@ -39,17 +39,9 @@ const IdPassPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      padding: '20px',
-      minHeight: '100vh'
-    }}>
+    <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* Single Unified Card */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {/* Navigation Tabs */}
         <TabNavigation
           activeTab={activeTab}
@@ -58,13 +50,7 @@ const IdPassPage: React.FC = () => {
         />
 
         {/* Search Bar and Pagination Row */}
-        <div style={{
-          padding: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
+        <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}

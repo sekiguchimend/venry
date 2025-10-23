@@ -1,45 +1,19 @@
 'use client';
 
 import React from 'react';
-import { Edit } from 'lucide-react';
 
 const GroupButtons: React.FC = () => {
   return (
-    <>
-      <button
-        style={{
-          padding: '6px 12px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #1976d2',
-          borderRadius: '4px',
-          fontSize: '13px',
-          color: '#1976d2',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}
-      >
-        グループ参照止
+    <div className="flex items-center gap-1 md:gap-2">
+      <button className="py-1 px-1.5 md:px-2 bg-transparent border-none text-xs text-blue-700 cursor-pointer underline">
+        <span className="hidden sm:inline">🗂 グループ</span>
+        <span className="sm:hidden">🗂</span>
       </button>
-      <button
-        style={{
-          padding: '6px 12px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #1976d2',
-          borderRadius: '4px',
-          fontSize: '13px',
-          color: '#1976d2',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}
-      >
-        <Edit size={14} />
-        グループを編集
+      <button className="py-1 px-1.5 md:px-2 bg-transparent border-none text-xs text-blue-700 cursor-pointer underline">
+        <span className="hidden sm:inline">🗂 解除</span>
+        <span className="sm:hidden">❌</span>
       </button>
-    </>
+    </div>
   );
 };
 

@@ -1,489 +1,171 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Settings, Edit, ChevronDown, Star } from 'lucide-react';
+import { Search, Filter, MessageCircle, Eye, Upload } from 'lucide-react';
 
-interface EscortData {
-  id: number;
-  favorite: boolean;
-  status: 'waiting' | 'accepting' | string;
-  statusCode?: string;
-  time: string;
-  name: string;
-  comment: string;
-  score: string;
-}
-
-const ESCORT_DATA: EscortData[] = [
-  {
-    id: 1,
-    favorite: true,
-    status: 'waiting',
-    time: '15:00 〜 翌00:00',
-    name: 'あんじゅ',
-    comment: '小さなお顔とスレンダーな体、理想のスタイルを持つ彼女。',
-    score: '28/1000'
-  },
-  {
-    id: 2,
-    favorite: true,
-    status: 'accepting',
-    statusCode: '〜23:10',
-    time: '15:00 〜 翌00:00',
-    name: 'れん',
-    comment: '圧倒的なモデル美女と夢の様な時間！見惚し見苦笑！',
-    score: '23/1000'
-  },
-  {
-    id: 3,
-    favorite: true,
-    status: 'waiting',
-    time: '17:00 〜 翌03:00',
-    name: 'かれん',
-    comment: '業界未経験！！元エステシャン！おっとりスレンダーレディ♪',
-    score: '28/1000'
-  }
-];
-
-const InstantEscortUpdatePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('all');
+const ImmediateUpdatePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSort, setSelectedSort] = useState('latest');
-  const [selectedTarget, setSelectedTarget] = useState('all-waiting');
+  const [selectedWomen, setSelectedWomen] = useState<string[]>([]);
 
-  const tabs = [
-    { key: 'all', label: '女性' },
-    { key: 'site-settings', label: 'サイト設定' }
+  const womenData = [
+    { id: '1', name: '瑞穂-ruri-', status: '出勤中', time: '17:00~' },
+    { id: '2', name: '彩羽-ayaha-', status: '待機中', time: '18:00~' },
   ];
 
   return (
-    <div style={{
-      padding: '20px',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
-      {/* Orange Alert Banner */}
-      <div style={{
-        backgroundColor: '#ff9800',
-        color: '#ffffff',
-        padding: '12px 16px',
-        marginBottom: '20px',
-        borderRadius: '4px',
-        fontSize: '14px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px'
-      }}>
-        <div style={{
-          width: '0',
-          height: '0',
-          borderLeft: '8px solid transparent',
-          borderRight: '8px solid transparent',
-          borderBottom: '14px solid #ffffff'
-        }} />
-        即客内可能な女性を各サイトへ一括で更新します。また、待機中や接客中の最新情報も可能です。
-        目安更新時間に当日の出勤情報により異なりますので、ご注意ください。
-        <div style={{
-          marginLeft: 'auto',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span>目安更新時間 5:00</span>
-          <Edit size={16} />
+    <div className="p-3 md:p-5 min-h-screen bg-gray-100">
+      {/* Header Buttons */}
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-5 gap-3">
+        <div className="flex gap-2 md:gap-3 flex-wrap">
+          <button className="py-2 px-3 md:px-4 bg-green-500 text-white border-none rounded text-xs md:text-sm font-medium cursor-pointer flex items-center gap-2">
+            <Upload size={14} className="md:w-4 md:h-4" />
+            一括更新
+          </button>
+          <button className="py-2 px-3 md:px-4 bg-white border border-gray-200 rounded text-xs md:text-sm text-gray-700 cursor-pointer flex items-center gap-2">
+            <Filter size={14} className="md:w-4 md:h-4" />
+            詳細設定
+          </button>
+        </div>
+        <div className="text-xs md:text-sm text-gray-600 text-center md:text-right">
+          全{womenData.length}件
         </div>
       </div>
 
-      {/* Control Row with Stop Button and Dropdowns - Outside Card */}
-      <div style={{
-        padding: '16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '16px',
-        marginBottom: '20px'
-      }}>
-        {/* Stop Button */}
-        <button
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#f44336',
-            color: '#ffffff',
-            border: 'none',
-            borderRadius: '20px',
-            fontSize: '14px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            transition: 'background-color 0.2s ease'
-          }}
-        >
-          ⏸ 止める
-        </button>
-
-        <span style={{ color: '#666', fontSize: '14px' }}>自動更新中</span>
-
-        {/* Dropdowns */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <select
-            value={selectedSort}
-            onChange={(e) => setSelectedSort(e.target.value)}
-            style={{
-              padding: '6px 12px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              backgroundColor: '#ffffff',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="latest">最新</option>
-            <option value="oldest">過去順</option>
-          </select>
-
-          <span style={{ color: '#666', fontSize: '14px' }}>で</span>
-
-          <select
-            value={selectedTarget}
-            onChange={(e) => setSelectedTarget(e.target.value)}
-            style={{
-              padding: '6px 12px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              backgroundColor: '#ffffff',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="all-waiting">全員同時</option>
-            <option value="waiting-only">待機中のみ</option>
-            <option value="accepting-only">接客中のみ</option>
-          </select>
-
-          <span style={{ color: '#666', fontSize: '14px' }}>を</span>
-
-          <select
-            style={{
-              padding: '6px 12px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              backgroundColor: '#ffffff',
-              cursor: 'pointer'
-            }}
-          >
-            <option value="all-sites">死にに出勤している人等</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Main Content Card */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
-        {/* Navigation Tabs */}
-        <div style={{
-          display: 'flex',
-          borderBottom: '1px solid #e0e0e0'
-        }}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              style={{
-                padding: '12px 24px',
-                border: 'none',
-                backgroundColor: '#ffffff',
-                color: activeTab === tab.key ? '#1976d2' : '#666',
-                borderBottom: activeTab === tab.key ? '3px solid #1976d2' : '3px solid transparent',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: activeTab === tab.key ? '500' : '400',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-
-        {/* Search Bar and Status Row */}
-        <div style={{
-          padding: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
-          {/* Search Bar */}
-          <div style={{
-            position: 'relative',
-            width: '350px'
-          }}>
-            <Search
-              size={18}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#666'
-              }}
-            />
+      {/* Main Card */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        {/* Search Bar */}
+        <div className="p-3 md:p-4 border-b border-gray-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-full md:max-w-md">
+            <Search size={16} className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="名前で検索"
+              placeholder="女性名で検索"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 40px 8px 40px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '20px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s ease'
-              }}
+              className="w-full py-2 pl-10 pr-4 border border-gray-200 rounded-full text-xs md:text-sm outline-none"
             />
           </div>
-
-          {/* Status NEW button and Count */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}>
-            <button
-              style={{
-                padding: '4px 8px',
-                backgroundColor: '#ff4444',
-                color: '#ffffff',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '12px',
-                fontWeight: 'bold'
-              }}
-            >
-              NEW
-            </button>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-              <div
-                style={{
-                  width: '12px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  backgroundColor: '#4CAF50'
-                }}
-              />
-              <span style={{ fontSize: '14px', color: '#666' }}>ステータス一括設定</span>
-              <Settings size={16} style={{ color: '#666' }} />
-            </div>
-
-            <div style={{
-              fontSize: '14px',
-              color: '#666'
-            }}>
-              女性 65 人　更新対象 10 コンテンツ
-            </div>
-          </div>
+          <button className="py-2 px-4 bg-transparent border-none text-xs md:text-sm text-blue-700 cursor-pointer underline self-end md:self-auto">
+            フィルター設定
+          </button>
         </div>
 
-        {/* Table Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '60px 120px 200px 100px 150px 1fr 100px 60px',
-          padding: '12px 16px',
-          backgroundColor: '#f8f9fa',
-          borderBottom: '1px solid #e0e0e0',
-          fontSize: '12px',
-          fontWeight: '500',
-          color: '#666'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            対象女性
+        {/* Table Header - Hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[60px_80px_1fr_120px_120px_100px] px-4 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-600 items-center">
+          <div className="text-center">
+            <input type="checkbox" />
           </div>
-          <div style={{ textAlign: 'center' }}>
-            個別設定
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            ステータス
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            出勤
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            選択
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            名前
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            コメント
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            除外設定
-          </div>
+          <div className="text-center">写真</div>
+          <div className="pl-2">女性名</div>
+          <div className="text-center">状態</div>
+          <div className="text-center">出勤時間</div>
+          <div className="text-center">操作</div>
         </div>
 
-        {/* Escort Data Rows */}
-        {ESCORT_DATA.map((escort) => (
-          <div
-            key={escort.id}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '60px 120px 200px 100px 150px 1fr 100px 60px',
-              padding: '12px 16px',
-              borderBottom: '1px solid #f0f0f0',
-              alignItems: 'center',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          >
-            {/* Favorite Star */}
-            <div style={{ textAlign: 'center' }}>
-              <Star
-                size={20}
-                style={{
-                  color: escort.favorite ? '#ffc107' : '#e0e0e0',
-                  fill: escort.favorite ? '#ffc107' : 'none',
-                  cursor: 'pointer'
-                }}
-              />
-            </div>
-
-            {/* Individual Settings */}
-            <div style={{ textAlign: 'center' }}>
-              <button
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer'
-                }}
-              >
-                個別設定
-              </button>
-            </div>
-
-            {/* Status */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px'
-            }}>
-              <div
-                style={{
-                  padding: '4px 8px',
-                  backgroundColor: escort.status === 'waiting' ? '#ffffff' : '#4CAF50',
-                  color: escort.status === 'waiting' ? '#666' : '#ffffff',
-                  border: escort.status === 'waiting' ? '1px solid #e0e0e0' : 'none',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: '500'
-                }}
-              >
-                {escort.status === 'waiting' ? '待機中' : '接客中'}
+        {/* Table Rows */}
+        {womenData.map((woman) => (
+          <div key={woman.id}>
+            {/* Desktop Layout */}
+            <div className="hidden md:grid grid-cols-[60px_80px_1fr_120px_120px_100px] px-4 py-3 border-b border-gray-100 items-center hover:bg-gray-50">
+              <div className="flex justify-center">
+                <input
+                  type="checkbox"
+                  checked={selectedWomen.includes(woman.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedWomen([...selectedWomen, woman.id]);
+                    } else {
+                      setSelectedWomen(selectedWomen.filter(id => id !== woman.id));
+                    }
+                  }}
+                />
               </div>
-              {escort.statusCode && (
-                <div
-                  style={{
-                    padding: '2px 6px',
-                    backgroundColor: '#2196F3',
-                    color: '#ffffff',
-                    borderRadius: '3px',
-                    fontSize: '10px'
-                  }}
-                >
-                  {escort.statusCode}
-                </div>
-              )}
-              <ChevronDown size={16} style={{ color: '#666' }} />
-            </div>
-
-            {/* Time */}
-            <div style={{
-              textAlign: 'center',
-              fontSize: '12px',
-              color: '#666'
-            }}>
-              {escort.time}
-            </div>
-
-            {/* Selection Buttons */}
-            <div style={{
-              display: 'flex',
-              gap: '4px',
-              justifyContent: 'center'
-            }}>
-              {['連絡', '選択'].map((label) => (
-                <button
-                  key={label}
-                  style={{
-                    padding: '4px 8px',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.2s ease'
-                  }}
-                >
-                  {label}
+              <div className="flex justify-center">
+                <div className="w-14 h-14 bg-gray-200 rounded"></div>
+              </div>
+              <div className="pl-2">
+                <div className="text-sm font-medium text-gray-800">{woman.name}</div>
+              </div>
+              <div className="text-center">
+                <span className={`inline-block py-1 px-3 rounded-full text-xs font-medium ${
+                  woman.status === '出勤中'
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {woman.status}
+                </span>
+              </div>
+              <div className="text-center text-sm text-gray-600">
+                {woman.time}
+              </div>
+              <div className="flex justify-center gap-2">
+                <button className="p-1.5 bg-transparent border-none text-blue-700 cursor-pointer">
+                  <MessageCircle size={16} />
                 </button>
-              ))}
+                <button className="p-1.5 bg-transparent border-none text-gray-600 cursor-pointer">
+                  <Eye size={16} />
+                </button>
+              </div>
             </div>
 
-            {/* Name */}
-            <div style={{
-              fontSize: '14px',
-              color: '#333',
-              fontWeight: '500'
-            }}>
-              {escort.name}
-            </div>
-
-            {/* Comment */}
-            <div style={{
-              fontSize: '12px',
-              color: '#666',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              {escort.comment}
-            </div>
-
-            {/* Score */}
-            <div style={{
-              textAlign: 'center',
-              fontSize: '12px',
-              color: '#666'
-            }}>
-              {escort.score}
+            {/* Mobile Card Layout */}
+            <div className="md:hidden p-4 border-b border-gray-100 hover:bg-gray-50">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={selectedWomen.includes(woman.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedWomen([...selectedWomen, woman.id]);
+                    } else {
+                      setSelectedWomen(selectedWomen.filter(id => id !== woman.id));
+                    }
+                  }}
+                  className="mt-1"
+                />
+                <div className="w-12 h-12 bg-gray-200 rounded flex-shrink-0"></div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-1">
+                    <div className="text-sm font-medium text-gray-800">{woman.name}</div>
+                    <div className="flex gap-2 ml-2">
+                      <button className="p-1 bg-transparent border-none text-blue-700 cursor-pointer">
+                        <MessageCircle size={14} />
+                      </button>
+                      <button className="p-1 bg-transparent border-none text-gray-600 cursor-pointer">
+                        <Eye size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <span className={`inline-block py-1 px-2 rounded-full font-medium ${
+                      woman.status === '出勤中'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {woman.status}
+                    </span>
+                    <span>{woman.time}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-2 mt-5">
+        {[1, 2, 3, 4].map(page => (
+          <button
+            key={page}
+            className="py-1.5 px-3 border border-gray-200 rounded bg-white text-sm text-gray-600 cursor-pointer hover:bg-gray-50"
+          >
+            {page}
+          </button>
         ))}
       </div>
     </div>
   );
 };
 
-export default InstantEscortUpdatePage;
+export default ImmediateUpdatePage;

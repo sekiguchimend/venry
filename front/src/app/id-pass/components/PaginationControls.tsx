@@ -20,23 +20,12 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '16px'
-    }}>
-      <div style={{
-        fontSize: '14px',
-        color: '#666'
-      }}>
+    <div className="flex flex-col sm:flex-row items-center gap-2 md:gap-4">
+      <div className="text-xs md:text-sm text-gray-600 text-center sm:text-left">
         {startItem}-{endItem}件 / {totalItems}件中
       </div>
 
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '4px'
-      }}>
+      <div className="flex items-center gap-1">
         {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
           const pageNum = i + 1;
           const isActive = pageNum === currentPage;
@@ -45,34 +34,17 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
             <button
               key={pageNum}
               onClick={() => onPageChange(pageNum)}
-              style={{
-                width: '28px',
-                height: '28px',
-                border: 'none',
-                borderRadius: '50%',
-                backgroundColor: isActive ? '#1976d2' : 'transparent',
-                color: isActive ? '#ffffff' : '#666',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: isActive ? '500' : '400',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
-              }}
+              className={`w-6 h-6 md:w-7 md:h-7 border-none rounded-full cursor-pointer text-xs md:text-sm transition-all ${
+                isActive
+                  ? 'bg-blue-700 text-white font-medium'
+                  : 'bg-transparent text-gray-600 font-normal hover:bg-gray-100'
+              }`}
             >
               {pageNum}
             </button>
           );
         })}
-        <ChevronRight size={16} style={{ color: '#666', cursor: 'pointer' }} />
+        <ChevronRight size={14} className="md:w-4 md:h-4 text-gray-600 cursor-pointer ml-1" />
       </div>
     </div>
   );

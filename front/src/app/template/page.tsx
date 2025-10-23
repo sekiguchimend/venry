@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Edit, Plus } from 'lucide-react';
 
 const TemplatePage: React.FC = () => {
@@ -35,372 +35,221 @@ const TemplatePage: React.FC = () => {
   ];
 
   return (
-    <div style={{
-      padding: '20px',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
+    <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* Header Button Section */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '20px'
-      }}>
-        <button
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#4caf50',
-            border: 'none',
-            borderRadius: '20px',
-            fontSize: '14px',
-            color: '#ffffff',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            transition: 'background-color 0.2s ease'
-          }}
-        >
-          <Plus size={16} />
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-5 gap-3">
+        <button className="py-2 px-3 md:px-4 bg-green-500 border-none rounded-full text-xs md:text-sm text-white cursor-pointer flex items-center gap-1 transition-colors hover:bg-green-600 self-start">
+          <Plus size={14} className="md:w-4 md:h-4" />
           新規登録
         </button>
 
-        <div style={{
-          fontSize: '14px',
-          color: '#666'
-        }}>
-          <a href="#" style={{ color: '#1976d2', textDecoration: 'underline' }}>グループ型配信</a>
+        <div className="text-xs md:text-sm text-gray-600 text-center md:text-right">
+          <a href="#" className="text-blue-700 underline">グループ型配信</a>
         </div>
       </div>
 
       {/* Main Content Card */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {/* Navigation Tabs */}
-        <div style={{
-          display: 'flex',
-          borderBottom: '1px solid #e0e0e0'
-        }}>
+        <div className="flex border-b border-gray-200 overflow-x-auto">
           <button
             onClick={() => setActiveTab('template-list')}
-            style={{
-              padding: '12px 24px',
-              border: 'none',
-              backgroundColor: '#ffffff',
-              color: activeTab === 'template-list' ? '#1976d2' : '#666',
-              borderBottom: activeTab === 'template-list' ? '3px solid #1976d2' : '3px solid transparent',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: activeTab === 'template-list' ? '500' : '400',
-              transition: 'all 0.2s ease'
-            }}
+            className={`py-3 px-3 md:px-6 border-none bg-white text-xs md:text-sm font-medium cursor-pointer transition-all whitespace-nowrap ${
+              activeTab === 'template-list'
+                ? 'text-blue-700 border-b-[3px] border-b-blue-700 font-medium'
+                : 'text-gray-600 border-b-[3px] border-b-transparent font-normal'
+            }`}
           >
-            テンプレート一覧
+            <span className="hidden md:inline">テンプレート一覧</span>
+            <span className="md:hidden">テンプレート</span>
           </button>
           <button
             onClick={() => setActiveTab('regularly-used-folder')}
-            style={{
-              padding: '12px 24px',
-              border: 'none',
-              backgroundColor: '#ffffff',
-              color: activeTab === 'regularly-used-folder' ? '#1976d2' : '#666',
-              borderBottom: activeTab === 'regularly-used-folder' ? '3px solid #1976d2' : '3px solid transparent',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: activeTab === 'regularly-used-folder' ? '500' : '400',
-              transition: 'all 0.2s ease'
-            }}
+            className={`py-3 px-3 md:px-6 border-none bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap ${
+              activeTab === 'regularly-used-folder'
+                ? 'text-blue-700 border-b-[3px] border-b-blue-700 font-medium'
+                : 'text-gray-600 border-b-[3px] border-b-transparent font-normal'
+            }`}
           >
-            定期用中フォルダ
+            <span className="hidden md:inline">定期用中フォルダ</span>
+            <span className="md:hidden">定期用</span>
           </button>
           <button
             onClick={() => setActiveTab('usage-disabled')}
-            style={{
-              padding: '12px 24px',
-              border: 'none',
-              backgroundColor: '#ffffff',
-              color: activeTab === 'usage-disabled' ? '#1976d2' : '#666',
-              borderBottom: activeTab === 'usage-disabled' ? '3px solid #1976d2' : '3px solid transparent',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: activeTab === 'usage-disabled' ? '500' : '400',
-              transition: 'all 0.2s ease'
-            }}
+            className={`py-3 px-3 md:px-6 border-none bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap ${
+              activeTab === 'usage-disabled'
+                ? 'text-blue-700 border-b-[3px] border-b-blue-700 font-medium'
+                : 'text-gray-600 border-b-[3px] border-b-transparent font-normal'
+            }`}
           >
-            の要確集・使用不可
+            <span className="hidden md:inline">の要確集・使用不可</span>
+            <span className="md:hidden">使用不可</span>
           </button>
-          <button
-            style={{
-              padding: '12px 16px',
-              border: 'none',
-              backgroundColor: '#ffffff',
-              color: '#666',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <Plus size={16} />
+          <button className="py-3 px-3 md:px-4 border-none bg-white text-gray-600 cursor-pointer text-sm transition-colors hover:bg-gray-50">
+            <Plus size={14} className="md:w-4 md:h-4" />
           </button>
         </div>
 
         {/* Search Bar and Actions Row */}
-        <div style={{
-          padding: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
+        <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
           {/* Search Bar */}
-          <div style={{
-            position: 'relative',
-            width: '350px'
-          }}>
+          <div className="relative w-full md:w-[350px]">
             <Search
-              size={18}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#666'
-              }}
+              size={16}
+              className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
             />
             <input
               type="text"
               placeholder="テンプレート名で検索"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 40px 8px 40px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '20px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s ease'
-              }}
+              className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
             />
           </div>
 
           {/* Action Links */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}>
-            <a href="#" style={{
-              fontSize: '14px',
-              color: '#1976d2',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-              🔄 テンプレート並び替え
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-4">
+            <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
+              🔄 <span className="hidden sm:inline">テンプレート並び替え</span><span className="sm:hidden">並び替え</span>
             </a>
-            <a href="#" style={{
-              fontSize: '14px',
-              color: '#1976d2',
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
+            <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
               📁 選択削除
             </a>
-            <div style={{
-              fontSize: '14px',
-              color: '#666'
-            }}>
+            <div className="text-xs md:text-sm text-gray-600 text-center sm:text-left">
               登録件数29/上限400件
             </div>
           </div>
         </div>
 
-        {/* Table Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px',
-          padding: '12px 16px',
-          backgroundColor: '#f8f9fa',
-          borderBottom: '1px solid #e0e0e0',
-          fontSize: '12px',
-          fontWeight: '400',
-          color: '#666',
-          alignItems: 'center'
-        }}>
+        {/* Table Header - Hidden on mobile */}
+        <div className="hidden md:grid grid-cols-[50px_40px_80px_1fr_100px_100px_80px] py-3 px-4 bg-gray-50 border-b border-gray-200 text-xs font-normal text-gray-600 items-center">
           <div></div>
-          <div style={{ textAlign: 'center' }}>No.</div>
-          <div style={{ textAlign: 'center' }}>画像</div>
-          <div style={{ paddingLeft: '8px' }}>テンプレート名</div>
-          <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <div className="text-center">No.</div>
+          <div className="text-center">画像</div>
+          <div className="pl-2">テンプレート名</div>
+          <div className="text-center flex items-center justify-center gap-1">
             女性
-            <div style={{
-              width: '14px',
-              height: '14px',
-              borderRadius: '50%',
-              backgroundColor: '#2196f3',
-              color: '#ffffff',
-              fontSize: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold'
-            }}>
+            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[10px] flex items-center justify-center font-bold">
               ?
             </div>
           </div>
-          <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <div className="text-center flex items-center justify-center gap-1">
             ラベル
-            <div style={{
-              width: '14px',
-              height: '14px',
-              borderRadius: '50%',
-              backgroundColor: '#2196f3',
-              color: '#ffffff',
-              fontSize: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold'
-            }}>
+            <div className="w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[10px] flex items-center justify-center font-bold">
               ?
             </div>
           </div>
-          <div style={{ textAlign: 'center' }}>メモ</div>
+          <div className="text-center">メモ</div>
         </div>
 
         {/* Content Rows */}
         {templates.map((template) => (
-          <div key={template.no} style={{
-            display: 'grid',
-            gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px',
-            padding: '8px 16px',
-            borderBottom: '1px solid #f0f0f0',
-            alignItems: 'center',
-            minHeight: '60px'
-          }}>
-            {/* Edit Button */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <button
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '2px',
-                  padding: '2px 6px',
-                  backgroundColor: 'transparent',
-                  color: '#1976d2',
-                  border: 'none',
-                  borderRadius: '2px',
-                  fontSize: '11px',
-                  cursor: 'pointer',
-                  fontWeight: '400'
-                }}
-              >
-                <Edit size={11} />
-                編集
-              </button>
-            </div>
+          <div key={template.no}>
+            {/* Desktop Layout */}
+            <div className="hidden md:grid grid-cols-[50px_40px_80px_1fr_100px_100px_80px] py-2 px-4 border-b border-gray-100 items-center min-h-[60px]">
+              {/* Edit Button */}
+              <div className="flex items-center justify-center">
+                <button className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal">
+                  <Edit size={11} />
+                  編集
+                </button>
+              </div>
 
-            {/* Number */}
-            <div style={{ textAlign: 'center', fontSize: '13px', color: '#333' }}>
-              {template.no}
-            </div>
+              {/* Number */}
+              <div className="text-center text-[13px] text-gray-800">
+                {template.no}
+              </div>
 
-            {/* Image */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center'
-            }}>
-              <div style={{
-                width: '60px',
-                height: '40px',
-                backgroundColor: '#e0e0e0',
-                borderRadius: '2px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
+              {/* Image */}
+              <div className="flex justify-center items-center">
+                <div className="w-[60px] h-10 bg-gray-200 rounded-sm flex items-center justify-center">
+                  {template.no === 1 && (
+                    <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[9px]">
+                      画像
+                    </div>
+                  )}
+                  {template.no === 2 && (
+                    <div className="bg-yellow-400 text-gray-800 py-0.5 px-1 rounded-sm text-[8px] font-bold">
+                      SUPER
+                    </div>
+                  )}
+                  {template.no === 3 && (
+                    <div className="bg-red-400 text-white py-0.5 px-1 rounded-sm text-[9px]">
+                      タイム
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Template Name */}
+              <div className="text-[13px] text-gray-800 pl-2 font-normal">
+                {template.name}
+              </div>
+
+              {/* Woman Column */}
+              <div className="text-center">
+                {/* Empty for now */}
+              </div>
+
+              {/* Label Column */}
+              <div className="flex items-center justify-center">
                 {template.no === 1 && (
-                  <div style={{
-                    backgroundColor: '#666',
-                    color: '#fff',
-                    padding: '2px 4px',
-                    borderRadius: '2px',
-                    fontSize: '9px'
-                  }}>
-                    画像
-                  </div>
+                  <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-[11px] text-gray-600 cursor-pointer">
+                    イベント
+                  </button>
                 )}
-                {template.no === 2 && (
-                  <div style={{
-                    backgroundColor: '#ffd700',
-                    color: '#333',
-                    padding: '2px 4px',
-                    borderRadius: '2px',
-                    fontSize: '8px',
-                    fontWeight: 'bold'
-                  }}>
-                    SUPER
-                  </div>
-                )}
-                {template.no === 3 && (
-                  <div style={{
-                    backgroundColor: '#ff6b6b',
-                    color: '#fff',
-                    padding: '2px 4px',
-                    borderRadius: '2px',
-                    fontSize: '9px'
-                  }}>
-                    タイム
-                  </div>
-                )}
+              </div>
+
+              {/* Memo Column */}
+              <div className="text-center">
+                {/* Empty */}
               </div>
             </div>
 
-            {/* Template Name */}
-            <div style={{
-              fontSize: '13px',
-              color: '#333',
-              paddingLeft: '8px',
-              fontWeight: '400'
-            }}>
-              {template.name}
-            </div>
-
-            {/* Woman Column */}
-            <div style={{ textAlign: 'center' }}>
-              {/* Empty for now */}
-            </div>
-
-            {/* Label Column */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {template.no === 1 && (
-                <button style={{
-                  padding: '2px 8px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '2px',
-                  fontSize: '11px',
-                  color: '#666',
-                  cursor: 'pointer'
-                }}>
-                  イベント
-                </button>
-              )}
-            </div>
-
-            {/* Memo Column */}
-            <div style={{ textAlign: 'center' }}>
-              {/* Empty */}
+            {/* Mobile Card Layout */}
+            <div className="md:hidden p-4 border-b border-gray-100">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-8 bg-gray-200 rounded-sm flex items-center justify-center mb-2">
+                    {template.no === 1 && (
+                      <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[8px]">
+                        画像
+                      </div>
+                    )}
+                    {template.no === 2 && (
+                      <div className="bg-yellow-400 text-gray-800 py-0.5 px-1 rounded-sm text-[7px] font-bold">
+                        SUPER
+                      </div>
+                    )}
+                    {template.no === 3 && (
+                      <div className="bg-red-400 text-white py-0.5 px-1 rounded-sm text-[8px]">
+                        タイム
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center text-xs text-gray-600">
+                    No.{template.no}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="text-sm text-gray-800 font-normal">
+                      {template.name}
+                    </div>
+                    <button className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2">
+                      <Edit size={12} />
+                      編集
+                    </button>
+                  </div>
+                  {template.no === 1 && (
+                    <div className="flex items-center gap-2">
+                      <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-xs text-gray-600 cursor-pointer">
+                        イベント
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         ))}

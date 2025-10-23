@@ -2,21 +2,32 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Phone, HelpCircle, Bell } from 'lucide-react';
+import { Phone, HelpCircle, Bell, Menu } from 'lucide-react';
 import { useUserStore } from '@/stores/userStore';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 const Header: React.FC = () => {
   const { userInfo } = useUserStore();
+  const { setIsMobileMenuOpen } = useSidebar();
 
   return (
-    <header className="w-full bg-white border-b border-gray-300" style={{ height: '48px' }}>
-      <div className="flex items-center justify-between h-full px-6">
-        {/* Logo and Company Name */}
+    <header className="header w-full h-12 bg-white border-b border-gray-300">
+      <div className="flex items-center justify-between h-full px-4 md:px-6">
+        {/* Mobile Menu Button and Logo */}
         <div className="flex items-center">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="mobile-menu-btn md:hidden mr-3 p-1 border-0 bg-transparent cursor-pointer text-gray-600"
+          >
+            <Menu size={24} />
+          </button>
+
+          {/* Logo and Company Name */}
           <Link href="/" className="flex items-center no-underline">
             <div className="flex items-center">
               {/* Logo Icon - Shield shape */}
-              <div className="w-7 h-7 mr-2">
+              <div className="logo-icon w-6 h-6 md:w-7 md:h-7 mr-2">
                 <svg
                   viewBox="0 0 28 28"
                   fill="none"
@@ -36,65 +47,74 @@ const Header: React.FC = () => {
                   <circle cx="14" cy="17" r="1.5" fill="white" />
                 </svg>
               </div>
-              <span className="text-xl font-medium" style={{ color: '#1a1a1a', letterSpacing: '0.5px' }}>
+              <span className="logo-text text-lg md:text-xl font-medium text-gray-900 tracking-wide">
                 Mr.Venrey
               </span>
             </div>
           </Link>
         </div>
 
-        {/* Navigation and Info */}
-        <div className="flex items-center" style={{ gap: '24px' }}>
+        {/* Desktop Navigation and Info */}
+        <div className="desktop-nav hidden md:flex items-center gap-6">
           {/* お知らせ link */}
           <Link
             href="/notices"
-            className="flex items-center no-underline"
-            style={{ fontSize: '14px', color: '#333' }}
+            className="flex items-center no-underline text-sm text-gray-800"
           >
             お知らせ
-            <span
-              className="ml-1.5 inline-flex items-center justify-center"
-              style={{
-                backgroundColor: '#e3f2fd',
-                borderRadius: '50%',
-                width: '18px',
-                height: '18px',
-                color: '#1976d2'
-              }}
-            >
+            <span className="ml-1.5 inline-flex items-center justify-center bg-blue-50 rounded-full w-5 h-5 text-blue-700">
               <HelpCircle className="w-3.5 h-3.5" />
             </span>
           </Link>
 
           {/* ID and Company Name */}
-          <div style={{ fontSize: '14px', color: '#555' }}>
+          <div className="text-sm text-gray-600">
             ID:{userInfo.id} {userInfo.companyName}
           </div>
 
           {/* Phone number */}
           <a
             href={`tel:${userInfo.phoneNumber}`}
-            className="flex items-center no-underline"
-            style={{ fontSize: '14px', color: '#1976d2' }}
+            className="flex items-center no-underline text-sm text-blue-700"
           >
             <Phone className="w-4 h-4 mr-1" />
-            <span style={{ textDecoration: 'underline' }}>{userInfo.phoneNumber}</span>
+            <span className="underline">{userInfo.phoneNumber}</span>
           </a>
 
           {/* User ID */}
-          <div style={{ fontSize: '14px', color: '#555' }}>
+          <div className="text-sm text-gray-600">
             ID: {userInfo.id}
           </div>
 
           {/* Alert/Notification Icon */}
-          <button
-            className="border-0 bg-transparent cursor-pointer p-0"
-            style={{ color: '#ff9800' }}
-          >
+          <button className="border-0 bg-transparent cursor-pointer p-0 text-orange-500">
             <Bell className="w-5 h-5" fill="currentColor" />
           </button>
         </div>
+
+        {/* Mobile Navigation - Simplified */}
+        <div className="mobile-nav flex md:hidden items-center gap-3">
+          {/* Notification Icon */}
+          <button className="border-0 bg-transparent cursor-pointer p-0 text-orange-500">
+            <Bell className="w-5 h-5" fill="currentColor" />
+          </button>
+
+          {/* User ID - Mobile */}
+          <div className="text-xs text-gray-600">
+            ID: {userInfo.id}
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+          }
+        }
+      `}</style>
     </header>
   );
 };

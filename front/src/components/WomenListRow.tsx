@@ -10,78 +10,29 @@ interface WomenListRowProps {
 
 const WomenListRow: React.FC<WomenListRowProps> = ({ item }) => {
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '60px 100px 60px 1fr 80px 120px 80px',
-      padding: '8px 16px',
-      borderBottom: '1px solid #f0f0f0',
-      alignItems: 'center',
-      minHeight: '70px'
-    }}>
+    <div className="grid grid-cols-[60px_100px_60px_1fr_80px_120px_80px] py-2 px-4 border-b border-gray-100 items-center min-h-[70px]">
       {/* Edit Button */}
       <div>
-        <button
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '3px',
-            padding: '3px 6px',
-            backgroundColor: 'transparent',
-            color: '#1976d2',
-            border: 'none',
-            borderRadius: '3px',
-            fontSize: '11px',
-            fontWeight: '500',
-            cursor: 'pointer'
-          }}
-        >
+        <button className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded text-[11px] font-medium cursor-pointer">
           <Edit size={11} />
           編集
         </button>
       </div>
 
       {/* Profile Image */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'flex-start',
-        alignItems: 'center'
-      }}>
-        <div style={{
-          width: '60px',
-          height: '50px',
-          backgroundColor: '#f0f0f0',
-          borderRadius: '4px',
-          backgroundImage: `url(${item.profileImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative'
-        }}>
+      <div className="flex justify-start items-center">
+        <div
+          className="w-[60px] h-[50px] bg-gray-100 rounded relative bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${item.profileImage})`
+          }}
+        >
           {/* Number badges */}
-          <div style={{
-            position: 'absolute',
-            bottom: '2px',
-            left: '2px',
-            display: 'flex',
-            gap: '2px'
-          }}>
-            <div style={{
-              backgroundColor: '#333',
-              color: '#fff',
-              fontSize: '8px',
-              padding: '1px 3px',
-              borderRadius: '2px',
-              fontWeight: 'bold'
-            }}>
+          <div className="absolute bottom-0.5 left-0.5 flex gap-0.5">
+            <div className="bg-gray-800 text-white text-[8px] py-0.5 px-0.5 rounded-sm font-bold">
               白5
             </div>
-            <div style={{
-              backgroundColor: '#333',
-              color: '#fff',
-              fontSize: '8px',
-              padding: '1px 3px',
-              borderRadius: '2px',
-              fontWeight: 'bold'
-            }}>
+            <div className="bg-gray-800 text-white text-[8px] py-0.5 px-0.5 rounded-sm font-bold">
               色7
             </div>
           </div>
@@ -89,101 +40,57 @@ const WomenListRow: React.FC<WomenListRowProps> = ({ item }) => {
       </div>
 
       {/* Age */}
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          fontSize: '13px',
-          color: '#333',
-          fontWeight: '400'
-        }}>
+      <div className="flex flex-col items-center justify-center">
+        <div className="text-[13px] text-gray-800 font-normal">
           {item.age}
         </div>
       </div>
 
       {/* Name, Newcomer status and Measurements */}
-      <div style={{
-        fontSize: '13px',
-        color: '#333',
-        paddingLeft: '8px'
-      }}>
-        <div style={{
-          marginBottom: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <span style={{
-            fontSize: '13px',
-            fontWeight: '500',
-            color: '#333'
-          }}>
+      <div className="text-[13px] text-gray-800 pl-2">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="text-[13px] font-medium text-gray-800">
             {item.name}
           </span>
           {item.isNewcomer && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2px 6px',
-              backgroundColor: '#e0e0e0',
-              borderRadius: '2px',
-              fontSize: '10px',
-              color: '#666'
-            }}>
+            <span className="inline-flex items-center justify-center py-0.5 px-1.5 bg-gray-200 rounded-sm text-[10px] text-gray-600">
               新人
             </span>
           )}
         </div>
-        <div style={{ fontSize: '12px', color: '#666' }}>
+        <div className="text-xs text-gray-600">
           T.{item.measurements.height}
         </div>
-        <div style={{ fontSize: '12px', color: '#666' }}>
+        <div className="text-xs text-gray-600">
           B.{item.measurements.bust} (C) W.{item.measurements.waist} H.{item.measurements.hip}
         </div>
       </div>
 
       {/* Registration Date */}
-      <div style={{
-        fontSize: '13px',
-        color: '#333',
-        textAlign: 'center'
-      }}>
+      <div className="text-[13px] text-gray-800 text-center">
         {item.registrationDate}
       </div>
 
       {/* Public Status */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor: item.isPublic ? '#e3f2fd' : '#f5f5f5',
-          border: `1px solid ${item.isPublic ? '#2196f3' : '#e0e0e0'}`,
-          borderRadius: '20px',
-          padding: '4px 12px',
-          fontSize: '11px',
-          color: item.isPublic ? '#1976d2' : '#666'
-        }}>
-          <div style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: item.isPublic ? '#2196f3' : '#bdbdbd',
-            marginRight: '6px'
-          }}></div>
+      <div className="flex justify-center items-center">
+        <div
+          className={`flex items-center border rounded-full py-1 px-3 text-[11px] ${
+            item.isPublic
+              ? 'bg-blue-50 border-blue-500 text-blue-700'
+              : 'bg-gray-50 border-gray-200 text-gray-600'
+          }`}
+        >
+          <div
+            className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+              item.isPublic ? 'bg-blue-500' : 'bg-gray-400'
+            }`}
+          ></div>
           公開中
         </div>
       </div>
 
       {/* Memo Column */}
-      <div style={{ textAlign: 'center' }}>
+      <div className="text-center">
         {/* Empty for memos */}
       </div>
     </div>

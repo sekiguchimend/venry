@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -24,8 +24,8 @@ import {
   UserX,
   Square,
   ChevronDown,
-  ChevronLeft,
-  ChevronsLeft
+  ChevronsLeft,
+  X
 } from 'lucide-react';
 
 interface MenuItemProps {
@@ -34,40 +34,24 @@ interface MenuItemProps {
   label: string;
   isActive?: boolean;
   isCollapsed?: boolean;
+  onClick?: () => void;
 }
 
-const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCollapsed }) => {
+const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCollapsed, onClick }) => {
   return (
     <Link
       href={href}
-      className={`sidebar-menu-item ${isActive ? 'active' : ''}`}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: isCollapsed ? '12px 10px' : '12px 20px',
-        fontSize: '14px',
-        color: isActive ? '#1976d2' : '#424242',
-        backgroundColor: isActive ? '#e3f2fd' : 'transparent',
-        borderLeft: `3px solid ${isActive ? '#1976d2' : 'transparent'}`,
-        transition: 'background-color 0.15s ease, border-left-color 0.15s ease, color 0.15s ease, padding 0.2s ease',
-        textDecoration: 'none',
-        justifyContent: isCollapsed ? 'center' : 'flex-start',
-      }}
+      className={`sidebar-menu-item flex items-center ${isCollapsed ? 'px-2.5 justify-center' : 'px-5 justify-start'} py-3 text-sm transition-all duration-150 ease-in-out no-underline ${
+        isActive ? 'text-blue-700 bg-blue-50 border-l-[3px] border-blue-700' : 'text-gray-700 bg-transparent border-l-[3px] border-transparent'
+      }`}
+      onClick={onClick}
       title={isCollapsed ? label : undefined}
     >
-      <span style={{
-        width: '20px',
-        height: '20px',
-        marginRight: isCollapsed ? '0' : '12px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: isActive ? '#1976d2' : '#757575'
-      }}>
+      <span className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? 'mr-0' : 'mr-3'} ${isActive ? 'text-blue-700' : 'text-gray-600'}`}>
         {icon}
       </span>
       {!isCollapsed && (
-        <span style={{ fontWeight: isActive ? 500 : 400 }}>{label}</span>
+        <span className={isActive ? 'font-medium' : 'font-normal'}>{label}</span>
       )}
     </Link>
   );
@@ -96,7 +80,7 @@ const MENU_ITEMS = [
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const { isCollapsed, toggleSidebar } = useSidebar();
+  const { isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar();
 
   const menuItems = useMemo(
     () => MENU_ITEMS.map(item => ({
@@ -106,156 +90,152 @@ const Sidebar: React.FC = () => {
     []
   );
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobileMenuOpen, setIsMobileMenuOpen]);
+
+  const handleMenuItemClick = () => {
+    if (window.innerWidth <= 768) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
   return (
-    <aside
-      style={{
-        width: isCollapsed ? '60px' : '220px',
-        minHeight: '100vh',
-        backgroundColor: '#ffffff',
-        borderRight: '1px solid #e0e0e0',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
-        transition: 'width 0.2s ease'
-      }}
-      className="hide-scrollbar"
-    >
-      {/* Top Section */}
-      <div style={{
-        padding: isCollapsed ? '16px 8px' : '16px',
-        borderBottom: '1px solid #e0e0e0',
-        backgroundColor: '#ffffff',
-        transition: 'padding 0.2s ease'
-      }}>
-        {/* Toggle Button */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: isCollapsed ? 'center' : 'flex-end',
-          marginBottom: '12px'
-        }}>
-          <ChevronsLeft
-            size={20}
-            style={{
-              color: '#666',
-              cursor: 'pointer',
-              transform: isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s ease'
-            }}
-            onClick={toggleSidebar}
-          />
-        </div>
+    <>
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="mobile-overlay fixed top-0 left-0 right-0 bottom-0 bg-black/50 z-[998] hidden"
+        />
+      )}
 
-        {!isCollapsed && (
-          <>
-            {/* Hotel Selection */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              cursor: 'pointer'
-            }}>
-              {/* Kyoto Icon */}
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                backgroundColor: '#FF9800',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginRight: '12px',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}>
-                京都
-              </div>
+      <aside
+        className={`sidebar hide-scrollbar flex flex-col min-h-screen bg-white border-r border-gray-200 overflow-y-auto transition-all duration-200 ease-in-out relative scrollbar-none ${
+          isCollapsed ? 'w-[60px] min-w-[60px] max-w-[60px]' : 'w-[220px] min-w-[220px] max-w-[220px]'
+        }`}
+      >
+        {/* Top Section */}
+        <div className={`${isCollapsed ? 'p-2' : 'p-4'} border-b border-gray-200 bg-white transition-all duration-200`}>
+          {/* Toggle/Close Buttons */}
+          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-3`}>
+            <div className="desktop-only">
+              <ChevronsLeft
+                size={20}
+                className={`text-gray-600 cursor-pointer transition-transform duration-200 ${
+                  isCollapsed ? 'rotate-180' : 'rotate-0'
+                }`}
+                onClick={toggleSidebar}
+              />
+            </div>
+            <div className="mobile-only">
+              <X
+                size={24}
+                className="text-gray-600 cursor-pointer"
+                onClick={() => setIsMobileMenuOpen(false)}
+              />
+            </div>
+          </div>
 
-              {/* Hotel Name and Dropdown */}
-              <div style={{ flex: 1 }}>
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}>
-                  <span style={{
-                    fontSize: '14px',
-                    color: '#333',
-                    fontWeight: '400'
-                  }}>
-                    京都ホテル協会邸...
-                  </span>
-                  <ChevronDown
-                    size={16}
-                    style={{
-                      color: '#666',
-                      marginLeft: '4px'
-                    }}
-                  />
+          {!isCollapsed && (
+            <>
+              {/* Hotel Selection */}
+              <div className="flex items-center cursor-pointer">
+                {/* Kyoto Icon */}
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center mr-3 text-white text-sm font-medium">
+                  京都
+                </div>
+
+                {/* Hotel Name and Dropdown */}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-800 font-normal">
+                      京都ホテル協会邸...
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className="text-gray-600 ml-1"
+                    />
+                  </div>
                 </div>
               </div>
+            </>
+          )}
+
+          {isCollapsed && (
+            <div className="flex justify-center mt-2">
+              <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-medium">
+                京
+              </div>
             </div>
-          </>
-        )}
-
-        {isCollapsed && (
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            marginTop: '8px'
-          }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#FF9800',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontSize: '12px',
-              fontWeight: '500'
-            }}>
-              京
-            </div>
-          </div>
-        )}
-      </div>
-
-      <nav style={{ flex: 1, paddingTop: '8px', paddingBottom: '8px' }}>
-        {menuItems.map((item) => (
-          <MenuItem
-            key={item.href}
-            href={item.href}
-            icon={item.icon}
-            label={item.label}
-            isActive={pathname === item.href}
-            isCollapsed={isCollapsed}
-          />
-        ))}
-      </nav>
-
-      {/* Footer Section */}
-      {!isCollapsed && (
-        <div style={{
-          padding: '16px',
-          borderTop: '1px solid #e0e0e0',
-          backgroundColor: '#fafafa'
-        }}>
-          <div style={{
-            fontSize: '11px',
-            color: '#9e9e9e',
-            textAlign: 'center',
-            lineHeight: '1.4'
-          }}>
-            <p style={{ margin: 0 }}>© 2024 Mr.Venrey</p>
-            <p style={{ margin: '4px 0 0 0' }}>Version 1.0.0</p>
-          </div>
+          )}
         </div>
-      )}
-    </aside>
+
+        <nav className="flex-1 pt-2 pb-2">
+          {menuItems.map((item) => (
+            <MenuItem
+              key={item.href}
+              href={item.href}
+              icon={item.icon}
+              label={item.label}
+              isActive={pathname === item.href}
+              isCollapsed={isCollapsed}
+              onClick={handleMenuItemClick}
+            />
+          ))}
+        </nav>
+
+        {/* Footer Section */}
+        {!isCollapsed && (
+          <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="text-[11px] text-gray-400 text-center leading-tight">
+              <p className="m-0">© 2024 Mr.Venrey</p>
+              <p className="mt-1 mb-0">Version 1.0.0</p>
+            </div>
+          </div>
+        )}
+      </aside>
+
+      <style jsx>{`
+        .desktop-only {
+          display: block;
+        }
+        .mobile-only {
+          display: none;
+        }
+        .mobile-overlay {
+          display: none !important;
+        }
+
+        @media (max-width: 768px) {
+          .desktop-only {
+            display: none;
+          }
+          .mobile-only {
+            display: block;
+          }
+          .sidebar {
+            position: fixed !important;
+            left: ${isMobileMenuOpen ? '0' : '-100%'} !important;
+            top: 0;
+            z-index: 999;
+            transition: left 0.3s ease !important;
+            width: 280px !important;
+            box-shadow: ${isMobileMenuOpen ? '2px 0 10px rgba(0, 0, 0, 0.1)' : 'none'};
+          }
+          .mobile-overlay {
+            display: ${isMobileMenuOpen ? 'block' : 'none'} !important;
+          }
+        }
+      `}</style>
+    </>
   );
 };
 

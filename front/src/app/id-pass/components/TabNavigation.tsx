@@ -9,25 +9,16 @@ interface TabNavigationProps {
 
 const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, tabs }) => {
   return (
-    <div style={{
-      display: 'flex',
-      borderBottom: '1px solid #e0e0e0'
-    }}>
+    <div className="flex border-b border-gray-200 overflow-x-auto">
       {tabs.map((tab) => (
         <button
           key={tab.key}
           onClick={() => onTabChange(tab.key)}
-          style={{
-            padding: '12px 24px',
-            border: 'none',
-            backgroundColor: activeTab === tab.key ? '#ffffff' : '#f5f5f5',
-            color: activeTab === tab.key ? '#1976d2' : '#666',
-            borderBottom: activeTab === tab.key ? '2px solid #1976d2' : '2px solid transparent',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: activeTab === tab.key ? '500' : '400',
-            transition: 'all 0.2s ease'
-          }}
+          className={`py-3 px-3 md:px-6 border-none cursor-pointer text-xs md:text-sm transition-all whitespace-nowrap ${
+            activeTab === tab.key
+              ? 'bg-white text-blue-700 border-b-2 border-b-blue-700 font-medium'
+              : 'bg-gray-50 text-gray-600 border-b-2 border-b-transparent font-normal hover:bg-gray-100'
+          }`}
         >
           {tab.label}
         </button>

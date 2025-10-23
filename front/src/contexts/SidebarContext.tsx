@@ -5,6 +5,8 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface SidebarContextType {
   isCollapsed: boolean;
   toggleSidebar: () => void;
+  isMobileMenuOpen: boolean;
+  setIsMobileMenuOpen: (open: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -23,13 +25,14 @@ interface SidebarProviderProps {
 
 export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
 
   return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar }}>
+    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen }}>
       {children}
     </SidebarContext.Provider>
   );

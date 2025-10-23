@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import WomenList from '../../components/WomenList';
+import WomenListResponsive from '../../components/WomenListResponsive';
 import { WomanItem } from '../../types/women-list';
+import ResponsiveContainer from '../../components/ResponsiveContainer';
 
 const GirlListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,12 +53,8 @@ const GirlListPage: React.FC = () => {
   };
 
   return (
-    <div style={{
-      padding: '20px',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
-      <WomenList
+    <ResponsiveContainer className="min-h-screen bg-gray-100">
+      <WomenListResponsive
         items={sampleWomen}
         searchTerm={searchTerm}
         onSearch={handleSearch}
@@ -66,7 +63,7 @@ const GirlListPage: React.FC = () => {
         totalPages={4}
         onPageChange={handlePageChange}
       />
-    </div>
+    </ResponsiveContainer>
   );
 };
 

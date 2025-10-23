@@ -5,86 +5,68 @@ import { HelpCircle, Mail, Phone, Clock, MessageSquare } from 'lucide-react';
 
 const SupportPage: React.FC = () => {
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-          <HelpCircle size={24} style={{ marginRight: '12px', color: '#1976d2' }} />
-          <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#333', margin: 0 }}>
+    <div className="p-4 md:p-6 max-w-6xl mx-auto">
+      <div className="mb-8">
+        <div className="flex items-center mb-4">
+          <HelpCircle size={24} className="mr-3 text-blue-700" />
+          <h1 className="text-3xl font-bold text-gray-800 m-0">
             Mr.Venreyサポート
           </h1>
         </div>
-        <p style={{ color: '#666', fontSize: '16px', margin: 0 }}>
+        <p className="text-gray-600 text-base m-0">
           ご不明な点やお困りのことがございましたら、お気軽にお問い合わせください。
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {/* サポート時間 */}
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Clock size={20} style={{ marginRight: '8px', color: '#1976d2' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', margin: 0 }}>
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="flex items-center mb-4">
+            <Clock size={20} className="mr-2 text-blue-700" />
+            <h3 className="text-lg font-semibold text-gray-800 m-0">
               サポート時間
             </h3>
           </div>
-          <div style={{ color: '#666', lineHeight: '1.6' }}>
-            <p style={{ margin: '8px 0' }}>平日: 9:00 - 18:00</p>
-            <p style={{ margin: '8px 0' }}>土日祝: 10:00 - 17:00</p>
-            <p style={{ margin: '8px 0', fontSize: '14px', color: '#999' }}>
+          <div className="text-gray-600 leading-relaxed">
+            <p className="my-2">平日: 9:00 - 18:00</p>
+            <p className="my-2">土日祝: 10:00 - 17:00</p>
+            <p className="my-2 text-sm text-gray-400">
               ※年末年始は休業いたします
             </p>
           </div>
         </div>
 
         {/* 電話サポート */}
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Phone size={20} style={{ marginRight: '8px', color: '#1976d2' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', margin: 0 }}>
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="flex items-center mb-4">
+            <Phone size={20} className="mr-2 text-blue-700" />
+            <h3 className="text-lg font-semibold text-gray-800 m-0">
               電話サポート
             </h3>
           </div>
-          <div style={{ color: '#666', lineHeight: '1.6' }}>
-            <p style={{ margin: '8px 0', fontSize: '18px', fontWeight: '600', color: '#333' }}>
+          <div className="text-gray-600 leading-relaxed">
+            <p className="my-2 text-lg font-semibold text-gray-800">
               03-1234-5678
             </p>
-            <p style={{ margin: '8px 0', fontSize: '14px' }}>
+            <p className="my-2 text-sm">
               緊急時や急を要するお問い合わせの場合は、お電話でご連絡ください。
             </p>
           </div>
         </div>
 
         {/* メールサポート */}
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-            <Mail size={20} style={{ marginRight: '8px', color: '#1976d2' }} />
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#333', margin: 0 }}>
+        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+          <div className="flex items-center mb-4">
+            <Mail size={20} className="mr-2 text-blue-700" />
+            <h3 className="text-lg font-semibold text-gray-800 m-0">
               メールサポート
             </h3>
           </div>
-          <div style={{ color: '#666', lineHeight: '1.6' }}>
-            <p style={{ margin: '8px 0', fontSize: '16px', fontWeight: '600', color: '#333' }}>
+          <div className="text-gray-600 leading-relaxed">
+            <p className="my-2 text-base font-semibold text-gray-800">
               support@mrvenrey.com
             </p>
-            <p style={{ margin: '8px 0', fontSize: '14px' }}>
+            <p className="my-2 text-sm">
               24時間受付。通常1営業日以内にご返信いたします。
             </p>
           </div>
@@ -92,15 +74,15 @@ const SupportPage: React.FC = () => {
       </div>
 
       {/* よくある質問 */}
-      <div style={{ marginTop: '48px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px' }}>
-          <MessageSquare size={24} style={{ marginRight: '12px', color: '#1976d2' }} />
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', margin: 0 }}>
+      <div className="mt-12">
+        <div className="flex items-center mb-6">
+          <MessageSquare size={24} className="mr-3 text-blue-700" />
+          <h2 className="text-2xl font-bold text-gray-800 m-0">
             よくある質問
           </h2>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-3 md:gap-4">
           {[
             {
               question: 'パスワードを忘れてしまいました',
@@ -119,17 +101,11 @@ const SupportPage: React.FC = () => {
               answer: '定期メンテナンスは月1回、第3日曜日の深夜2:00-6:00に実施しております。詳細はお知らせページでご確認ください。'
             }
           ].map((faq, index) => (
-            <div key={index} style={{
-              backgroundColor: '#fff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              padding: '20px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
+            <div key={index} className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-gray-800 mb-2">
                 Q. {faq.question}
               </h3>
-              <p style={{ fontSize: '14px', color: '#666', margin: 0, lineHeight: '1.6' }}>
+              <p className="text-sm text-gray-600 m-0 leading-relaxed">
                 A. {faq.answer}
               </p>
             </div>
@@ -138,87 +114,49 @@ const SupportPage: React.FC = () => {
       </div>
 
       {/* お問い合わせフォーム */}
-      <div style={{ marginTop: '48px' }}>
-        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '24px' }}>
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
           お問い合わせフォーム
         </h2>
 
-        <div style={{
-          backgroundColor: '#fff',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          padding: '24px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 shadow-sm">
+          <form className="flex flex-col gap-4 md:gap-5">
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
-                お名前 <span style={{ color: '#f44336' }}>*</span>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                お名前 <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                className="w-full py-3 px-3 border border-gray-300 rounded text-sm box-border"
                 placeholder="お名前を入力してください"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
-                メールアドレス <span style={{ color: '#f44336' }}>*</span>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                メールアドレス <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
+                className="w-full py-3 px-3 border border-gray-300 rounded text-sm box-border"
                 placeholder="example@domain.com"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#333', marginBottom: '8px' }}>
-                お問い合わせ内容 <span style={{ color: '#f44336' }}>*</span>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                お問い合わせ内容 <span className="text-red-500">*</span>
               </label>
               <textarea
                 rows={6}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  resize: 'vertical'
-                }}
+                className="w-full py-3 px-3 border border-gray-300 rounded text-sm box-border resize-y"
                 placeholder="お問い合わせ内容を詳しくご記入ください"
               />
             </div>
 
             <button
               type="submit"
-              style={{
-                backgroundColor: '#1976d2',
-                color: 'white',
-                padding: '12px 32px',
-                border: 'none',
-                borderRadius: '4px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                alignSelf: 'flex-start'
-              }}
+              className="bg-blue-700 text-white py-3 px-8 border-none rounded text-base font-semibold cursor-pointer self-start"
             >
               送信する
             </button>

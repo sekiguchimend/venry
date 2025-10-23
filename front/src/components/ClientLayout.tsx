@@ -10,37 +10,36 @@ interface ClientLayoutProps {
 }
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
-  const { isCollapsed } = useSidebar();
   const pathname = usePathname();
+  const { isCollapsed } = useSidebar();
 
   const isLoginPage = pathname === '/login';
 
   if (isLoginPage) {
     return (
-      <main style={{
-        minHeight: 'calc(100vh - 48px)',
-        backgroundColor: '#e0e0e0',
-        margin: 0,
-        padding: 0
-      }}>
+      <main className="ml-0 min-h-[calc(100vh-48px)] bg-gray-100 transition-none">
         {children}
       </main>
     );
   }
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div className="app-layout flex min-h-screen">
       <Sidebar />
-      <main
-        style={{
-          flex: 1,
-          minHeight: '100vh',
-          backgroundColor: '#f5f5f5',
-          padding: '20px'
-        }}
-      >
+      <main className="main-content flex-1 min-h-[calc(100vh-48px)] bg-gray-100 overflow-auto">
         {children}
       </main>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .app-layout {
+            flex-direction: column;
+          }
+          .main-content {
+            min-height: calc(100vh - 48px);
+          }
+        }
+      `}</style>
     </div>
   );
 };

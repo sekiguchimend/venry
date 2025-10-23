@@ -21,207 +21,98 @@ const ContentUpdatePage: React.FC = () => {
   ];
 
   return (
-    <div style={{
-      padding: '20px',
-      minHeight: '100vh',
-      backgroundColor: '#f5f5f5'
-    }}>
+    <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* Header Buttons Section */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: '20px'
-      }}>
-        <div style={{
-          display: 'flex',
-          gap: '12px',
-          alignItems: 'center'
-        }}>
-          <button
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              color: '#333',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <Settings size={16} />
-            まとめて更新設定
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-5 gap-3">
+        <div className="flex flex-wrap gap-2 md:gap-3 items-center">
+          <button className="py-2 px-3 md:px-4 bg-white border border-gray-200 rounded text-xs md:text-sm text-gray-800 cursor-pointer flex items-center gap-1 transition-colors hover:bg-gray-50">
+            <Settings size={14} className="md:w-4 md:h-4" />
+            <span className="hidden sm:inline">まとめて更新設定</span>
+            <span className="sm:hidden">更新設定</span>
           </button>
 
-          <button
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              color: '#333',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <Settings size={16} />
+          <button className="py-2 px-3 md:px-4 bg-white border border-gray-200 rounded text-xs md:text-sm text-gray-800 cursor-pointer flex items-center gap-1 transition-colors hover:bg-gray-50">
+            <Settings size={14} className="md:w-4 md:h-4" />
             ツール
           </button>
 
-          <button
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e0e0e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              color: '#333',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <Settings size={16} />
-            更新情報を見る!
+          <button className="py-2 px-3 md:px-4 bg-white border border-gray-200 rounded text-xs md:text-sm text-gray-800 cursor-pointer flex items-center gap-1 transition-colors hover:bg-gray-50">
+            <Settings size={14} className="md:w-4 md:h-4" />
+            <span className="hidden sm:inline">更新情報を見る!</span>
+            <span className="sm:hidden">更新情報</span>
           </button>
         </div>
 
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          backgroundColor: '#ffffff',
-          padding: '8px 12px',
-          borderRadius: '4px',
-          border: '1px solid #e0e0e0'
-        }}>
-          <span style={{
-            fontSize: '14px',
-            color: '#333',
-            fontWeight: '500'
-          }}>
+        <div className="flex items-center gap-2 bg-white py-2 px-3 rounded border border-gray-200 self-end md:self-auto">
+          <span className="text-xs md:text-sm text-gray-800 font-medium">
             24時間更新
           </span>
-          <Settings size={16} style={{ color: '#666' }} />
+          <Settings size={14} className="md:w-4 md:h-4 text-gray-600" />
         </div>
       </div>
 
       {/* Main Content Card */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        borderRadius: '8px',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
-      }}>
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         {/* Navigation Tabs */}
-        <div style={{
-          display: 'flex',
-          borderBottom: '1px solid #e0e0e0'
-        }}>
+        <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              style={{
-                padding: '12px 24px',
-                border: 'none',
-                backgroundColor: '#ffffff',
-                color: activeTab === tab.key ? '#1976d2' : '#666',
-                borderBottom: activeTab === tab.key ? '3px solid #1976d2' : '3px solid transparent',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: activeTab === tab.key ? '500' : '400',
-                transition: 'all 0.2s ease'
-              }}
+              className={`py-3 px-4 md:px-6 border-none bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 ${
+                activeTab === tab.key
+                  ? 'text-blue-700 border-b-4 border-b-blue-700 font-medium'
+                  : 'text-gray-600 border-b-4 border-b-transparent font-normal'
+              }`}
             >
-              {tab.label}
+              <span className="hidden md:inline">{tab.label}</span>
+              <span className="md:hidden">
+                {tab.key === 'content-list' && 'コンテンツ'}
+                {tab.key === 'monthly-site' && '月末サイト'}
+                {tab.key === 'female-recruitment' && '女性求人'}
+                {tab.key === 'male-recruitment' && '男性求人'}
+              </span>
             </button>
           ))}
-          <button
-            style={{
-              padding: '12px 16px',
-              border: 'none',
-              backgroundColor: '#ffffff',
-              color: '#666',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'background-color 0.2s ease'
-            }}
-          >
-            <Plus size={16} />
+          <button className="py-3 px-4 md:px-4 border-none bg-white text-gray-600 cursor-pointer text-sm transition-colors hover:bg-gray-50 flex-shrink-0">
+            <Plus size={14} className="md:w-4 md:h-4" />
           </button>
         </div>
 
         {/* Search Bar and Pagination Row */}
-        <div style={{
-          padding: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #f0f0f0'
-        }}>
+        <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
           {/* Search Bar */}
-          <div style={{
-            position: 'relative',
-            width: '350px'
-          }}>
+          <div className="relative w-full md:w-[350px]">
             <Search
-              size={18}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#666'
-              }}
+              size={16}
+              className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
             />
             <input
               type="text"
               placeholder="コンテンツ名で検索"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 40px 8px 40px',
-                border: '1px solid #e0e0e0',
-                borderRadius: '20px',
-                fontSize: '14px',
-                outline: 'none',
-                transition: 'border-color 0.2s ease'
-              }}
+              className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
             />
           </div>
 
           {/* Pagination and Count */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px'
-          }}>
-            {shouldShowGroupButtons(activeTab) && <GroupButtons />}
-
-            <div style={{
-              fontSize: '14px',
-              color: '#666'
-            }}>
-              {getItemCount(activeTab)}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
+            <div className="flex items-center justify-between sm:justify-start gap-3">
+              {shouldShowGroupButtons(activeTab) && <GroupButtons />}
+              
+              <div className="text-xs md:text-sm text-gray-600">
+                {getItemCount(activeTab)}
+              </div>
             </div>
 
-            <PaginationControls
-              activeTab={activeTab}
-              currentPage={currentPage}
-              setCurrentPage={setCurrentPage}
-            />
+            <div className="flex justify-center sm:justify-end">
+              <PaginationControls
+                activeTab={activeTab}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            </div>
           </div>
         </div>
 

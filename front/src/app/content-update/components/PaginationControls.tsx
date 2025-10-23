@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { TabKey } from '../../../types/content-update';
-import { shouldShowSecondPage } from '../utils/tabContentFactory';
 
 interface PaginationControlsProps {
   activeTab: TabKey;
@@ -15,42 +14,23 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
   setCurrentPage
 }) => {
-  const pages = shouldShowSecondPage(activeTab) ? [1, 2] : [1];
+  const totalPages = 3;
 
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '4px'
-    }}>
-      {pages.map((pageNum) => {
-        const isActive = pageNum === currentPage;
-        return (
-          <button
-            key={pageNum}
-            onClick={() => setCurrentPage(pageNum)}
-            style={{
-              width: '28px',
-              height: '28px',
-              border: 'none',
-              borderRadius: '50%',
-              backgroundColor: isActive ? '#1976d2' : 'transparent',
-              color: isActive ? '#ffffff' : '#666',
-              cursor: 'pointer',
-              fontSize: '14px',
-              fontWeight: isActive ? '500' : '400',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {pageNum}
-          </button>
-        );
-      })}
-      {activeTab === 'content-list' && (
-        <span style={{ color: '#1976d2', cursor: 'pointer', fontSize: '14px' }}>
-          グループ配信設定
-        </span>
-      )}
+    <div className="flex items-center gap-1 md:gap-2">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+        <button
+          key={page}
+          onClick={() => setCurrentPage(page)}
+          className={`py-1 px-2 md:px-2.5 border rounded text-xs cursor-pointer min-w-5 md:min-w-6 ${
+            currentPage === page
+              ? 'border-blue-700 bg-blue-700 text-white'
+              : 'border-gray-200 bg-white text-gray-600'
+          }`}
+        >
+          {page}
+        </button>
+      ))}
     </div>
   );
 };
