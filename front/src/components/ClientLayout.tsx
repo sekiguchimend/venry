@@ -3,7 +3,6 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
-import { useSidebar } from '@/contexts/SidebarContext';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -11,7 +10,6 @@ interface ClientLayoutProps {
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
   const pathname = usePathname();
-  const { isCollapsed } = useSidebar();
 
   const isLoginPage = pathname === '/login';
 
