@@ -6,6 +6,7 @@ import ContentListTab from '../tabs/ContentListTab';
 import MonthlySiteTab from '../tabs/MonthlySiteTab';
 import FemaleRecruitmentTab from '../tabs/FemaleRecruitmentTab';
 import MaleRecruitmentTab from '../tabs/MaleRecruitmentTab';
+import GroupCreateTab from '../tabs/GroupCreateTab';
 
 export const getTabContent = (activeTab: TabKey): React.ReactNode => {
   switch (activeTab) {
@@ -17,6 +18,8 @@ export const getTabContent = (activeTab: TabKey): React.ReactNode => {
       return <FemaleRecruitmentTab />;
     case 'male-recruitment':
       return <MaleRecruitmentTab />;
+    case 'group-create':
+      return <GroupCreateTab />;
     default:
       return <ContentListTab />;
   }

@@ -33,7 +33,7 @@ const NoticePage: React.FC = () => {
             {/* 出勤管理 */}
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between py-3 border-b border-gray-100 gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center">
+                <div className="w-8 h-8 bg-green-700 rounded flex items-center justify-center">
                   <BookOpen size={16} className="text-white" />
                 </div>
                 <div>

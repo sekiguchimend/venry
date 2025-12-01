@@ -52,17 +52,17 @@ const ContentUpdatePage: React.FC = () => {
       </div>
 
       {/* Main Content Card */}
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded overflow-hidden">
         {/* Navigation Tabs */}
         <div className="flex border-b border-gray-200 overflow-x-auto scrollbar-none">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`py-3 px-4 md:px-6 border-none bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 ${
+              className={`py-4 px-4 md:px-6 border-0 bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 relative ${
                 activeTab === tab.key
-                  ? 'text-blue-700 border-b-4 border-b-blue-700 font-medium'
-                  : 'text-gray-600 border-b-4 border-b-transparent font-normal'
+                  ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
+                  : 'text-gray-600 font-normal'
               }`}
             >
               <span className="hidden md:inline">{tab.label}</span>
@@ -74,50 +74,59 @@ const ContentUpdatePage: React.FC = () => {
               </span>
             </button>
           ))}
-          <button className="py-3 px-4 md:px-4 border-none bg-white text-gray-600 cursor-pointer text-sm transition-colors hover:bg-gray-50 flex-shrink-0">
+          <button
+            onClick={() => setActiveTab('group-create')}
+            className={`py-3 px-4 md:px-4 border-none bg-white cursor-pointer text-sm transition-colors hover:bg-gray-50 flex-shrink-0 relative ${
+              activeTab === 'group-create'
+                ? 'text-blue-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
+                : 'text-gray-600'
+            }`}
+          >
             <Plus size={14} className="md:w-4 md:h-4" />
           </button>
         </div>
 
-        {/* Search Bar and Pagination Row */}
-        <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
-          {/* Search Bar */}
-          <div className="relative w-full md:w-[350px]">
-            <Search
-              size={16}
-              className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
-            />
-            <input
-              type="text"
-              placeholder="コンテンツ名で検索"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
-            />
-          </div>
-
-          {/* Pagination and Count */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
-            <div className="flex items-center justify-between sm:justify-start gap-3">
-              {shouldShowGroupButtons(activeTab) && <GroupButtons />}
-              
-              <div className="text-xs md:text-sm text-gray-600">
-                {getItemCount(activeTab)}
-              </div>
-            </div>
-
-            <div className="flex justify-center sm:justify-end">
-              <PaginationControls
-                activeTab={activeTab}
-                currentPage={currentPage}
-                setCurrentPage={setCurrentPage}
+        {/* Search Bar and Pagination Row - Hide for group-create */}
+        {activeTab !== 'group-create' && (
+          <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
+            {/* Search Bar */}
+            <div className="relative w-full md:w-[350px]">
+              <Search
+                size={16}
+                className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
+              />
+              <input
+                type="text"
+                placeholder="コンテンツ名で検索"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
               />
             </div>
-          </div>
-        </div>
 
-        {/* Table Header */}
-        <TableHeader />
+            {/* Pagination and Count */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 md:gap-4">
+              <div className="flex items-center justify-between sm:justify-start gap-3">
+                {shouldShowGroupButtons(activeTab) && <GroupButtons />}
+
+                <div className="text-xs md:text-sm text-gray-600">
+                  {getItemCount(activeTab)}
+                </div>
+              </div>
+
+              <div className="flex justify-center sm:justify-end">
+                <PaginationControls
+                  activeTab={activeTab}
+                  currentPage={currentPage}
+                  setCurrentPage={setCurrentPage}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Table Header - Hide for group-create */}
+        {activeTab !== 'group-create' && <TableHeader />}
 
         {/* Tab Content */}
         {getTabContent(activeTab)}

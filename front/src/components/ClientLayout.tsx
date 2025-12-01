@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -10,30 +11,33 @@ interface ClientLayoutProps {
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
   const pathname = usePathname();
+  const { isCollapsed } = useSidebar();
 
   const isLoginPage = pathname === '/login';
 
   if (isLoginPage) {
     return (
-      <main className="ml-0 min-h-[calc(100vh-48px)] bg-gray-100 transition-none">
+      <main className="mt-12 ml-0 min-h-[calc(100vh-48px)] bg-gray-100 transition-none">
         {children}
       </main>
     );
   }
 
   return (
-    <div className="app-layout flex min-h-screen">
+    <div className="app-layout">
       <Sidebar />
-      <main className="main-content flex-1 min-h-[calc(100vh-48px)] bg-gray-100 overflow-auto">
+      <main
+        className={`main-content min-h-[calc(100vh-48px)] bg-gray-100 overflow-auto mt-12 transition-all duration-200 ${
+          isCollapsed ? 'ml-[60px]' : 'ml-[220px]'
+        }`}
+      >
         {children}
       </main>
 
       <style jsx>{`
         @media (max-width: 768px) {
-          .app-layout {
-            flex-direction: column;
-          }
           .main-content {
+            margin-left: 0 !important;
             min-height: calc(100vh - 48px);
           }
         }

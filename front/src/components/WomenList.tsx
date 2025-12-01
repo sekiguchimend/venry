@@ -32,12 +32,12 @@ const WomenList: React.FC<WomenListProps> = ({
       <div className="flex items-center justify-between py-4 px-4 border-b border-gray-100">
         {/* Left side - Action buttons */}
         <div className="flex items-center gap-3">
-          <button className="py-2 px-4 bg-green-500 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
+          <button className="py-2 px-4 bg-green-700 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
             <Plus size={16} />
             新規登録
           </button>
 
-          <button className="py-2 px-4 bg-green-500 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
+          <button className="py-2 px-4 bg-green-700 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
             <Plus size={16} />
             女性取り込み
           </button>

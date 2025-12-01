@@ -42,12 +42,12 @@ const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCol
     <Link
       href={href}
       className={`sidebar-menu-item flex items-center ${isCollapsed ? 'px-2.5 justify-center' : 'px-5 justify-start'} py-3 text-sm transition-all duration-150 ease-in-out no-underline ${
-        isActive ? 'text-blue-700 bg-blue-50 border-l-[3px] border-blue-700' : 'text-gray-700 bg-transparent border-l-[3px] border-transparent'
+        isActive ? 'active text-white bg-blue-600' : 'text-gray-700 bg-transparent'
       }`}
       onClick={onClick}
       title={isCollapsed ? label : undefined}
     >
-      <span className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? 'mr-0' : 'mr-3'} ${isActive ? 'text-blue-700' : 'text-gray-600'}`}>
+      <span className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? 'mr-0' : 'mr-3'} ${isActive ? 'text-white' : 'text-gray-600'}`}>
         {icon}
       </span>
       {!isCollapsed && (
@@ -57,8 +57,9 @@ const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCol
   );
 });
 
+const FIXED_MENU_ITEM = { href: '/support', IconComponent: HelpCircle, label: 'Mr.Venreyサポート' };
+
 const MENU_ITEMS = [
-  { href: '/support', IconComponent: HelpCircle, label: 'Mr.Venreyサポート' },
   { href: '/notices', IconComponent: MessageSquare, label: 'お知らせ' },
   { href: '/id-pass', IconComponent: Settings, label: 'ID・PASS登録' },
   { href: '/content-update', IconComponent: RefreshCw, label: 'コンテンツ更新' },
@@ -67,7 +68,7 @@ const MENU_ITEMS = [
   { href: '/immediate-update', IconComponent: RotateCcw, label: '即座・接客一括更新' },
   { href: '/photo-diary', IconComponent: ArrowRight, label: '写メ日記配信' },
   { href: '/girl-list', IconComponent: MessageCircle, label: '女性一覧' },
-  { href: '/standing', IconComponent: Users, label: '立ち替え' },
+  { href: '/sorting', IconComponent: Users, label: '並び替え' },
   { href: '/girl-status', IconComponent: ArrowUp, label: '女性登録状況一覧' },
   { href: '/auto-generation', IconComponent: UserPlus, label: 'AI自動生成' },
   { href: '/weekly-schedule', IconComponent: Cog, label: '週間スケジュール' },
@@ -118,67 +119,82 @@ const Sidebar: React.FC = () => {
       )}
 
       <aside
-        className={`sidebar hide-scrollbar flex flex-col min-h-screen bg-white border-r border-gray-200 overflow-y-auto transition-all duration-200 ease-in-out relative scrollbar-none ${
+        className={`sidebar flex flex-col h-[calc(100vh-48px)] bg-white border-r border-gray-200 transition-all duration-200 ease-in-out fixed top-12 left-0 z-40 ${
           isCollapsed ? 'w-[60px] min-w-[60px] max-w-[60px]' : 'w-[220px] min-w-[220px] max-w-[220px]'
         }`}
       >
-        {/* Top Section */}
-        <div className={`${isCollapsed ? 'p-2' : 'p-4'} border-b border-gray-200 bg-white transition-all duration-200`}>
-          {/* Toggle/Close Buttons */}
-          <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-3`}>
-            <div className="desktop-only">
-              <ChevronsLeft
-                size={20}
-                className={`text-gray-600 cursor-pointer transition-transform duration-200 ${
-                  isCollapsed ? 'rotate-180' : 'rotate-0'
-                }`}
-                onClick={toggleSidebar}
-              />
+        {/* Fixed Top Section */}
+        <div className="flex-shrink-0">
+          <div className={`${isCollapsed ? 'p-2' : 'p-4'} border-b border-gray-200 bg-white transition-all duration-200`}>
+            {/* Toggle/Close Buttons */}
+            <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-3`}>
+              <div className="desktop-only">
+                <ChevronsLeft
+                  size={20}
+                  className={`text-gray-600 cursor-pointer transition-transform duration-200 ${
+                    isCollapsed ? 'rotate-180' : 'rotate-0'
+                  }`}
+                  onClick={toggleSidebar}
+                />
+              </div>
+              <div className="mobile-only">
+                <X
+                  size={24}
+                  className="text-gray-600 cursor-pointer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                />
+              </div>
             </div>
-            <div className="mobile-only">
-              <X
-                size={24}
-                className="text-gray-600 cursor-pointer"
-                onClick={() => setIsMobileMenuOpen(false)}
-              />
-            </div>
-          </div>
 
-          {!isCollapsed && (
-            <>
-              {/* Hotel Selection */}
-              <div className="flex items-center cursor-pointer">
-                {/* Kyoto Icon */}
-                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center mr-3 text-white text-sm font-medium">
-                  京都
-                </div>
+            {!isCollapsed && (
+              <>
+                {/* Hotel Selection */}
+                <div className="flex items-center cursor-pointer">
+                  {/* Kyoto Icon */}
+                  <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center mr-3 text-white text-sm font-medium">
+                    京都
+                  </div>
 
-                {/* Hotel Name and Dropdown */}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-800 font-normal">
-                      京都ホテル協会邸...
-                    </span>
-                    <ChevronDown
-                      size={16}
-                      className="text-gray-600 ml-1"
-                    />
+                  {/* Hotel Name and Dropdown */}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-800 font-normal">
+                        京都ホテル協会邸...
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className="text-gray-600 ml-1"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {isCollapsed && (
-            <div className="flex justify-center mt-2">
-              <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-medium">
-                京
+            {isCollapsed && (
+              <div className="flex justify-center mt-2">
+                <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-medium">
+                  京
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+
+          {/* Fixed Menu Item - Mr.Venreyサポート */}
+          <div className="border-b border-gray-200">
+            <MenuItem
+              href={FIXED_MENU_ITEM.href}
+              icon={<FIXED_MENU_ITEM.IconComponent size={18} />}
+              label={FIXED_MENU_ITEM.label}
+              isActive={pathname === FIXED_MENU_ITEM.href}
+              isCollapsed={isCollapsed}
+              onClick={handleMenuItemClick}
+            />
+          </div>
         </div>
 
-        <nav className="flex-1 pt-2 pb-2">
+        {/* Scrollable Menu Section */}
+        <nav className="flex-1 overflow-y-auto pt-2 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {menuItems.map((item) => (
             <MenuItem
               key={item.href}

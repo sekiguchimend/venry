@@ -1,0 +1,140 @@
+{
+  "contentList": [
+    {
+      "id": "1",
+      "contentName": "HIME CHANNEL(店舗詳細)",
+      "timer": {
+        "nextTime": "21:35",
+        "date": "08月17日"
+      },
+      "timerIconColor": "#f44336",
+      "lastUpdated": {
+        "date": "08月17日",
+        "time": "20:35"
+      },
+      "category": {
+        "label": "その他",
+        "backgroundColor": "#fff3e0"
+      }
+    },
+    {
+      "id": "2",
+      "contentName": "求人情報サイト(トップページ)",
+      "timer": {
+        "nextTime": "22:00",
+        "date": "08月18日"
+      },
+      "timerIconColor": "#4caf50",
+      "lastUpdated": {
+        "date": "08月18日",
+        "time": "15:30"
+      },
+      "category": {
+        "label": "求人",
+        "backgroundColor": "#e3f2fd"
+      }
+    },
+    {
+      "id": "3",
+      "contentName": "キャンペーン告知(特設ページ)",
+      "timer": {
+        "nextTime": "09:00",
+        "date": "08月19日"
+      },
+      "timerIconColor": "#ff9800",
+      "lastUpdated": {
+        "date": "08月19日",
+        "time": "08:00"
+      },
+      "category": {
+        "label": "特集",
+        "backgroundColor": "#f3e5f5"
+      }
+    },
+    {
+      "id": "4",
+      "contentName": "イベント情報(月間スケジュール)",
+      "timer": {
+        "nextTime": "12:30",
+        "date": "08月20日"
+      },
+      "timerIconColor": "#2196f3",
+      "lastUpdated": {
+        "date": "08月20日",
+        "time": "11:00"
+      },
+      "category": {
+        "label": "イベント",
+        "backgroundColor": "#e8f5e9"
+      }
+    },
+    {
+      "id": "5",
+      "contentName": "新着ニュース(お知らせ)",
+      "timer": {
+        "nextTime": "14:00",
+        "date": "08月21日"
+      },
+      "timerIconColor": "#9c27b0",
+      "lastUpdated": {
+        "date": "08月21日",
+        "time": "10:30"
+      },
+      "category": {
+        "label": "お知らせ",
+        "backgroundColor": "#fce4ec"
+      }
+    },
+    {
+      "id": "6",
+      "contentName": "スタッフブログ(日記)",
+      "timer": {
+        "nextTime": "18:00",
+        "date": "08月22日"
+      },
+      "timerIconColor": "#00bcd4",
+      "lastUpdated": {
+        "date": "08月22日",
+        "time": "16:45"
+      },
+      "category": {
+        "label": "ブログ",
+        "backgroundColor": "#e0f7fa"
+      }
+    },
+    {
+      "id": "7",
+      "contentName": "割引クーポン(期間限定)",
+      "timer": {
+        "nextTime": "10:00",
+        "date": "08月23日"
+      },
+      "timerIconColor": "#ff5722",
+      "lastUpdated": {
+        "date": "08月23日",
+        "time": "09:00"
+      },
+      "category": {
+        "label": "クーポン",
+        "backgroundColor": "#ffebee"
+      }
+    },
+    {
+      "id": "8",
+      "contentName": "アクセスマップ(店舗案内)",
+      "timer": {
+        "nextTime": "15:30",
+        "date": "08月24日"
+      },
+      "timerIconColor": "#607d8b",
+      "lastUpdated": {
+        "date": "08月24日",
+        "time": "14:00"
+      },
+      "category": {
+        "label": "案内",
+        "backgroundColor": "#eceff1"
+      }
+    }
+  ]
+}

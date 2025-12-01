@@ -42,7 +42,7 @@ const SimpleUpdatePage: React.FC = () => {
     <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* New Post Button */}
       <div className="mb-4">
-        <button className="inline-flex items-center gap-1.5 py-2.5 px-4 md:px-5 bg-green-500 text-white border-none rounded-full text-xs md:text-sm font-medium cursor-pointer transition-colors hover:bg-green-600">
+        <button className="inline-flex items-center gap-1.5 py-2.5 px-4 md:px-5 bg-green-700 text-white border-none rounded-full text-xs md:text-sm font-medium cursor-pointer transition-colors hover:bg-green-800">
           <Plus size={16} className="md:w-[18px] md:h-[18px]" />
           新規投稿
         </button>

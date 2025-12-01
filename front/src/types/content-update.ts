@@ -22,7 +22,7 @@ export interface ContentItem {
   };
 }
 
-export type TabKey = 'content-list' | 'monthly-site' | 'female-recruitment' | 'male-recruitment';
+export type TabKey = 'content-list' | 'monthly-site' | 'female-recruitment' | 'male-recruitment' | 'group-create';
 
 export interface TabItem {
   key: TabKey;

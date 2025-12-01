@@ -14,10 +14,10 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, t
         <button
           key={tab.key}
           onClick={() => onTabChange(tab.key)}
-          className={`py-3 px-3 md:px-6 border-none cursor-pointer text-xs md:text-sm transition-all whitespace-nowrap ${
+          className={`py-4 px-4 md:px-6 border-0 bg-white cursor-pointer text-xs md:text-sm transition-all whitespace-nowrap flex-shrink-0 relative ${
             activeTab === tab.key
-              ? 'bg-white text-blue-700 border-b-2 border-b-blue-700 font-medium'
-              : 'bg-gray-50 text-gray-600 border-b-2 border-b-transparent font-normal hover:bg-gray-100'
+              ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
+              : 'text-gray-600 font-normal'
           }`}
         >
           {tab.label}

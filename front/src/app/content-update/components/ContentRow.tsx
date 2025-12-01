@@ -2,131 +2,134 @@
 
 import React from 'react';
 import { Edit, Clock } from 'lucide-react';
-import { ContentItem } from '../../../types/content-update';
 
 interface ContentRowProps {
-  item: ContentItem;
+  item: {
+    id: string;
+    contentName: string;
+    timer: {
+      nextTime: string;
+      date: string;
+    };
+    timerIconColor: string;
+    lastUpdated: {
+      date: string;
+      time: string;
+    };
+    category: {
+      label: string;
+      backgroundColor: string;
+    };
+  };
 }
 
 const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
   return (
     <div>
       {/* Desktop Layout */}
-      <div className="hidden md:grid grid-cols-[60px_100px_20px_1fr_140px_100px_60px_60px] py-2 px-4 border-b border-gray-100 min-h-[50px] items-center">
-        {/* Edit Button */}
-        <div>
-          <button
-            className={`flex items-center gap-0.5 py-0.5 px-1.5 border-none rounded text-xs font-medium cursor-pointer ${
-              item.editButton.type === 'primary'
-                ? 'bg-blue-700 text-white'
-                : 'bg-transparent text-blue-700'
-            }`}
-          >
-            <Edit size={10} />
-            {item.editButton.text}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: '50px 100px 1fr 100px 80px 50px auto 1fr',
+        padding: '8px 16px',
+        borderBottom: '1px solid #f0f0f0',
+        minHeight: '50px',
+        alignItems: 'center'
+      }}>
+        {/* 編集ボタン */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2px',
+            padding: '2px 6px',
+            backgroundColor: 'transparent',
+            color: '#3b82f6',
+            border: 'none',
+            borderRadius: '2px',
+            fontSize: '11px',
+            cursor: 'pointer',
+            fontWeight: 'normal'
+          }}>
+            <Edit size={11} />
+            編集
           </button>
         </div>
 
-        {/* Timer Section */}
-        <div>
-          <div className="text-xs text-gray-600 mb-px">次回</div>
-          <div className="text-sm font-bold text-gray-800 mb-px">
-            {item.timer.nextTime}
+        {/* タイマー */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Clock size={16} style={{ color: item.timerIconColor }} />
+          <div>
+            <div style={{ fontSize: '10px', color: '#666' }}>次回</div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#333' }}>{item.timer.nextTime}</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>({item.timer.date})</div>
           </div>
-          <div className="text-xs text-gray-600">({item.timer.date})</div>
         </div>
 
-        {/* Timer Icon */}
-        <div>
-          <Clock size={16} style={{ color: item.timerIcon.color }} />
-        </div>
-
-        {/* Content Name */}
-        <div className="text-sm text-gray-800 font-normal">
+        {/* コンテンツ名 */}
+        <div style={{ fontSize: '14px', color: '#333' }}>
           {item.contentName}
         </div>
 
-        {/* Last Updated */}
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-0.5 text-xs text-blue-700 underline cursor-pointer">
+        {/* 最終更新日 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <span style={{ fontSize: '12px', color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>
             {item.lastUpdated.date}{item.lastUpdated.time}
-            <Edit size={11} />
-          </div>
+          </span>
+          <Edit size={11} style={{ color: '#3b82f6' }} />
         </div>
 
-        {/* Category Tag */}
-        <div className="text-center">
-          <span
-            className="inline-block py-0.5 px-2 text-gray-600 text-xs rounded-lg font-medium"
-            style={{ backgroundColor: item.category.backgroundColor }}
-          >
+        {/* 種別 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{
+            padding: '2px 8px',
+            backgroundColor: item.category.backgroundColor,
+            borderRadius: '8px',
+            fontSize: '12px',
+            color: '#666'
+          }}>
             {item.category.label}
           </span>
         </div>
 
-        {/* Priority Edit Icon */}
-        <div className="text-center">
-          <Edit size={13} className="text-gray-600 cursor-pointer" />
+        {/* 上位 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Edit size={13} style={{ color: '#666', cursor: 'pointer' }} />
         </div>
 
-        {/* Memo Column (empty) */}
-        <div className="text-center">
-          {/* Empty */}
+        {/* メモ */}
+        <div style={{ display: 'flex', alignItems: 'center', marginLeft: '8px' }}>
+          {/* メモ内容 */}
         </div>
+
+        {/* 空きスペース */}
+        <div></div>
       </div>
 
       {/* Mobile Card Layout */}
       <div className="md:hidden p-4 border-b border-gray-100 bg-white">
-        <div className="flex items-start gap-3">
-          {/* Timer Icon and Info */}
+        <div className="flex items-center gap-3">
+          {/* タイマー */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <Clock size={16} style={{ color: item.timerIcon.color }} />
-            <div className="text-center">
-              <div className="text-xs text-gray-600">次回</div>
-              <div className="text-sm font-bold text-gray-800">
-                {item.timer.nextTime}
-              </div>
-              <div className="text-xs text-gray-600">
-                {item.timer.date}
-              </div>
+            <Clock size={16} style={{ color: item.timerIconColor }} />
+            <div>
+              <div className="text-xs text-gray-500">次回</div>
+              <div className="text-sm font-bold text-gray-800">{item.timer.nextTime}</div>
+              <div className="text-xs text-gray-500">({item.timer.date})</div>
             </div>
           </div>
 
           {/* Content Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between mb-2">
-              <div className="text-sm text-gray-800 font-normal flex-1 pr-2">
-                {item.contentName}
-              </div>
-              <button
-                className={`flex items-center gap-1 py-1 px-2 border-none rounded text-xs font-medium cursor-pointer flex-shrink-0 ${
-                  item.editButton.type === 'primary'
-                    ? 'bg-blue-700 text-white'
-                    : 'bg-transparent text-blue-700'
-                }`}
-              >
-                <Edit size={12} />
-                {item.editButton.text}
-              </button>
+            <div className="text-sm text-gray-800">
+              {item.contentName}
             </div>
-
-            {/* Bottom Row */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span
-                  className="inline-block py-1 px-2 text-gray-600 text-xs rounded-lg font-medium"
-                  style={{ backgroundColor: item.category.backgroundColor }}
-                >
-                  {item.category.label}
-                </span>
-                <div className="flex items-center gap-1 text-xs text-blue-700 underline cursor-pointer">
-                  {item.lastUpdated.date} {item.lastUpdated.time}
-                  <Edit size={10} />
-                </div>
-              </div>
-              <Edit size={14} className="text-gray-600 cursor-pointer" />
+            <div className="text-xs text-gray-500 mt-1">
+              {item.lastUpdated.date} {item.lastUpdated.time} | {item.category.label}
             </div>
           </div>
+
+          {/* メモ */}
+          <Edit size={14} className="text-gray-600 cursor-pointer flex-shrink-0" />
         </div>
       </div>
     </div>

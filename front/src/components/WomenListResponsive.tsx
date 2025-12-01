@@ -32,12 +32,12 @@ const WomenListResponsive: React.FC<WomenListProps> = ({
       <div className="header-section flex items-center justify-between py-4 px-4 border-b border-gray-100 flex-wrap gap-3">
         {/* Left side - Action buttons */}
         <div className="action-buttons flex items-center gap-3 flex-wrap">
-          <button className="btn-primary mobile-btn py-2 px-4 bg-green-500 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
+          <button className="btn-primary mobile-btn py-2 px-4 bg-green-700 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
             <Plus size={16} />
             <span className="btn-text">新規登録</span>
           </button>
 
-          <button className="btn-primary mobile-btn desktop-only py-2 px-4 bg-green-500 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
+          <button className="btn-primary mobile-btn desktop-only py-2 px-4 bg-green-700 border-none rounded-full text-sm text-white cursor-pointer flex items-center gap-1">
             <Plus size={16} />
             <span className="btn-text">女性取り込み</span>
           </button>
