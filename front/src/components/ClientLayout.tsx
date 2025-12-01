@@ -27,21 +27,12 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
     <div className="app-layout">
       <Sidebar />
       <main
-        className={`main-content min-h-[calc(100vh-48px)] bg-gray-100 overflow-auto mt-12 transition-all duration-200 ${
-          isCollapsed ? 'ml-[60px]' : 'ml-[220px]'
+        className={`min-h-[calc(100vh-48px)] bg-gray-100 overflow-auto mt-12 transition-all duration-200 max-md:ml-0 ${
+          isCollapsed ? 'md:ml-[60px]' : 'md:ml-[220px]'
         }`}
       >
         {children}
       </main>
-
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .main-content {
-            margin-left: 0 !important;
-            min-height: calc(100vh - 48px);
-          }
-        }
-      `}</style>
     </div>
   );
 };

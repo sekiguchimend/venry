@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useLayoutEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -81,7 +81,32 @@ const MENU_ITEMS = [
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
-  const { isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen } = useSidebar();
+  const { isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen, getScrollPosition, setScrollPosition } = useSidebar();
+  const navRef = useRef<HTMLElement>(null);
+
+  // スクロール位置を保存
+  useEffect(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+
+    const handleScroll = () => {
+      setScrollPosition(nav.scrollTop);
+    };
+
+    nav.addEventListener('scroll', handleScroll);
+    return () => nav.removeEventListener('scroll', handleScroll);
+  }, [setScrollPosition]);
+
+  // pathname変更後にスクロール位置を復元
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const savedPosition = getScrollPosition();
+    if (nav && savedPosition > 0) {
+      requestAnimationFrame(() => {
+        nav.scrollTop = savedPosition;
+      });
+    }
+  }, [pathname, getScrollPosition]);
 
   const menuItems = useMemo(
     () => MENU_ITEMS.map(item => ({
@@ -111,24 +136,26 @@ const Sidebar: React.FC = () => {
   return (
     <>
       {/* Mobile Menu Overlay */}
-      {isMobileMenuOpen && (
-        <div
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="mobile-overlay fixed top-0 left-0 right-0 bottom-0 bg-black/50 z-[998] hidden"
-        />
-      )}
+      <div
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={`fixed inset-0 bg-black/50 z-[998] md:hidden transition-opacity duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
 
       <aside
-        className={`sidebar flex flex-col h-[calc(100vh-48px)] bg-white border-r border-gray-200 transition-all duration-200 ease-in-out fixed top-12 left-0 z-40 ${
-          isCollapsed ? 'w-[60px] min-w-[60px] max-w-[60px]' : 'w-[220px] min-w-[220px] max-w-[220px]'
-        }`}
+        className={`sidebar flex flex-col bg-white border-r border-gray-200 fixed z-40 transition-all duration-200 ease-in-out
+          md:top-12 md:left-0 md:h-[calc(100vh-48px)] ${isCollapsed ? 'md:w-[60px]' : 'md:w-[220px]'}
+          max-md:top-0 max-md:h-screen max-md:w-[280px] max-md:z-[999] max-md:shadow-lg max-md:transition-[left] max-md:duration-300 ${
+            isMobileMenuOpen ? 'max-md:left-0' : 'max-md:-left-full'
+          }`}
       >
         {/* Fixed Top Section */}
         <div className="flex-shrink-0">
           <div className={`${isCollapsed ? 'p-2' : 'p-4'} border-b border-gray-200 bg-white transition-all duration-200`}>
             {/* Toggle/Close Buttons */}
             <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} mb-3`}>
-              <div className="desktop-only">
+              <div className="hidden md:block">
                 <ChevronsLeft
                   size={20}
                   className={`text-gray-600 cursor-pointer transition-transform duration-200 ${
@@ -137,7 +164,7 @@ const Sidebar: React.FC = () => {
                   onClick={toggleSidebar}
                 />
               </div>
-              <div className="mobile-only">
+              <div className="block md:hidden">
                 <X
                   size={24}
                   className="text-gray-600 cursor-pointer"
@@ -194,7 +221,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Scrollable Menu Section */}
-        <nav className="flex-1 overflow-y-auto pt-2 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <nav ref={navRef} className="flex-1 overflow-y-auto pt-2 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {menuItems.map((item) => (
             <MenuItem
               key={item.href}
@@ -218,39 +245,6 @@ const Sidebar: React.FC = () => {
           </div>
         )}
       </aside>
-
-      <style jsx>{`
-        .desktop-only {
-          display: block;
-        }
-        .mobile-only {
-          display: none;
-        }
-        .mobile-overlay {
-          display: none !important;
-        }
-
-        @media (max-width: 768px) {
-          .desktop-only {
-            display: none;
-          }
-          .mobile-only {
-            display: block;
-          }
-          .sidebar {
-            position: fixed !important;
-            left: ${isMobileMenuOpen ? '0' : '-100%'} !important;
-            top: 0;
-            z-index: 999;
-            transition: left 0.3s ease !important;
-            width: 280px !important;
-            box-shadow: ${isMobileMenuOpen ? '2px 0 10px rgba(0, 0, 0, 0.1)' : 'none'};
-          }
-          .mobile-overlay {
-            display: ${isMobileMenuOpen ? 'block' : 'none'} !important;
-          }
-        }
-      `}</style>
     </>
   );
 };

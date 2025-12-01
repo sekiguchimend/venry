@@ -1,12 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useRef, useCallback, ReactNode } from 'react';
 
 interface SidebarContextType {
   isCollapsed: boolean;
   toggleSidebar: () => void;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
+  getScrollPosition: () => number;
+  setScrollPosition: (position: number) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
@@ -26,13 +28,29 @@ interface SidebarProviderProps {
 export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const scrollPositionRef = useRef<number>(0);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+  const getScrollPosition = useCallback(() => {
+    return scrollPositionRef.current;
+  }, []);
+
+  const setScrollPosition = useCallback((position: number) => {
+    scrollPositionRef.current = position;
+  }, []);
+
   return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen }}>
+    <SidebarContext.Provider value={{
+      isCollapsed,
+      toggleSidebar,
+      isMobileMenuOpen,
+      setIsMobileMenuOpen,
+      getScrollPosition,
+      setScrollPosition
+    }}>
       {children}
     </SidebarContext.Provider>
   );

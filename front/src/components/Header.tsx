@@ -110,15 +110,6 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-          }
-        }
-      `}</style>
     </header>
   );
 };
