@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSidebar } from '@/contexts/SidebarContext';
@@ -21,11 +21,12 @@ import {
   Calendar,
   CheckSquare,
   Upload,
-  UserX,
-  Square,
+  UserPlus as UserPlusIcon,
+  Trash2,
   ChevronDown,
   ChevronsLeft,
-  X
+  X,
+  ListFilter
 } from 'lucide-react';
 
 interface MenuItemProps {
@@ -35,19 +36,23 @@ interface MenuItemProps {
   isActive?: boolean;
   isCollapsed?: boolean;
   onClick?: () => void;
+  iconColor?: string;
 }
 
-const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCollapsed, onClick }) => {
+const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCollapsed, onClick, iconColor }) => {
   return (
     <Link
       href={href}
       className={`sidebar-menu-item flex items-center ${isCollapsed ? 'px-2.5 justify-center' : 'px-5 justify-start'} py-3 text-sm transition-all duration-150 ease-in-out no-underline ${
-        isActive ? 'active text-white bg-blue-600' : 'text-gray-700 bg-transparent'
+        isActive ? 'active text-white bg-[#2196F3]' : 'text-gray-700 bg-transparent'
       }`}
       onClick={onClick}
       title={isCollapsed ? label : undefined}
     >
-      <span className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? 'mr-0' : 'mr-3'} ${isActive ? 'text-white' : 'text-gray-600'}`}>
+      <span
+        className={`w-5 h-5 flex items-center justify-center ${isCollapsed ? 'mr-0' : 'mr-3'}`}
+        style={{ color: isActive ? 'white' : (iconColor || '#666') }}
+      >
         {icon}
       </span>
       {!isCollapsed && (
@@ -59,7 +64,14 @@ const MenuItem = React.memo<MenuItemProps>(({ href, icon, label, isActive, isCol
 
 const FIXED_MENU_ITEM = { href: '/support', IconComponent: HelpCircle, label: 'Mr.Venreyサポート' };
 
-const MENU_ITEMS = [
+interface MenuItemConfig {
+  href: string;
+  IconComponent: React.ComponentType<{ size?: number }>;
+  label: string;
+  iconColor?: string;
+}
+
+const MENU_ITEMS: MenuItemConfig[] = [
   { href: '/notices', IconComponent: MessageSquare, label: 'お知らせ' },
   { href: '/id-pass', IconComponent: Settings, label: 'ID・PASS登録' },
   { href: '/content-update', IconComponent: RefreshCw, label: 'コンテンツ更新' },
@@ -75,14 +87,19 @@ const MENU_ITEMS = [
   { href: '/today-schedule', IconComponent: Calendar, label: '当日スケジュール' },
   { href: '/monthly-schedule', IconComponent: CheckSquare, label: '月間スケジュール' },
   { href: '/dispatch-info-update', IconComponent: Upload, label: '出勤情報をサイトへ更新' },
-  { href: '/girl-site-update', IconComponent: UserX, label: '女性をサイトへ更新' },
-  { href: '/girl-site-delete', IconComponent: Square, label: '女性をサイトから削除' },
+  { href: '/girl-site-update', IconComponent: UserPlusIcon, label: '女性をサイトへ更新', iconColor: '#EF5350' },
+  { href: '/girl-site-delete', IconComponent: Trash2, label: '女性をサイトから削除', iconColor: '#EF5350' },
+];
+
+const BOTTOM_MENU_ITEMS: MenuItemConfig[] = [
+  { href: '/settings', IconComponent: Settings, label: '設定' },
 ];
 
 const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const { isCollapsed, toggleSidebar, isMobileMenuOpen, setIsMobileMenuOpen, getScrollPosition, setScrollPosition } = useSidebar();
   const navRef = useRef<HTMLElement>(null);
+  const [isUpdateResultOpen, setIsUpdateResultOpen] = useState(false);
 
   // スクロール位置を保存
   useEffect(() => {
@@ -111,7 +128,8 @@ const Sidebar: React.FC = () => {
   const menuItems = useMemo(
     () => MENU_ITEMS.map(item => ({
       ...item,
-      icon: <item.IconComponent size={18} />
+      icon: <item.IconComponent size={18} />,
+      iconColor: item.iconColor
     })),
     []
   );
@@ -221,7 +239,7 @@ const Sidebar: React.FC = () => {
         </div>
 
         {/* Scrollable Menu Section */}
-        <nav ref={navRef} className="flex-1 overflow-y-auto pt-2 pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <nav ref={navRef} className="flex-1 overflow-y-auto pt-2 pb-2 sidebar-nav">
           {menuItems.map((item) => (
             <MenuItem
               key={item.href}
@@ -231,19 +249,122 @@ const Sidebar: React.FC = () => {
               isActive={pathname === item.href}
               isCollapsed={isCollapsed}
               onClick={handleMenuItemClick}
+              iconColor={item.iconColor}
+            />
+          ))}
+
+          {/* 更新結果 - Expandable Section */}
+          <div className="mt-2">
+            <button
+              onClick={() => setIsUpdateResultOpen(!isUpdateResultOpen)}
+              className={`sidebar-menu-item w-full flex items-center ${isCollapsed ? 'px-2.5 justify-center' : 'px-5 justify-between'} py-3 text-sm transition-all duration-150 ease-in-out border-none cursor-pointer ${
+                isUpdateResultOpen ? 'bg-[#E3F2FD] text-[#1976D2]' : 'bg-transparent text-gray-700 hover:bg-gray-100'
+              }`}
+              title={isCollapsed ? '更新結果' : undefined}
+            >
+              <div className="flex items-center">
+                <span className={`w-5 h-5 flex items-center justify-center ${isUpdateResultOpen ? 'text-[#1976D2]' : 'text-gray-600'}`} style={{ marginRight: isCollapsed ? 0 : '12px' }}>
+                  <ListFilter size={18} />
+                </span>
+                {!isCollapsed && (
+                  <span className="flex items-center">
+                    更新結果
+                    <span className="text-[#EF5350] font-bold ml-1">！</span>
+                  </span>
+                )}
+              </div>
+              {!isCollapsed && (
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform duration-200 ${isUpdateResultOpen ? 'rotate-180 text-[#1976D2]' : 'text-gray-500'}`}
+                />
+              )}
+            </button>
+            {isUpdateResultOpen && !isCollapsed && (
+              <div className="bg-white">
+                <Link
+                  href="/update-result/content"
+                  className="flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+                  onClick={handleMenuItemClick}
+                >
+                  <div className="flex items-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500 mr-3">
+                      <ListFilter size={16} />
+                    </span>
+                    コンテンツ更新結果
+                  </div>
+                </Link>
+                <Link
+                  href="/update-result/dispatch"
+                  className="flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+                  onClick={handleMenuItemClick}
+                >
+                  <div className="flex items-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500 mr-3">
+                      <ListFilter size={16} />
+                    </span>
+                    出勤更新結果
+                  </div>
+                  <span className="text-[#EF5350] font-bold">！</span>
+                </Link>
+                <Link
+                  href="/update-result/girls"
+                  className="flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+                  onClick={handleMenuItemClick}
+                >
+                  <div className="flex items-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500 mr-3">
+                      <ListFilter size={16} />
+                    </span>
+                    女性更新結果
+                  </div>
+                  <span className="text-[#EF5350] font-bold">！</span>
+                </Link>
+                <Link
+                  href="/update-result/delete"
+                  className="flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+                  onClick={handleMenuItemClick}
+                >
+                  <div className="flex items-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500 mr-3">
+                      <ListFilter size={16} />
+                    </span>
+                    削除更新結果
+                  </div>
+                </Link>
+                <Link
+                  href="/update-result/sort"
+                  className="flex items-center justify-between px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 no-underline"
+                  onClick={handleMenuItemClick}
+                >
+                  <div className="flex items-center">
+                    <span className="w-5 h-5 flex items-center justify-center text-gray-500 mr-3">
+                      <ListFilter size={16} />
+                    </span>
+                    並び替え更新結果
+                  </div>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="my-2 border-t border-gray-200" />
+
+          {/* Bottom Menu Items */}
+          {BOTTOM_MENU_ITEMS.map((item) => (
+            <MenuItem
+              key={item.href}
+              href={item.href}
+              icon={<item.IconComponent size={18} />}
+              label={item.label}
+              isActive={pathname === item.href}
+              isCollapsed={isCollapsed}
+              onClick={handleMenuItemClick}
+              iconColor={item.iconColor}
             />
           ))}
         </nav>
-
-        {/* Footer Section */}
-        {!isCollapsed && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
-            <div className="text-[11px] text-gray-400 text-center leading-tight">
-              <p className="m-0">© 2024 Mr.Venrey</p>
-              <p className="mt-1 mb-0">Version 1.0.0</p>
-            </div>
-          </div>
-        )}
       </aside>
     </>
   );

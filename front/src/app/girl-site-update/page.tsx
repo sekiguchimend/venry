@@ -161,7 +161,7 @@ const GirlSiteUpdatePage: React.FC = () => {
               </div>
 
               {/* Girls List */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto card-scroll">
                 {girlsData.map((girl) => (
                   <div
                     key={girl.id}
@@ -233,7 +233,7 @@ const GirlSiteUpdatePage: React.FC = () => {
               </div>
 
               {/* Sites List */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto card-scroll">
                 {sitesData.map((site) => (
                   <div
                     key={site.id}
