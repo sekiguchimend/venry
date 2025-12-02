@@ -13,11 +13,12 @@ const ClientLayout: React.FC<ClientLayoutProps> = ({ children }) => {
   const pathname = usePathname();
   const { isCollapsed } = useSidebar();
 
-  const isLoginPage = pathname === '/login';
+  // ログイン/サインアップページではヘッダーとサイドバーを非表示
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
 
-  if (isLoginPage) {
+  if (isAuthPage) {
     return (
-      <main className="mt-12 ml-0 min-h-[calc(100vh-48px)] bg-gray-100 transition-none">
+      <main className="min-h-screen bg-gray-100 transition-none">
         {children}
       </main>
     );

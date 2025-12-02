@@ -2,13 +2,27 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Phone, HelpCircle, Bell, Menu } from 'lucide-react';
+import { Phone, HelpCircle, Bell, Menu, LogOut } from 'lucide-react';
 import { useUserStore } from '@/stores/userStore';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { signOut } from '@/lib/supabase/auth';
+import { useRouter } from 'next/navigation';
 
 const Header: React.FC = () => {
   const { userInfo } = useUserStore();
   const { setIsMobileMenuOpen } = useSidebar();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <header className="header fixed top-0 left-0 right-0 w-full h-12 bg-white border-b border-gray-300 z-50">
@@ -85,15 +99,28 @@ const Header: React.FC = () => {
             <span className="underline">{userInfo.phoneNumber}</span>
           </a>
 
-          {/* User ID */}
-          <div className="text-sm text-gray-600">
-            ID: {userInfo.id}
-          </div>
+          {/* User Email */}
+          {user && (
+            <div className="text-sm text-gray-600">
+              {user.email}
+            </div>
+          )}
 
           {/* Alert/Notification Icon */}
           <button className="border-0 bg-transparent cursor-pointer p-0 text-orange-500">
             <Bell className="w-5 h-5" fill="currentColor" />
           </button>
+
+          {/* Logout Button */}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="flex items-center border-0 bg-transparent cursor-pointer p-0 text-gray-600 hover:text-gray-800"
+              title="ログアウト"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Mobile Navigation - Simplified */}

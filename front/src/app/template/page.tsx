@@ -1,11 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2, X } from 'lucide-react';
 
 const TemplatePage: React.FC = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('template-list');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedLabel, setSelectedLabel] = useState('');
+  const [selectedGirl, setSelectedGirl] = useState('');
+
+  const labels = ['新着', 'イベント', '割引', '新人', '出勤', '待機', '写メ', 'その他'];
 
   const templates = [
     {
@@ -13,7 +20,8 @@ const TemplatePage: React.FC = () => {
       image: '/images/template1.png',
       name: '5月くじイベント',
       hasWoman: false,
-      hasNotice: false,
+      label: 'イベント',
+      settingCount: 7,
       hasMemo: false
     },
     {
@@ -21,7 +29,8 @@ const TemplatePage: React.FC = () => {
       image: '/images/template2.png',
       name: '【SUPER RALLY】※使用不可！使用時は要確集！',
       hasWoman: false,
-      hasNotice: false,
+      label: 'イベント',
+      settingCount: 8,
       hasMemo: false
     },
     {
@@ -29,7 +38,8 @@ const TemplatePage: React.FC = () => {
       image: '/images/template3.png',
       name: 'スーパータイム割！※使用不可！使用時は要確集！',
       hasWoman: false,
-      hasNotice: false,
+      label: '割引',
+      settingCount: 7,
       hasMemo: false
     }
   ];
@@ -38,7 +48,10 @@ const TemplatePage: React.FC = () => {
     <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* Header Button Section */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-5 gap-3">
-        <button className="py-2 px-3 md:px-4 bg-green-700 border-none rounded-full text-xs md:text-sm text-white cursor-pointer flex items-center gap-1 transition-colors hover:bg-green-800 self-start">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="py-2 px-3 md:px-4 bg-green-700 border-none rounded-full text-xs md:text-sm text-white cursor-pointer flex items-center gap-1 transition-colors hover:bg-green-800 self-start"
+        >
           <Plus size={14} className="md:w-4 md:h-4" />
           新規登録
         </button>
@@ -124,7 +137,7 @@ const TemplatePage: React.FC = () => {
         </div>
 
         {/* Table Header - Hidden on mobile */}
-        <div className="hidden md:grid py-3 px-4 bg-gray-50 border-b border-gray-200 text-xs font-normal text-gray-600 items-center" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 100px 1fr' }}>
+        <div className="hidden md:grid py-3 px-4 bg-gray-50 border-b border-gray-200 text-xs font-normal text-gray-600 items-center" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
           <div></div>
           <div className="text-center">No.</div>
           <div className="text-center">画像</div>
@@ -137,6 +150,10 @@ const TemplatePage: React.FC = () => {
             <span>ラベル</span>
             <HelpCircle size={14} className="text-blue-500" />
           </div>
+          <div className="flex items-center justify-center gap-1">
+            <span>設定数</span>
+            <HelpCircle size={14} className="text-blue-500" />
+          </div>
           <div className="flex items-center justify-center">メモ</div>
           <div></div>
         </div>
@@ -145,10 +162,13 @@ const TemplatePage: React.FC = () => {
         {templates.map((template) => (
           <div key={template.no}>
             {/* Desktop Layout */}
-            <div className="hidden md:grid py-2 px-4 border-b border-gray-100 items-center min-h-[60px]" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 100px 1fr' }}>
+            <div className="hidden md:grid py-2 px-4 border-b border-gray-100 items-center min-h-[60px]" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
               {/* Edit Button */}
               <div className="flex items-center justify-center">
-                <button className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal">
+                <button
+                  onClick={() => router.push('/template/edit')}
+                  className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal"
+                >
                   <Edit size={11} />
                   編集
                 </button>
@@ -192,11 +212,16 @@ const TemplatePage: React.FC = () => {
 
               {/* Label Column */}
               <div className="flex items-center justify-center">
-                {template.no === 1 && (
-                  <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-[11px] text-gray-600 cursor-pointer">
-                    イベント
-                  </button>
+                {template.label && (
+                  <span className="py-0.5 px-2 bg-transparent border border-green-500 rounded-sm text-[11px] text-green-600">
+                    {template.label}
+                  </span>
                 )}
+              </div>
+
+              {/* Setting Count Column */}
+              <div className="flex items-center justify-center text-[13px] text-blue-600 underline cursor-pointer">
+                {template.settingCount}
               </div>
 
               {/* Memo Column */}
@@ -238,7 +263,10 @@ const TemplatePage: React.FC = () => {
                     <div className="text-sm text-gray-800 font-normal">
                       {template.name}
                     </div>
-                    <button className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2">
+                    <button
+                      onClick={() => router.push('/template/edit')}
+                      className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2"
+                    >
                       <Edit size={12} />
                       編集
                     </button>
@@ -256,6 +284,85 @@ const TemplatePage: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Template Settings Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-[600px] max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-lg font-medium text-[#323232]">テンプレート設定</h2>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={20} className="text-gray-600" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              {/* Label Selection */}
+              <div className="mb-6">
+                <h3 className="text-base font-medium text-[#323232] mb-4">ラベルを選択してください</h3>
+                <div className="grid grid-cols-4 gap-3 mb-4">
+                  {labels.map((label) => (
+                    <label key={label} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="label"
+                        value={label}
+                        checked={selectedLabel === label}
+                        onChange={(e) => setSelectedLabel(e.target.value)}
+                        className="w-4 h-4 accent-[#323232]"
+                      />
+                      <span className="text-sm text-[#323232]">{label}</span>
+                    </label>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  テンプレートにラベルを付与します。管理する際の目安としてご活用ください。<br />
+                  設定したラベルは後から変更可能です。
+                </p>
+              </div>
+
+              {/* Girl Selection */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-base font-medium text-[#323232]">情報を連動させる女性を選択してください</h3>
+                  <span className="px-2 py-0.5 bg-white border border-orange-400 text-orange-400 text-xs rounded">任意</span>
+                </div>
+                <select
+                  value={selectedGirl}
+                  onChange={(e) => setSelectedGirl(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded text-sm text-[#323232] bg-white outline-none focus:border-gray-400"
+                >
+                  <option value="">未選択</option>
+                  <option value="girl1">女性1</option>
+                  <option value="girl2">女性2</option>
+                  <option value="girl3">女性3</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-center gap-3 p-4 border-t border-gray-200">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-8 py-2 border border-gray-300 rounded text-sm text-[#323232] bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                className="px-8 py-2 border-none rounded text-sm text-white bg-gray-400 cursor-not-allowed"
+                disabled
+              >
+                決定
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

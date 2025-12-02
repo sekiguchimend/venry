@@ -2,98 +2,149 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserStore } from '@/stores/userStore';
+import { signIn } from '@/lib/supabase/auth';
+import Link from 'next/link';
 
 const LoginPage: React.FC = () => {
-  const [companyName] = useState('京都ホテル協会邸 様');
-  const { login } = useUserStore();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = () => {
-    login({
-      id: '4910',
-      companyName: companyName,
-      phoneNumber: '06-6526-7766',
-    });
-    router.push('/');
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      await signIn({ email, password });
+      router.push('/');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('ログインに失敗しました');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-full flex items-center justify-center py-8 md:py-15 px-4 md:px-5">
+    <div className="min-h-screen flex items-center justify-center bg-gray-200 py-8 px-4">
       {/* Login Card */}
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-sm md:w-80 p-0">
-        {/* Top Section with Logo and Title */}
-        <div className="bg-gradient-to-br from-gray-100 to-gray-300 py-8 px-8 pb-6 rounded-t-lg text-center">
-          {/* Logo */}
-          <div className="mb-4">
-            <svg
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-16 h-16 mx-auto"
-            >
-              {/* Diamond shape logo */}
-              <path
-                d="M32 8L16 24L32 40L48 24L32 8Z"
-                fill="#0099cc"
-              />
-              <path
-                d="M32 24L24 32L32 40L40 32L32 24Z"
-                fill="#006699"
-              />
-            </svg>
-          </div>
-
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+        {/* Top Section with Title */}
+        <div className="bg-gradient-to-br from-gray-100 to-gray-300 py-12 px-8 text-center">
           {/* Title */}
-          <h1 className="text-lg font-medium text-gray-800 m-0 tracking-wide">
+          <h1 className="text-lg font-bold text-gray-800 tracking-wide">
             ログイン
           </h1>
         </div>
 
         {/* Bottom Section with Form */}
-        <div className="py-6 px-8 pb-8">
-          {/* Company Group Label */}
-          <div className="text-center text-xs text-gray-600 mb-4 flex items-center justify-center">
-            <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mr-1.5"></span>
-            DCグループ 様
-          </div>
+        <div className="py-8 px-8">
+          <form onSubmit={handleLogin}>
+            {/* ID Field */}
+            <div className="mb-6">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
+                ID
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="IDを入力"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
+            </div>
 
-          {/* Company Name */}
-          <div className="text-center text-lg font-semibold text-gray-800 mb-8 leading-snug">
-            {companyName}
-          </div>
+            {/* Password Field */}
+            <div className="mb-8">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2">
+                パスワード
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="パスワードを入力"
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none"
+                  style={{ color: '#1E88E5' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#1976D2')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#1E88E5')}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    {showPassword ? (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                      />
+                    ) : (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                      />
+                    )}
+                    {!showPassword && (
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
 
-          {/* Login Button */}
-          <button
-            onClick={handleLogin}
-            className="w-full bg-blue-700 text-white border-none rounded-3xl py-3 px-6 text-base font-medium cursor-pointer mb-4 transition-colors hover:bg-blue-800"
-          >
-            ログイン
-          </button>
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full text-white border-none rounded-full py-3.5 px-6 text-base font-medium cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: loading ? undefined : '#1E88E5' }}
+              onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1976D2')}
+              onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#1E88E5')}
+            >
+              {loading ? 'ログイン中...' : 'ログイン'}
+            </button>
+          </form>
 
           {/* New Account Link */}
-          <div className="text-center">
-            <a href="#" className="text-sm text-gray-600 underline">
-              新規アカウントでログイン
-            </a>
+          <div className="text-center mt-6">
+            <Link href="/signup" className="text-sm text-gray-600 hover:text-gray-800 underline">
+              新規アカウントで登録
+            </Link>
           </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-transparent p-3 md:p-5 text-center">
-        <div className="mb-2 flex flex-wrap justify-center items-center gap-1 md:gap-2">
-          {['運営会社', '利用規約', 'プライバシーポリシー', 'オフィシャルサイト'].map((link, index) => (
-            <span key={link} className="flex items-center">
-              <a href="#" className="text-xs text-gray-600 underline">
-                {link}
-              </a>
-              {index < 3 && <span className="text-gray-400 mx-1 hidden md:inline">|</span>}
-            </span>
-          ))}
-        </div>
-        <div className="text-xs text-gray-500">
-          © 2024 Mr.Venrey. All rights reserved.
         </div>
       </div>
     </div>
