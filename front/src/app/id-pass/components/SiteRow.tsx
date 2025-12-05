@@ -8,17 +8,20 @@ import IdPassModal from './IdPassModal';
 interface SiteRowProps {
   site: Site;
   isRegistered: boolean;
-  onRegister: (siteId: number) => void;
-  onUnregister: (siteId: number) => void;
+  onRegister: (siteId: string, loginId: string) => void;
+  onUnregister: (siteId: string) => void;
   activeTab: TabKey;
+  initialLoginId?: string;
+  initialPassword?: string;
+  initialFlowCodes?: string[];
 }
 
-const SiteRow: React.FC<SiteRowProps> = ({ site, isRegistered, onRegister, onUnregister, activeTab }) => {
+const SiteRow: React.FC<SiteRowProps> = ({ site, isRegistered, onRegister, onUnregister, activeTab, initialLoginId, initialPassword, initialFlowCodes }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const actionLabels = ['有', '無', '次', '女', '出'];
 
-  const handleSave = () => {
-    onRegister(site.id);
+  const handleSave = (loginId: string) => {
+    onRegister(site.id, loginId);
     setIsModalOpen(false);
   };
 
@@ -159,10 +162,15 @@ const SiteRow: React.FC<SiteRowProps> = ({ site, isRegistered, onRegister, onUnr
       <IdPassModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        siteId={site.id}
         siteName={site.name}
+        siteAutomationId={site.automationId}
         onSave={handleSave}
         onUnregister={handleUnregister}
         isRegistered={isRegistered}
+        initialLoginId={initialLoginId}
+        initialPassword={initialPassword}
+        initialFlowCodes={initialFlowCodes}
       />
     </div>
   );

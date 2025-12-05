@@ -11,7 +11,7 @@ import (
 // CORSMiddleware はCORSを設定するミドルウェア
 func CORSMiddleware() *cors.Cors {
 	allowedOrigins := []string{"http://localhost:3000"}
-	
+
 	// 環境変数から許可するオリジンを取得
 	if origins := os.Getenv("ALLOWED_ORIGINS"); origins != "" {
 		allowedOrigins = strings.Split(origins, ",")
@@ -40,4 +40,3 @@ func CORSMiddleware() *cors.Cors {
 		MaxAge:           300,
 	})
 }
-

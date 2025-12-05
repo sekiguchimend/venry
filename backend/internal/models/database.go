@@ -1,47 +1,103 @@
 package models
 
 import (
-	"database/sql"
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"log"
+	"io"
+	"net/http"
 	"os"
-
-	_ "github.com/lib/pq"
 )
 
-var DB *sql.DB
+var (
+	supabaseURL string
+	supabaseKey string
+	httpClient  *http.Client
+)
 
-// InitDB はデータベース接続を初期化
+// InitDB はSupabase REST APIクライアントを初期化
 func InitDB() error {
-	databaseURL := os.Getenv("DATABASE_URL")
-	if databaseURL == "" {
-		return fmt.Errorf("DATABASE_URL environment variable not set")
+	supabaseURL = os.Getenv("SUPABASE_URL")
+	if supabaseURL == "" {
+		return fmt.Errorf("SUPABASE_URL environment variable not set")
 	}
 
-	var err error
-	DB, err = sql.Open("postgres", databaseURL)
-	if err != nil {
-		return fmt.Errorf("failed to open database: %w", err)
+	supabaseKey = os.Getenv("SUPABASE_ANON_KEY")
+	if supabaseKey == "" {
+		return fmt.Errorf("SUPABASE_ANON_KEY environment variable not set")
 	}
 
-	// 接続確認
-	if err = DB.Ping(); err != nil {
-		return fmt.Errorf("failed to ping database: %w", err)
-	}
-
-	// コネクションプール設定
-	DB.SetMaxOpenConns(25)
-	DB.SetMaxIdleConns(5)
-
-	log.Println("Database connection established")
+	httpClient = &http.Client{}
 	return nil
 }
 
-// CloseDB はデータベース接続をクローズ
+// CloseDB はクリーンアップ
 func CloseDB() error {
-	if DB != nil {
-		return DB.Close()
-	}
 	return nil
 }
 
+// SupabaseRequest はSupabase REST APIにリクエストを送信（ユーザートークン必須）
+func SupabaseRequest(method, endpoint string, body interface{}, result interface{}, userToken string) error {
+	var reqBody io.Reader
+	if body != nil {
+		jsonData, err := json.Marshal(body)
+		if err != nil {
+			return fmt.Errorf("failed to marshal request body: %w", err)
+		}
+		reqBody = bytes.NewBuffer(jsonData)
+	}
+
+	url := fmt.Sprintf("%s/rest/v1/%s", supabaseURL, endpoint)
+	req, err := http.NewRequest(method, url, reqBody)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("apikey", supabaseKey)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", userToken))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Prefer", "return=representation")
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("API error (status %d): %s", resp.StatusCode, string(respBody))
+	}
+
+	if result != nil && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, result); err != nil {
+			return fmt.Errorf("failed to unmarshal response: %w", err)
+		}
+	}
+
+	return nil
+}
+
+// SupabaseGet はGETリクエストを送信
+func SupabaseGet(endpoint string, result interface{}, userToken string) error {
+	return SupabaseRequest(http.MethodGet, endpoint, nil, result, userToken)
+}
+
+// SupabasePost はPOSTリクエストを送信
+func SupabasePost(endpoint string, body interface{}, result interface{}, userToken string) error {
+	return SupabaseRequest(http.MethodPost, endpoint, body, result, userToken)
+}
+
+// SupabasePatch はPATCHリクエストを送信
+func SupabasePatch(endpoint string, body interface{}, result interface{}, userToken string) error {
+	return SupabaseRequest(http.MethodPatch, endpoint, body, result, userToken)
+}
+
+// SupabaseDelete はDELETEリクエストを送信
+func SupabaseDelete(endpoint string, userToken string) error {
+	return SupabaseRequest(http.MethodDelete, endpoint, nil, nil, userToken)
+}

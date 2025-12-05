@@ -1,8 +1,17 @@
+export interface SiteFlow {
+  code: string;
+  name: string;
+  description?: string;
+  isPaid?: boolean;
+}
+
 export interface Site {
-  id: number;
+  id: string;
   name: string;
   status: 'active' | 'inactive';
   hasIssues?: boolean;
+  automationId: string;
+  flows: SiteFlow[];
 }
 
 export type TabKey = 'all' | 'registered' | 'unregistered';

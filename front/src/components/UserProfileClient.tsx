@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getAPIClient } from '@/lib/api/client';
+import { getUserProfile } from '@/lib/api/actions';
 import { UserResponse } from '@/lib/api/types';
 
-// クライアントコンポーネントの使用例
 export default function UserProfileClient() {
   const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -12,14 +11,13 @@ export default function UserProfileClient() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const userData = await getAPIClient<UserResponse>('/api/user/me');
-        setUser(userData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setLoading(false);
+      const result = await getUserProfile();
+      if (result.success && result.data) {
+        setUser(result.data);
+      } else {
+        setError(result.error || 'Unknown error');
       }
+      setLoading(false);
     };
 
     fetchUser();
@@ -77,4 +75,3 @@ export default function UserProfileClient() {
     </div>
   );
 }
-

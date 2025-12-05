@@ -1,12 +1,10 @@
-import { requireAuth } from '@/lib/auth/server';
 import { getAPI } from '@/lib/api/server';
 import { UserResponse, Site } from '@/lib/api/types';
 import Link from 'next/link';
 
 // サーバーコンポーネント（デフォルト）
+// ミドルウェアで認証チェックを行うため、ここでは不要
 export default async function ApiExamplePage() {
-  // 認証チェック
-  await requireAuth();
 
   let user: UserResponse | null = null;
   let sites: Site[] = [];

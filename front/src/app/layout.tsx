@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import { AuthProvider } from "@/contexts/AuthContext";
 import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geistSans = Geist({
@@ -31,13 +30,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ margin: 0, padding: 0 }}
       >
-        <AuthProvider>
-          <SidebarProvider>
-            <ConditionalLayout>
-              {children}
-            </ConditionalLayout>
-          </SidebarProvider>
-        </AuthProvider>
+        <SidebarProvider>
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
+        </SidebarProvider>
       </body>
     </html>
   );

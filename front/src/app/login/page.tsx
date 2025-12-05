@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signIn } from '@/lib/supabase/auth';
+import { login } from '@/lib/api/auth';
 import Link from 'next/link';
 
 const LoginPage: React.FC = () => {
@@ -18,18 +18,15 @@ const LoginPage: React.FC = () => {
     setError('');
     setLoading(true);
 
-    try {
-      await signIn({ email, password });
-      router.push('/');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('ログインに失敗しました');
-      }
-    } finally {
-      setLoading(false);
+    const result = await login(email, password);
+
+    if (result.success) {
+      router.push('/notices');
+    } else {
+      setError(result.error || 'ログインに失敗しました');
     }
+
+    setLoading(false);
   };
 
   return (

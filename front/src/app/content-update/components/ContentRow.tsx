@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Edit, Clock } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ContentRowProps {
   item: {
@@ -24,6 +25,12 @@ interface ContentRowProps {
 }
 
 const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
+  const router = useRouter();
+
+  const handleEdit = () => {
+    router.push(`/content-update/edit?id=${item.id}`);
+  };
+
   return (
     <div>
       {/* Desktop Layout */}
@@ -37,7 +44,9 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
       }}>
         {/* 編集ボタン */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <button style={{
+          <button
+            onClick={handleEdit}
+            style={{
             display: 'flex',
             alignItems: 'center',
             gap: '2px',
@@ -129,7 +138,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
           </div>
 
           {/* メモ */}
-          <Edit size={14} className="text-gray-600 cursor-pointer flex-shrink-0" />
+          <Edit size={14} className="text-gray-600 cursor-pointer flex-shrink-0" onClick={handleEdit} />
         </div>
       </div>
     </div>

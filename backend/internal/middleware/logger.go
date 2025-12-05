@@ -45,4 +45,3 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 		)
 	})
 }
-

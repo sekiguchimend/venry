@@ -34,11 +34,19 @@ func main() {
 	// ヘルスチェック（認証不要）
 	mux.HandleFunc("/health", handlers.HealthCheck)
 
+	// 認証エンドポイント（認証不要）
+	mux.HandleFunc("/api/auth/signup", handlers.SignUp)
+	mux.HandleFunc("/api/auth/login", handlers.Login)
+	mux.HandleFunc("/api/auth/logout", handlers.Logout)
+	mux.HandleFunc("/api/auth/refresh", handlers.RefreshToken)
+
 	// 認証が必要なエンドポイント
 	mux.Handle("/api/user/me", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetCurrentUser)))
 	mux.Handle("/api/user/profile", middleware.AuthMiddleware(http.HandlerFunc(handlers.UpdateUserProfile)))
 	mux.Handle("/api/sites", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetSites)))
 	mux.Handle("/api/credentials", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetCompanyCredentials)))
+	mux.Handle("/api/credentials/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveCredential)))
+	mux.Handle("/api/credentials/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteCredential)))
 
 	// ミドルウェアチェーン
 	handler := middleware.LoggerMiddleware(corsMiddleware.Handler(mux))

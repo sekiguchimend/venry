@@ -1,51 +1,134 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useTransition, useEffect, useMemo } from 'react';
+import { saveCredential, deleteCredential } from '../actions/credentials';
+import { getSiteByAutomationId } from '../utils/siteData';
+import { SiteFlow } from '@/types/id-pass';
 
 interface IdPassModalProps {
   isOpen: boolean;
   onClose: () => void;
+  siteId: string;
   siteName: string;
-  onSave: () => void;
+  siteAutomationId?: string;
+  onSave: (loginId: string) => void;
   onUnregister: () => void;
   isRegistered: boolean;
+  initialLoginId?: string;
+  initialPassword?: string;
+  initialFlowCodes?: string[];
 }
 
-interface ContentItem {
-  id: number;
-  name: string;
+interface FlowItem extends SiteFlow {
   checked: boolean;
-  hasLink?: boolean;
 }
 
-const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, onSave, onUnregister, isRegistered }) => {
-  const [id, setId] = useState('himechannel7+S2154@gmail.com');
-  const [password, setPassword] = useState('dcphoteheru');
-  const [contents, setContents] = useState<ContentItem[]>([
-    { id: 1, name: `${siteName}(店舗投稿)`, checked: true, hasLink: true },
-    { id: 2, name: `${siteName}(クーポン)`, checked: true },
-    { id: 3, name: `${siteName}(今すぐ遊べる)【一括更新専用】`, checked: true },
-  ]);
+const IdPassModal: React.FC<IdPassModalProps> = ({
+  isOpen,
+  onClose,
+  siteId,
+  siteName,
+  siteAutomationId = '',
+  onSave,
+  onUnregister,
+  isRegistered,
+  initialLoginId = '',
+  initialPassword = '',
+  initialFlowCodes = [],
+}) => {
+  const [id, setId] = useState(initialLoginId);
+  const [password, setPassword] = useState(initialPassword);
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [flows, setFlows] = useState<FlowItem[]>([]);
   const [allChecked, setAllChecked] = useState(true);
+
+  // initialFlowCodesを文字列化して比較用にメモ化
+  const initialFlowCodesKey = useMemo(
+    () => JSON.stringify(initialFlowCodes),
+    [initialFlowCodes]
+  );
+
+  // モーダルが開くたびに初期値を更新
+  useEffect(() => {
+    if (isOpen) {
+      setId(initialLoginId);
+      setPassword(initialPassword);
+      setError(null);
+
+      // サイトのautomation_idからフロー一覧を取得
+      const site = getSiteByAutomationId(siteAutomationId);
+      const siteFlows = site?.flows || [];
+      const flowItems: FlowItem[] = siteFlows.map((flow) => ({
+        ...flow,
+        // 初期値があればそれを使用、なければ全てチェック
+        checked: initialFlowCodes.length > 0
+          ? initialFlowCodes.includes(flow.code)
+          : true,
+      }));
+      setFlows(flowItems);
+      setAllChecked(flowItems.length > 0 && flowItems.every((f) => f.checked));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialLoginId, initialPassword, siteAutomationId, initialFlowCodesKey]);
 
   if (!isOpen) return null;
 
   const handleAllCheckChange = () => {
     const newValue = !allChecked;
     setAllChecked(newValue);
-    setContents(contents.map(item => ({ ...item, checked: newValue })));
+    setFlows(flows.map((item) => ({ ...item, checked: newValue })));
   };
 
-  const handleItemCheckChange = (itemId: number) => {
-    const newContents = contents.map(item =>
-      item.id === itemId ? { ...item, checked: !item.checked } : item
+  const handleItemCheckChange = (code: string) => {
+    const newFlows = flows.map((item) =>
+      item.code === code ? { ...item, checked: !item.checked } : item
     );
-    setContents(newContents);
-    setAllChecked(newContents.every(item => item.checked));
+    setFlows(newFlows);
+    setAllChecked(newFlows.every((item) => item.checked));
   };
 
   const handleSave = () => {
-    onSave();
+    if (!id.trim()) {
+      setError('IDを入力してください');
+      return;
+    }
+    if (!password.trim()) {
+      setError('パスワードを入力してください');
+      return;
+    }
+
+    // 選択されたフローコードを取得
+    const selectedFlowCodes = flows
+      .filter((f) => f.checked)
+      .map((f) => f.code);
+
+    if (selectedFlowCodes.length === 0) {
+      setError('更新するコンテンツを1つ以上選択してください');
+      return;
+    }
+
+    setError(null);
+
+    startTransition(async () => {
+      const result = await saveCredential(siteId, id, password, selectedFlowCodes);
+      if (result.success) {
+        onSave(id);
+      } else {
+        setError(result.message);
+      }
+    });
+  };
+
+  const handleUnregister = () => {
+    startTransition(async () => {
+      const result = await deleteCredential(siteId);
+      if (result.success) {
+        onUnregister();
+      } else {
+        setError(result.message);
+      }
+    });
   };
 
   return (
@@ -97,7 +180,8 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {isRegistered && (
               <button
-                onClick={onUnregister}
+                onClick={handleUnregister}
+                disabled={isPending}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -105,9 +189,9 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
                   padding: '6px 12px',
                   backgroundColor: 'transparent',
                   border: 'none',
-                  color: '#e53935',
+                  color: isPending ? '#999' : '#e53935',
                   fontSize: '14px',
-                  cursor: 'pointer',
+                  cursor: isPending ? 'not-allowed' : 'pointer',
                 }}
               >
                 <span style={{ fontSize: '16px' }}>🗑</span>
@@ -132,6 +216,22 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
 
         {/* Content */}
         <div style={{ padding: '20px' }}>
+          {/* Error Message */}
+          {error && (
+            <div
+              style={{
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: '#ffebee',
+                borderRadius: '4px',
+                color: '#c62828',
+                fontSize: '14px',
+              }}
+            >
+              {error}
+            </div>
+          )}
+
           {/* STEP1 */}
           <div style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -160,6 +260,7 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
                     type="text"
                     value={id}
                     onChange={(e) => setId(e.target.value)}
+                    placeholder="ログインIDを入力"
                     style={{
                       flex: 1,
                       padding: '10px 12px',
@@ -172,9 +273,10 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                   <label style={{ width: '50px', fontSize: '14px', color: '#333' }}>PASS</label>
                   <input
-                    type="text"
+                    type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    placeholder="パスワードを入力"
                     style={{
                       flex: 1,
                       padding: '10px 12px',
@@ -239,69 +341,82 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
               </span>
             </div>
 
-            {/* Header row */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '12px 0',
-                borderBottom: '1px solid #e0e0e0',
-              }}
-            >
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                <input
-                  type="checkbox"
-                  checked={allChecked}
-                  onChange={handleAllCheckChange}
-                  style={{ width: '18px', height: '18px', accentColor: '#1976d2' }}
-                />
-                <span style={{ fontSize: '14px', color: '#666' }}>コンテンツ名</span>
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#666', fontSize: '13px' }}>
-                上位
-                <span
+            {flows.length > 0 ? (
+              <>
+                {/* Header row */}
+                <div
                   style={{
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    backgroundColor: '#1976d2',
-                    color: '#fff',
-                    fontSize: '12px',
+                    padding: '12px 0',
+                    borderBottom: '1px solid #e0e0e0',
                   }}
                 >
-                  ?
-                </span>
-              </div>
-            </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                    <input
+                      type="checkbox"
+                      checked={allChecked}
+                      onChange={handleAllCheckChange}
+                      style={{ width: '18px', height: '18px', accentColor: '#1976d2' }}
+                    />
+                    <span style={{ fontSize: '14px', color: '#666' }}>コンテンツ名</span>
+                  </label>
+                </div>
 
-            {/* Content items */}
-            {contents.map((item) => (
+                {/* Flow items */}
+                {flows.map((item) => (
+                  <div
+                    key={item.code}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '14px 0',
+                      borderBottom: '1px solid #f0f0f0',
+                    }}
+                  >
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                      <input
+                        type="checkbox"
+                        checked={item.checked}
+                        onChange={() => handleItemCheckChange(item.code)}
+                        style={{ width: '18px', height: '18px', accentColor: '#1976d2' }}
+                      />
+                      <div>
+                        <span style={{ fontSize: '14px', color: '#333' }}>{item.name}</span>
+                        {item.isPaid && (
+                          <span style={{
+                            fontSize: '10px',
+                            color: '#fff',
+                            backgroundColor: '#ff9800',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            marginLeft: '8px'
+                          }}>
+                            有料
+                          </span>
+                        )}
+                        {item.description && (
+                          <span style={{ fontSize: '12px', color: '#999', marginLeft: '8px' }}>
+                            {item.description}
+                          </span>
+                        )}
+                      </div>
+                    </label>
+                  </div>
+                ))}
+              </>
+            ) : (
               <div
-                key={item.id}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '14px 0',
-                  borderBottom: '1px solid #f0f0f0',
+                  padding: '20px',
+                  textAlign: 'center',
+                  color: '#999',
+                  fontSize: '14px',
                 }}
               >
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
-                  <input
-                    type="checkbox"
-                    checked={item.checked}
-                    onChange={() => handleItemCheckChange(item.id)}
-                    style={{ width: '18px', height: '18px', accentColor: '#1976d2' }}
-                  />
-                  <span style={{ fontSize: '14px', color: '#333' }}>{item.name}</span>
-                </label>
-                {item.hasLink && (
-                  <span style={{ color: '#1976d2', fontSize: '16px', cursor: 'pointer' }}>↗</span>
-                )}
+                このサイトには利用可能なフローがありません
               </div>
-            ))}
+            )}
           </div>
         </div>
 
@@ -317,13 +432,14 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
         >
           <button
             onClick={onClose}
+            disabled={isPending}
             style={{
               padding: '10px 32px',
               backgroundColor: '#f5f5f5',
               border: '1px solid #ddd',
               borderRadius: '4px',
               fontSize: '14px',
-              cursor: 'pointer',
+              cursor: isPending ? 'not-allowed' : 'pointer',
               color: '#333',
             }}
           >
@@ -331,17 +447,18 @@ const IdPassModal: React.FC<IdPassModalProps> = ({ isOpen, onClose, siteName, on
           </button>
           <button
             onClick={handleSave}
+            disabled={isPending}
             style={{
               padding: '10px 32px',
-              backgroundColor: '#4caf50',
+              backgroundColor: isPending ? '#a5d6a7' : '#4caf50',
               border: 'none',
               borderRadius: '4px',
               fontSize: '14px',
-              cursor: 'pointer',
+              cursor: isPending ? 'not-allowed' : 'pointer',
               color: '#fff',
             }}
           >
-            保存
+            {isPending ? '保存中...' : '保存'}
           </button>
         </div>
       </div>

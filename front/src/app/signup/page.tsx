@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signUp } from '@/lib/supabase/auth';
+import { signup } from '@/lib/api/auth';
 import Link from 'next/link';
 
 const SignUpPage: React.FC = () => {
@@ -20,38 +20,27 @@ const SignUpPage: React.FC = () => {
     setError('');
     setLoading(true);
 
-    // パスワードの確認
     if (password !== confirmPassword) {
       setError('パスワードが一致しません');
       setLoading(false);
       return;
     }
 
-    // パスワードの長さチェック
     if (password.length < 6) {
       setError('パスワードは6文字以上で入力してください');
       setLoading(false);
       return;
     }
 
-    try {
-      const data = await signUp({ email, password });
-      // サインアップ成功時、セッションがあればホームへリダイレクト
-      if (data.session) {
-        router.push('/');
-      } else {
-        // メール確認が必要な場合はエラーメッセージを表示
-        setError('メール確認が必要です。メールを確認してください。');
-      }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('登録に失敗しました');
-      }
-    } finally {
-      setLoading(false);
+    const result = await signup(email, password);
+
+    if (result.success) {
+      router.push('/notices');
+    } else {
+      setError(result.error || '登録に失敗しました');
     }
+
+    setLoading(false);
   };
 
   return (

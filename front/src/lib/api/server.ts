@@ -1,102 +1,71 @@
-import { cookies } from 'next/headers';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
-
-/**
- * ミドルウェアで保存されたアクセストークンを取得
- */
-export async function getAccessToken(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-  const tokenCookie = cookieStore.get('sb-access-token');
-  return tokenCookie?.value;
-}
+import { getAccessToken, refreshToken } from './auth';
+import { API_BASE_URL } from './config';
 
 /**
- * ミドルウェアで保存されたユーザーIDを取得
+ * サーバーコンポーネント用のfetchユーティリティ
  */
-export async function getUserId(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-  const userIdCookie = cookieStore.get('sb-user-id');
-  return userIdCookie?.value;
-}
-
-// サーバーコンポーネント用のfetchユーティリティ
 export async function fetchAPI<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
+  retryOnUnauthorized = true
 ): Promise<T> {
-  // ミドルウェアで保存されたアクセストークンを取得
   const accessToken = await getAccessToken();
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options?.headers,
   };
 
-  // アクセストークンがある場合はAuthorizationヘッダーに追加
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
+  // options.headersがあればマージ
+  if (options?.headers) {
+    const optHeaders = options.headers as Record<string, string>;
+    Object.assign(headers, optHeaders);
+  }
+
   const url = `${API_BASE_URL}${endpoint}`;
 
-  try {
-    const response = await fetch(url, {
-      ...options,
-      headers,
-      cache: options?.cache || 'no-store', // デフォルトでキャッシュしない
-    });
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    cache: options?.cache || 'no-store',
+  });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `API Error: ${response.status} ${response.statusText} - ${errorText}`
-      );
+  // 401エラーの場合、トークンリフレッシュを試行
+  if (response.status === 401 && retryOnUnauthorized) {
+    const refreshSuccess = await refreshToken();
+    if (refreshSuccess) {
+      // 新しいトークンで再試行
+      return fetchAPI<T>(endpoint, options, false);
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error(`Failed to fetch ${endpoint}:`, error);
-    throw error;
   }
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`API Error: ${response.status} ${response.statusText} - ${errorText}`);
+  }
+
+  return response.json();
 }
 
-// GETリクエスト
 export async function getAPI<T>(endpoint: string, cache?: RequestCache): Promise<T> {
-  return fetchAPI<T>(endpoint, {
-    method: 'GET',
-    cache,
-  });
+  return fetchAPI<T>(endpoint, { method: 'GET', cache });
 }
 
-// POSTリクエスト
 export async function postAPI<T>(endpoint: string, data: unknown): Promise<T> {
-  return fetchAPI<T>(endpoint, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  return fetchAPI<T>(endpoint, { method: 'POST', body: JSON.stringify(data) });
 }
 
-// PUTリクエスト
 export async function putAPI<T>(endpoint: string, data: unknown): Promise<T> {
-  return fetchAPI<T>(endpoint, {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  });
+  return fetchAPI<T>(endpoint, { method: 'PUT', body: JSON.stringify(data) });
 }
 
-// PATCHリクエスト
 export async function patchAPI<T>(endpoint: string, data: unknown): Promise<T> {
-  return fetchAPI<T>(endpoint, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-  });
+  return fetchAPI<T>(endpoint, { method: 'PATCH', body: JSON.stringify(data) });
 }
 
-// DELETEリクエスト
 export async function deleteAPI<T>(endpoint: string): Promise<T> {
-  return fetchAPI<T>(endpoint, {
-    method: 'DELETE',
-  });
+  return fetchAPI<T>(endpoint, { method: 'DELETE' });
 }
-

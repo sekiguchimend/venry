@@ -16,15 +16,16 @@ type UserResponse struct {
 
 // GetCurrentUser は現在のログインユーザー情報を取得
 func GetCurrentUser(w http.ResponseWriter, r *http.Request) {
-	// コンテキストからユーザーIDを取得
+	// コンテキストからユーザーIDとトークンを取得
 	authUserID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	token, _ := middleware.GetTokenFromContext(r.Context())
 
 	// ユーザー情報を取得
-	user, err := models.GetUserByAuthID(authUserID)
+	user, err := models.GetUserByAuthID(authUserID, token)
 	if err != nil {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)
 		return
@@ -35,12 +36,12 @@ func GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 最終ログイン時刻を更新
-	if err := models.UpdateLastLogin(user.ID); err != nil {
+	if err := models.UpdateLastLogin(user.ID, token); err != nil {
 		// ログ更新エラーは無視
 	}
 
 	// 会社情報を取得
-	company, err := models.GetCompanyByID(user.CompanyID)
+	company, err := models.GetCompanyByID(user.CompanyID, token)
 	if err != nil {
 		http.Error(w, "Failed to get company", http.StatusInternalServerError)
 		return
@@ -57,12 +58,13 @@ func GetCurrentUser(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUserProfile はユーザープロフィールを更新
 func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
-	// コンテキストからユーザーIDを取得
+	// コンテキストからユーザーIDとトークンを取得
 	authUserID, ok := middleware.GetUserIDFromContext(r.Context())
 	if !ok {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	token, _ := middleware.GetTokenFromContext(r.Context())
 
 	// リクエストボディをパース
 	var updateData struct {
@@ -74,7 +76,7 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// ユーザー情報を取得
-	user, err := models.GetUserByAuthID(authUserID)
+	user, err := models.GetUserByAuthID(authUserID, token)
 	if err != nil {
 		http.Error(w, "Failed to get user", http.StatusInternalServerError)
 		return
@@ -85,9 +87,7 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 名前を更新
-	query := `UPDATE users SET name = $1, updated_at = NOW() WHERE id = $2`
-	_, err = models.DB.Exec(query, updateData.Name, user.ID)
-	if err != nil {
+	if err := models.UpdateUserName(user.ID, updateData.Name, token); err != nil {
 		http.Error(w, "Failed to update user", http.StatusInternalServerError)
 		return
 	}
@@ -98,4 +98,3 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
-

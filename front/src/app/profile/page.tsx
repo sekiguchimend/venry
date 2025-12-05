@@ -1,15 +1,14 @@
-import { requireAuth, getAccessToken, getUserId } from '@/lib/auth/server';
+import { getAccessToken, getSession } from '@/lib/api/auth';
 import { getAPI } from '@/lib/api/server';
 import { UserResponse } from '@/lib/api/types';
 
 // サーバーコンポーネント - 認証が必要なページの例
+// ミドルウェアで認証チェックを行うため、ここでは不要
 export default async function ProfilePage() {
-  // 認証チェック（未認証の場合は自動的にログインページへリダイレクト）
-  const session = await requireAuth();
-
   // アクセストークンとユーザーIDを取得（デバッグ用）
+  const session = await getSession();
   const accessToken = await getAccessToken();
-  const userId = await getUserId();
+  const userId = session?.userId;
 
   let user: UserResponse | null = null;
   let error: string | null = null;
@@ -35,7 +34,7 @@ export default async function ProfilePage() {
             <code className="bg-white px-2 py-1 rounded">{userId}</code>
           </p>
           <p>
-            <span className="font-semibold">Email:</span> {session.user.email}
+            <span className="font-semibold">Email:</span> {user?.user?.email || '-'}
           </p>
           <p>
             <span className="font-semibold">アクセストークン:</span>{' '}
@@ -135,7 +134,7 @@ export default async function ProfilePage() {
               デバッグ情報（開発用）
             </summary>
             <pre className="mt-4 p-4 bg-white rounded overflow-auto text-xs">
-              {JSON.stringify({ user, session: { user: session.user } }, null, 2)}
+              {JSON.stringify({ user, session }, null, 2)}
             </pre>
           </details>
         </div>
