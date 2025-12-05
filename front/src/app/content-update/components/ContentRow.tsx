@@ -12,7 +12,9 @@ interface ContentRowProps {
       nextTime: string;
       date: string;
     };
-    timerIconColor: string;
+    timerIcon: {
+      color: string;
+    };
     lastUpdated: {
       date: string;
       time: string;
@@ -66,7 +68,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
 
         {/* タイマー */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Clock size={16} style={{ color: item.timerIconColor }} />
+          <Clock size={16} style={{ color: item.timerIcon.color }} />
           <div>
             <div style={{ fontSize: '10px', color: '#666' }}>次回</div>
             <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#333' }}>{item.timer.nextTime}</div>
@@ -119,7 +121,7 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
         <div className="flex items-center gap-3">
           {/* タイマー */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <Clock size={16} style={{ color: item.timerIconColor }} />
+            <Clock size={16} style={{ color: item.timerIcon.color }} />
             <div>
               <div className="text-xs text-gray-500">次回</div>
               <div className="text-sm font-bold text-gray-800">{item.timer.nextTime}</div>
