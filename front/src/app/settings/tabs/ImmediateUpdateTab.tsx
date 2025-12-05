@@ -48,7 +48,7 @@ const ImmediateUpdateTab: React.FC = () => {
       {/* デリヘルタウン 更新設定 */}
       <div className="pb-6">
         <div className="flex items-center gap-3 mb-2">
-          <h2 className="text-base font-bold text-gray-800">デリヘルタウン　更新設定</h2>
+          <h2 className="text-base font-bold text-gray-800">デリヘルタウン 更新設定</h2>
           <span className="px-2 py-1 bg-[#FFA726] text-white text-[11px] rounded">
             デリヘルタウンご利用の場合のみ有効
           </span>

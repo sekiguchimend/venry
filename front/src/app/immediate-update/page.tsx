@@ -258,7 +258,7 @@ const ImmediateUpdatePage: React.FC = () => {
                   <div className="text-center text-sm text-gray-800">{woman.startTime}</div>
 
                   {/* Separator */}
-                  <div className="text-center text-sm text-gray-400">～　{woman.endTime}</div>
+                  <div className="text-center text-sm text-gray-400">～ {woman.endTime}</div>
 
                   {/* Name */}
                   <div className="text-sm text-gray-800 font-medium">{woman.name}</div>

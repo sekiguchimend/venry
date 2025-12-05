@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Settings, BarChart3, Users, Zap, FileText } from 'lucide-react';
+import { Settings as SettingsIcon, BarChart3, Users, Zap, FileText } from 'lucide-react';
 
 // Tab Components
 import BasicSettingsTab from './tabs/BasicSettingsTab';
@@ -18,7 +18,7 @@ interface TabItem {
 }
 
 const TABS: TabItem[] = [
-  { id: 'basic', label: '基本設定', icon: <Settings size={16} />, hasRequired: true },
+  { id: 'basic', label: '基本設定', icon: <SettingsIcon size={16} />, hasRequired: true },
   { id: 'attendance', label: '出勤設定', icon: <BarChart3 size={16} /> },
   { id: 'female', label: '女性設定', icon: <Users size={16} /> },
   { id: 'immediate', label: '即姫・接客一括更新', icon: <Zap size={16} /> },
@@ -95,7 +95,7 @@ const SettingsPage: React.FC = () => {
               onClick={() => console.log('Settings saved')}
               className="flex items-center gap-2 px-6 py-2.5 bg-[#4CAF50] text-white rounded text-sm font-medium hover:bg-[#43A047] transition-colors cursor-pointer border-none"
             >
-              <Settings size={16} />
+              <SettingsIcon size={16} />
               設定を保存
             </button>
           </div>

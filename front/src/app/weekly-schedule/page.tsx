@@ -296,7 +296,7 @@ const WeeklySchedulePage: React.FC = () => {
                     <ArrowRight size={14} className="text-gray-400" />
                   </div>
                 </th>
-                {days.map((day, index) => (
+                {days.map((day) => (
                   <th
                     key={day.date}
                     className={`py-3 px-2 text-center text-sm font-medium w-[140px] border-r border-gray-200 last:border-r-0 ${

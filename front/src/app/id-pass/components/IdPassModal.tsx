@@ -69,7 +69,6 @@ const IdPassModal: React.FC<IdPassModalProps> = ({
       setFlows(flowItems);
       setAllChecked(flowItems.length > 0 && flowItems.every((f) => f.checked));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, initialLoginId, initialPassword, siteAutomationId, initialFlowCodesKey]);
 
   if (!isOpen) return null;

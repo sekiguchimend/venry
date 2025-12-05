@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { HelpCircle, Settings, Pencil } from 'lucide-react';
+import { HelpCircle, Pencil } from 'lucide-react';
 
 const BasicSettingsTab: React.FC = () => {
   const [timeMode, setTimeMode] = useState<'24h' | 'custom'>('24h');
@@ -26,10 +26,6 @@ const BasicSettingsTab: React.FC = () => {
     '翌08:59', '翌09:59', '翌10:59', '翌11:59', '翌12:59', '翌13:59', '翌14:59', '翌15:59',
     '翌16:59', '翌17:59', '翌18:59', '翌19:59', '翌20:59', '翌21:59', '翌22:59', '翌23:59'
   ];
-
-  const handleSave = () => {
-    console.log('Settings saved');
-  };
 
   return (
     <div className="p-8">

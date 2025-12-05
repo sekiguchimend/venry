@@ -42,7 +42,7 @@ export async function login(email: string, password: string): Promise<AuthResult
     await setAuthCookies(data);
 
     return { success: true };
-  } catch (error) {
+  } catch {
     return { success: false, error: 'サーバーとの通信に失敗しました' };
   }
 }
@@ -71,7 +71,7 @@ export async function signup(email: string, password: string): Promise<AuthResul
     }
 
     return { success: true };
-  } catch (error) {
+  } catch {
     return { success: false, error: 'サーバーとの通信に失敗しました' };
   }
 }

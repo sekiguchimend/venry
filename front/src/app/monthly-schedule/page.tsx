@@ -33,7 +33,7 @@ const MonthlySchedulePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('month');
   const [selectedWoman, setSelectedWoman] = useState('1');
-  const [currentMonth, setCurrentMonth] = useState({ year: 2025, month: 11 });
+  const [currentMonth] = useState({ year: 2025, month: 11 });
 
   const women: WomanData[] = [
     { id: '1', name: '瑠璃-ruri-', image: '/placeholder.jpg' },

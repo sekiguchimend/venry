@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { TabKey } from '../../../types/id-pass';
 import { SITES_DATA } from '../utils/siteData';
 import { TAB_CONFIG } from '../utils/tabConfig';
@@ -18,7 +17,6 @@ interface IdPassClientProps {
 }
 
 const IdPassClient: React.FC<IdPassClientProps> = ({ initialCredentials }) => {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -63,11 +61,6 @@ const IdPassClient: React.FC<IdPassClientProps> = ({ initialCredentials }) => {
     paginateSites(filteredSites, currentPage, itemsPerPage),
     [filteredSites, currentPage, itemsPerPage]
   );
-
-  // データを再取得
-  const refreshData = useCallback(() => {
-    router.refresh();
-  }, [router]);
 
   const handleRegister = useCallback((siteId: string, loginId: string) => {
     // ローカルstateを更新
