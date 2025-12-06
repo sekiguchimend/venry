@@ -3,35 +3,47 @@
 import React from 'react';
 import { Edit, Clock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { FlowItem, FLOW_TYPE_COLORS, TIMER_COLORS } from '../../../types/content-update';
 
+// FlowItem型に対応（旧ContentItemからの移行）
 interface ContentRowProps {
-  item: {
-    id: string;
-    contentName: string;
-    timer: {
-      nextTime: string;
-      date: string;
-    };
-    timerIcon: {
-      color: string;
-    };
-    lastUpdated: {
-      date: string;
-      time: string;
-    };
-    category: {
-      label: string;
-      backgroundColor: string;
-    };
-  };
+  item: FlowItem;
 }
 
 const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
   const router = useRouter();
 
   const handleEdit = () => {
-    router.push(`/content-update/edit?id=${item.id}`);
+    router.push(`/content-update/edit?siteId=${item.siteId}&flowCode=${item.flowCode}`);
   };
+
+  // タイマーの色を決定（設定されていればそれを使用、なければデフォルト）
+  const timerColor = item.timerIconColor || TIMER_COLORS.inactive;
+
+  // タイプに基づくカテゴリカラーを取得
+  const getCategoryStyle = () => {
+    if (item.category) {
+      return {
+        backgroundColor: item.category.backgroundColor,
+        label: item.category.label,
+      };
+    }
+    // タイプの最初の要素からカラーを取得
+    const firstType = item.types[0];
+    if (firstType && FLOW_TYPE_COLORS[firstType]) {
+      return {
+        backgroundColor: FLOW_TYPE_COLORS[firstType].bg,
+        label: firstType,
+      };
+    }
+    return { backgroundColor: '#f5f5f5', label: '' };
+  };
+
+  const categoryStyle = getCategoryStyle();
+
+  // タイマー情報（設定されていなければデフォルト表示）
+  const timerInfo = item.timer || { nextTime: '--:--', date: '未設定' };
+  const lastUpdatedInfo = item.lastUpdated || { date: '--', time: '--:--' };
 
   return (
     <div>
@@ -68,23 +80,23 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
 
         {/* タイマー */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Clock size={16} style={{ color: item.timerIcon.color }} />
+          <Clock size={16} style={{ color: timerColor }} />
           <div>
             <div style={{ fontSize: '10px', color: '#666' }}>次回</div>
-            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#333' }}>{item.timer.nextTime}</div>
-            <div style={{ fontSize: '10px', color: '#666' }}>({item.timer.date})</div>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#333' }}>{timerInfo.nextTime}</div>
+            <div style={{ fontSize: '10px', color: '#666' }}>({timerInfo.date})</div>
           </div>
         </div>
 
         {/* コンテンツ名 */}
         <div style={{ fontSize: '14px', color: '#333' }}>
-          {item.contentName}
+          {item.flowName}
         </div>
 
         {/* 最終更新日 */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
           <span style={{ fontSize: '12px', color: '#3b82f6', textDecoration: 'underline', cursor: 'pointer' }}>
-            {item.lastUpdated.date}{item.lastUpdated.time}
+            {lastUpdatedInfo.date}{lastUpdatedInfo.time}
           </span>
           <Edit size={11} style={{ color: '#3b82f6' }} />
         </div>
@@ -93,12 +105,12 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{
             padding: '2px 8px',
-            backgroundColor: item.category.backgroundColor,
+            backgroundColor: categoryStyle.backgroundColor,
             borderRadius: '8px',
             fontSize: '12px',
             color: '#666'
           }}>
-            {item.category.label}
+            {categoryStyle.label}
           </span>
         </div>
 
@@ -121,21 +133,21 @@ const ContentRow: React.FC<ContentRowProps> = ({ item }) => {
         <div className="flex items-center gap-3">
           {/* タイマー */}
           <div className="flex-shrink-0 flex items-center gap-2">
-            <Clock size={16} style={{ color: item.timerIcon.color }} />
+            <Clock size={16} style={{ color: timerColor }} />
             <div>
               <div className="text-xs text-gray-500">次回</div>
-              <div className="text-sm font-bold text-gray-800">{item.timer.nextTime}</div>
-              <div className="text-xs text-gray-500">({item.timer.date})</div>
+              <div className="text-sm font-bold text-gray-800">{timerInfo.nextTime}</div>
+              <div className="text-xs text-gray-500">({timerInfo.date})</div>
             </div>
           </div>
 
           {/* Content Info */}
           <div className="flex-1 min-w-0">
             <div className="text-sm text-gray-800">
-              {item.contentName}
+              {item.flowName}
             </div>
             <div className="text-xs text-gray-500 mt-1">
-              {item.lastUpdated.date} {item.lastUpdated.time} | {item.category.label}
+              {lastUpdatedInfo.date} {lastUpdatedInfo.time} | {categoryStyle.label}
             </div>
           </div>
 

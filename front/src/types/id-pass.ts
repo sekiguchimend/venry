@@ -2,6 +2,8 @@ export interface SiteFlow {
   code: string;
   name: string;
   description?: string;
+  types?: string[];
+  pages?: string[];
   isPaid?: boolean;
 }
 

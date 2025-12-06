@@ -1,0 +1,175 @@
+{
+  "_comment": "フロー実行ステップ定義 - Rodで実行される操作手順",
+  "_actions": {
+    "navigate": "ページ遷移",
+    "click": "要素クリック",
+    "input": "テキスト入力",
+    "upload": "ファイルアップロード",
+    "wait": "要素待機",
+    "waitTime": "固定時間待機(ms)",
+    "select": "ドロップダウン選択",
+    "screenshot": "スクリーンショット保存",
+    "condition": "条件分岐",
+    "loop": "ループ処理"
+  },
+  "_variables": {
+    "{{login_id}}": "ログインID",
+    "{{password}}": "パスワード",
+    "{{title}}": "タイトル",
+    "{{content}}": "本文",
+    "{{photo_path}}": "画像パス",
+    "{{girl_name}}": "女性名",
+    "{{start_time}}": "開始時刻",
+    "{{end_time}}": "終了時刻"
+  },
+
+  "steps": {
+    "hime_channel": {
+      "shop_post": {
+        "name": "HIME CHANNEL(店舗投稿)",
+        "loginUrl": "https://hime-channel.com/shop/login",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#login_id", "timeout": 5000 },
+          { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#password", "value": "{{password}}" },
+          { "action": "click", "selector": "button[type='submit']" },
+          { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='diary']" },
+          { "action": "wait", "selector": "#post_form", "timeout": 5000 },
+          { "action": "input", "selector": "#title", "value": "{{title}}" },
+          { "action": "input", "selector": "#content", "value": "{{content}}" },
+          { "action": "upload", "selector": "#photo", "file": "{{photo_path}}" },
+          { "action": "click", "selector": "#submit_btn" },
+          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
+        ]
+      },
+      "coupon": {
+        "name": "HIME CHANNEL(クーポン)",
+        "loginUrl": "https://hime-channel.com/shop/login",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#login_id", "timeout": 5000 },
+          { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#password", "value": "{{password}}" },
+          { "action": "click", "selector": "button[type='submit']" },
+          { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='coupon']" },
+          { "action": "wait", "selector": "#coupon_form", "timeout": 5000 },
+          { "action": "click", "selector": "#update_btn" },
+          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
+        ]
+      },
+      "available_now_bulk": {
+        "name": "HIME CHANNEL(今すぐ遊べる)【一括更新専用】",
+        "loginUrl": "https://hime-channel.com/shop/login",
+        "isBulkUpdate": true,
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#login_id", "timeout": 5000 },
+          { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#password", "value": "{{password}}" },
+          { "action": "click", "selector": "button[type='submit']" },
+          { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='available']" },
+          { "action": "wait", "selector": ".girl-list", "timeout": 5000 },
+          { "action": "click", "selector": "#select_all" },
+          { "action": "click", "selector": "#bulk_update_btn" },
+          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
+        ]
+      }
+    },
+
+    "cityheaven": {
+      "heaven_update_button": {
+        "name": "シティヘブンネット(ヘブン更新ボタン)",
+        "loginUrl": "https://cityheaven.net/shop/login",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#shop_id", "timeout": 5000 },
+          { "action": "input", "selector": "#shop_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#shop_pass", "value": "{{password}}" },
+          { "action": "click", "selector": ".login-btn" },
+          { "action": "wait", "selector": ".mypage", "timeout": 10000 },
+          { "action": "click", "selector": ".heaven-update-btn" },
+          { "action": "wait", "selector": ".update-complete", "timeout": 5000 }
+        ]
+      },
+      "photo_diary": {
+        "name": "シティヘブンネット(写メ日記)",
+        "loginUrl": "https://cityheaven.net/shop/login",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#shop_id", "timeout": 5000 },
+          { "action": "input", "selector": "#shop_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#shop_pass", "value": "{{password}}" },
+          { "action": "click", "selector": ".login-btn" },
+          { "action": "wait", "selector": ".mypage", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='diary']" },
+          { "action": "wait", "selector": "#diary_form", "timeout": 5000 },
+          { "action": "select", "selector": "#girl_select", "value": "{{girl_name}}" },
+          { "action": "input", "selector": "#diary_title", "value": "{{title}}" },
+          { "action": "input", "selector": "#diary_content", "value": "{{content}}" },
+          { "action": "upload", "selector": "#diary_photo", "file": "{{photo_path}}" },
+          { "action": "click", "selector": "#submit_diary" },
+          { "action": "wait", "selector": ".success", "timeout": 10000 }
+        ]
+      },
+      "sokuhime_single": {
+        "name": "シティヘブンネット(即ヒメ登録)【1人ずつ更新】",
+        "loginUrl": "https://cityheaven.net/shop/login",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#shop_id", "timeout": 5000 },
+          { "action": "input", "selector": "#shop_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#shop_pass", "value": "{{password}}" },
+          { "action": "click", "selector": ".login-btn" },
+          { "action": "wait", "selector": ".mypage", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='sokuhime']" },
+          { "action": "wait", "selector": ".girl-list", "timeout": 5000 },
+          { "action": "click", "selector": ".girl-row[data-name='{{girl_name}}'] .register-btn" },
+          { "action": "wait", "selector": ".register-form", "timeout": 5000 },
+          { "action": "input", "selector": "#start_time", "value": "{{start_time}}" },
+          { "action": "input", "selector": "#end_time", "value": "{{end_time}}" },
+          { "action": "click", "selector": "#confirm_btn" },
+          { "action": "wait", "selector": ".success", "timeout": 10000 }
+        ]
+      },
+      "sokuhime_all": {
+        "name": "シティヘブンネット(即ヒメ登録)【全員同時更新】",
+        "loginUrl": "https://cityheaven.net/shop/login",
+        "isBulkUpdate": true,
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}" },
+          { "action": "wait", "selector": "#shop_id", "timeout": 5000 },
+          { "action": "input", "selector": "#shop_id", "value": "{{login_id}}" },
+          { "action": "input", "selector": "#shop_pass", "value": "{{password}}" },
+          { "action": "click", "selector": ".login-btn" },
+          { "action": "wait", "selector": ".mypage", "timeout": 10000 },
+          { "action": "click", "selector": "a[href*='sokuhime']" },
+          { "action": "wait", "selector": ".girl-list", "timeout": 5000 },
+          { "action": "click", "selector": "#select_all_girls" },
+          { "action": "click", "selector": "#bulk_register_btn" },
+          { "action": "wait", "selector": ".success", "timeout": 10000 }
+        ]
+      }
+    },
+
+    "_template": {
+      "_example_flow": {
+        "name": "テンプレート用フロー",
+        "loginUrl": "https://example.com/login",
+        "description": "新しいフローを追加する際のテンプレート",
+        "steps": [
+          { "action": "navigate", "url": "{{loginUrl}}", "_comment": "ログインページへ移動" },
+          { "action": "wait", "selector": "#login_field", "timeout": 5000, "_comment": "ログインフォーム待機" },
+          { "action": "input", "selector": "#login_id", "value": "{{login_id}}", "_comment": "ID入力" },
+          { "action": "input", "selector": "#password", "value": "{{password}}", "_comment": "パスワード入力" },
+          { "action": "click", "selector": "#submit", "_comment": "ログインボタンクリック" },
+          { "action": "wait", "selector": ".dashboard", "timeout": 10000, "_comment": "ダッシュボード表示待機" },
+          { "action": "screenshot", "path": "debug/{{site_id}}_{{flow_code}}_{{timestamp}}.png", "_comment": "デバッグ用スクショ" }
+        ]
+      }
+    }
+  }
+}

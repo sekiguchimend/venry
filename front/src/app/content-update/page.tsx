@@ -2,23 +2,19 @@
 
 import React, { useState } from 'react';
 import { Search, Settings, Plus } from 'lucide-react';
-import { TabKey, TabItem } from '../../types/content-update';
+import { ContentTabKey, CONTENT_TABS } from '../../types/content-update';
 import { getTabContent, getItemCount, shouldShowGroupButtons } from './utils/tabContentFactory';
 import TableHeader from './components/TableHeader';
 import GroupButtons from './components/GroupButtons';
 import PaginationControls from './components/PaginationControls';
 
 const ContentUpdatePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabKey>('content-list');
+  const [activeTab, setActiveTab] = useState<ContentTabKey>('content-list');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const tabs: TabItem[] = [
-    { key: 'content-list', label: 'コンテンツ一覧' },
-    { key: 'monthly-site', label: '月末通り貫通サイト運営' },
-    { key: 'female-recruitment', label: '女性求人' },
-    { key: 'male-recruitment', label: '男性求人' }
-  ];
+  // タブ定義はJSONベースの設定から取得（group-create以外）
+  const tabs = CONTENT_TABS.filter(tab => tab.key !== 'group-create');
 
   return (
     <div className="p-3 md:p-5 min-h-screen bg-gray-100">

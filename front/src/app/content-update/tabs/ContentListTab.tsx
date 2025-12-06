@@ -2,12 +2,15 @@
 
 import React from 'react';
 import ContentRow from '../components/ContentRow';
-import contentData from '../data/contentData.json';
+import { getFlowItemsByPage } from '../utils/flowUtils';
 
 const ContentListTab: React.FC = () => {
+  // JSON設定からcontent-listページのフローを取得
+  const flowItems = getFlowItemsByPage('content-list');
+
   return (
     <>
-      {contentData.contentList.map((item) => (
+      {flowItems.map((item) => (
         <ContentRow key={item.id} item={item} />
       ))}
     </>

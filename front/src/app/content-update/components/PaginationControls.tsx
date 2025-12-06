@@ -1,10 +1,10 @@
 'use client';
 
 import React from 'react';
-import { TabKey } from '../../../types/content-update';
+import { ContentTabKey } from '../../../types/content-update';
 
 interface PaginationControlsProps {
-  activeTab: TabKey;
+  activeTab: ContentTabKey;
   currentPage: number;
   setCurrentPage: (page: number) => void;
 }

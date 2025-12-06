@@ -1,0 +1,611 @@
+{
+  "_types": {
+    "photo_diary": "写メ日記",
+    "sokuhime": "即姫/即ヒメ",
+    "news": "ニュース/速報",
+    "coupon": "クーポン/割引",
+    "ranking_up": "上位表示",
+    "recruit_female": "女性求人",
+    "recruit_male": "男性求人",
+    "bulk_update": "一括更新",
+    "video": "動画投稿",
+    "direct_mail": "直送便/メール",
+    "event": "イベント",
+    "blog": "ブログ",
+    "standby": "待機情報",
+    "pickup": "ピックアップ"
+  },
+  "_pages": {
+    "content-list": "コンテンツ一覧",
+    "monthly-site": "月額制サイト",
+    "female-recruitment": "女性求人",
+    "male-recruitment": "男性求人",
+    "group-create": "グループ作成"
+  },
+
+  "flows": {
+    "hime_channel": [
+      {
+        "code": "shop_post",
+        "name": "HIME CHANNEL(店舗投稿)",
+        "types": ["news", "content"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "coupon",
+        "name": "HIME CHANNEL(クーポン)",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "available_now_bulk",
+        "name": "HIME CHANNEL(今すぐ遊べる)【一括更新専用】",
+        "types": ["sokuhime", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "kfj_kyoto": [
+      {
+        "code": "news",
+        "name": "KFJ京都風俗情報(ニュース)",
+        "types": ["news"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "realtime",
+        "name": "KFJ京都風俗情報(リアルタイム)",
+        "types": ["news", "sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "discount_ticket",
+        "name": "KFJ京都風俗情報(割引チケット)",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "qpri": [],
+    "official_kyoto_hoteheru": [
+      {
+        "code": "sokuhime_bulk",
+        "name": "オフィシャル(京都ホテヘル倶楽部様)(即姫)【一括更新専用】",
+        "types": ["sokuhime", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "girls_heaven": [
+      {
+        "code": "search_ranking_up",
+        "name": "ガールズヘブン(お店検索表示順アップ)",
+        "types": ["ranking_up"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "manager_blog",
+        "name": "ガールズヘブン(店長ブログ)",
+        "types": ["blog"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "recruit",
+        "name": "ガールズヘブン(求人)",
+        "types": ["recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "senior_voice_old",
+        "name": "ガールズヘブン(先輩ボイス(旧))",
+        "types": ["recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "cityheaven": [
+      {
+        "code": "heaven_update_button",
+        "name": "シティヘブンネット(ヘブン更新ボタン)",
+        "types": ["ranking_up"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "pokkiri",
+        "name": "シティヘブンネット(ポッキリ)",
+        "types": ["coupon", "event"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "photo_diary",
+        "name": "シティヘブンネット(写メ日記)",
+        "types": ["photo_diary"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "sokuhime_single",
+        "name": "シティヘブンネット(即ヒメ登録)【1人ずつ更新】",
+        "types": ["sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "sokuhime_all",
+        "name": "シティヘブンネット(即ヒメ登録)【全員同時更新】",
+        "types": ["sokuhime", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "direct_mail",
+        "name": "シティヘブンネット(直送便/プラチナメール)",
+        "types": ["direct_mail"],
+        "pages": ["monthly-site"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "video",
+        "name": "シティヘブンネット(動画)",
+        "types": ["video"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "job_heaven": [
+      {
+        "code": "attendance_order",
+        "name": "シティヘブンネット(出勤並び順一発設定)",
+        "types": ["bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "girl_page_update",
+        "name": "シティヘブンネット(女の子ページ更新)【長期未更新女性のみ】",
+        "types": ["bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "search_ranking_up",
+        "name": "ジョブヘブン【メンズヘブン】(お店検索表示順アップ)",
+        "types": ["ranking_up", "recruit_male"],
+        "pages": ["male-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "recruit_movie",
+        "name": "ジョブヘブン【メンズヘブン】(求人ムービー)",
+        "types": ["video", "recruit_male"],
+        "pages": ["male-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "manager_blog",
+        "name": "ジョブヘブン【メンズヘブン】(店長ブログ)",
+        "types": ["blog", "recruit_male"],
+        "pages": ["male-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "senior_voice",
+        "name": "ジョブヘブン【メンズヘブン】(先輩の声)",
+        "types": ["recruit_male"],
+        "pages": ["male-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "deliheru_town": [
+      {
+        "code": "news",
+        "name": "デリヘルタウン(お知らせ)",
+        "types": ["news"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "standby_pickup_single",
+        "name": "デリヘルタウン(待機情報-ピックアップ)【1人ずつ更新】【有料】",
+        "types": ["standby", "pickup"],
+        "pages": ["content-list"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "standby_pickup_all",
+        "name": "デリヘルタウン(待機情報-ピックアップ)【全員同時更新】【有料】",
+        "types": ["standby", "pickup", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "title_image",
+        "name": "デリヘルタウン(タイトル画像(店舗バナー))",
+        "types": ["content"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "discount",
+        "name": "デリヘルタウン(割引特典)",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "photo_diary",
+        "name": "デリヘルタウン(写メ日記)",
+        "types": ["photo_diary"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "standby_status",
+        "name": "デリヘルタウン(待機情報-待機中に設定)",
+        "types": ["standby"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "special_content",
+        "name": "デリヘルタウン(特設コンテンツ)",
+        "types": ["content"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "vanilla": [
+      {
+        "code": "manager_blog",
+        "name": "バニラ(店長ブログ)",
+        "types": ["blog", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "pureajo": [
+      {
+        "code": "pr_video",
+        "name": "ぴゅあじょ(PR動画)",
+        "types": ["video", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "urgent_recruit",
+        "name": "ぴゅあじょ(急募速報)",
+        "types": ["news", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "ranking_up",
+        "name": "ぴゅあじょ(上位表示)",
+        "types": ["ranking_up", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "manager_news",
+        "name": "ぴゅあじょ(店長NEWS)",
+        "types": ["news", "blog", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "purela": [
+      {
+        "code": "photo_diary",
+        "name": "ぴゅあらば(写メ日記)",
+        "types": ["photo_diary"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "purela_staff": [
+      {
+        "code": "urgent_recruit",
+        "name": "ぴゅあらばスタッフ(急募速報)",
+        "types": ["news", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "ranking_up",
+        "name": "ぴゅあらばスタッフ(上位表示実行)",
+        "types": ["ranking_up", "recruit_female"],
+        "pages": ["female-recruitment"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "manzoku": [
+      {
+        "code": "available_now",
+        "name": "マンゾクネット(今すぐ入れるGAL)【有料】",
+        "types": ["sokuhime"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "latest_info",
+        "name": "マンゾクネット(最新情報)【有料】",
+        "types": ["news"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "photo_diary",
+        "name": "マンゾクネット(写メ日記)【有料】",
+        "types": ["photo_diary"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "video_ranking_up",
+        "name": "マンゾクネット(動画管理-上位表示)",
+        "types": ["video", "ranking_up"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "ekichika": [
+      {
+        "code": "news",
+        "name": "駅ちか人気！風俗ランキング(ニュース)",
+        "types": ["news"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "photo_diary",
+        "name": "駅ちか人気！風俗ランキング(写メ日記)",
+        "types": ["photo_diary"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "ranking_up",
+        "name": "駅ちか人気！風俗ランキング(上位表示)",
+        "types": ["ranking_up"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "sokuhime",
+        "name": "駅ちか人気！風俗ランキング(即ヒメ)",
+        "types": ["sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "video_post",
+        "name": "駅ちか人気！風俗ランキング(動画投稿)",
+        "types": ["video"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "kuchikomi": [
+      {
+        "code": "suguhime_busy_reregister",
+        "name": "口コミ風俗情報局(すぐヒメ！)【接客中を再登録】",
+        "types": ["sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "suguhime_selected",
+        "name": "口コミ風俗情報局(すぐヒメ！)【選択女性を更新】",
+        "types": ["sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "suguhime_paid",
+        "name": "口コミ風俗情報局(すぐヒメ！)【有料】",
+        "types": ["sokuhime"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "suguhime_paid_single",
+        "name": "口コミ風俗情報局(すぐヒメ！)【有料】【1人ずつ更新】",
+        "types": ["sokuhime"],
+        "pages": ["content-list", "monthly-site"],
+        "isPaid": true,
+        "isActive": true
+      },
+      {
+        "code": "himewari",
+        "name": "口コミ風俗情報局(ヒメ割！)",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "himewari_selected",
+        "name": "口コミ風俗情報局(ヒメ割！)【選択女性を更新】",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "himewari_multiple",
+        "name": "口コミ風俗情報局(ヒメ割！)【複数女性を更新】",
+        "types": ["coupon", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "hime_diary",
+        "name": "口コミ風俗情報局(ヒメ日記)",
+        "types": ["photo_diary"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "kyokuwari",
+        "name": "口コミ風俗情報局(局割！)",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "breaking_news",
+        "name": "口コミ風俗情報局(速報！)",
+        "types": ["news"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "manager_recommend",
+        "name": "口コミ風俗情報局(店長イチオシ)",
+        "types": ["pickup"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "pickup",
+        "name": "口コミ風俗情報局(ピックアップ)",
+        "types": ["pickup"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "discount_event",
+        "name": "口コミ風俗情報局(割引・イベント)",
+        "types": ["coupon", "event"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ],
+    "fuzoku_japan": [
+      {
+        "code": "available_now",
+        "name": "風俗じゃぱん！(今から遊べる女の子)",
+        "types": ["sokuhime"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "available_now_multiple",
+        "name": "風俗じゃぱん！(今から遊べる女の子)【複数女性を更新】",
+        "types": ["sokuhime", "bulk_update"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "shop_news",
+        "name": "風俗じゃぱん！(店舗速報)",
+        "types": ["news"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "video_post",
+        "name": "風俗じゃぱん！(動画投稿)",
+        "types": ["video"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "event_freetext",
+        "name": "風俗じゃぱん！(イベント(フリーテキスト))-1枚目を更新",
+        "types": ["event"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "coupon",
+        "name": "風俗じゃぱん！(クーポン券)-1枚目を更新",
+        "types": ["coupon"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
+        "code": "pickup_girls",
+        "name": "風俗じゃぱん！(ピックアップガールズ)",
+        "types": ["pickup"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      }
+    ]
+  }
+}

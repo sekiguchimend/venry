@@ -1,0 +1,116 @@
+{
+  "sites": [
+    {
+      "id": "hime_channel",
+      "uuid": "650fa91d-7fd1-4787-9b8a-6493b80bb65c",
+      "name": "HIME CHANNEL",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "kfj_kyoto",
+      "uuid": "8b0a0312-1d93-4c7d-95fd-31a707c96636",
+      "name": "KFJ京都風俗情報",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "qpri",
+      "uuid": "eb1c4653-c950-4e9b-98c0-97f8805d9b6a",
+      "name": "Qプリ",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "official_kyoto_hoteheru",
+      "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "オフィシャル(京都ホテヘル倶楽部様)",
+      "category": "official",
+      "isActive": true
+    },
+    {
+      "id": "girls_heaven",
+      "uuid": "4df956fb-e760-4dcf-9b75-4370f1ab875e",
+      "name": "ガールズヘブン",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "cityheaven",
+      "uuid": "6a32f75c-601c-45d4-9a5e-71526bb847c1",
+      "name": "シティヘブンネット",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "job_heaven",
+      "uuid": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "name": "ジョブヘブン【メンズヘブン】",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "deliheru_town",
+      "uuid": "c3d4e5f6-a7b8-9012-cdef-345678901234",
+      "name": "デリヘルタウン",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "vanilla",
+      "uuid": "d4e5f6a7-b8c9-0123-def0-456789012345",
+      "name": "バニラ",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "pureajo",
+      "uuid": "e5f6a7b8-c9d0-1234-ef01-567890123456",
+      "name": "ぴゅあじょ",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "purela",
+      "uuid": "f6a7b8c9-d0e1-2345-f012-678901234567",
+      "name": "ぴゅあらば",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "purela_staff",
+      "uuid": "a7b8c9d0-e1f2-3456-0123-789012345678",
+      "name": "ぴゅあらばスタッフ",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "manzoku",
+      "uuid": "b8c9d0e1-f2a3-4567-1234-890123456789",
+      "name": "マンゾクネット",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "ekichika",
+      "uuid": "c9d0e1f2-a3b4-5678-2345-901234567890",
+      "name": "駅ちか人気！風俗ランキング",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "kuchikomi",
+      "uuid": "d0e1f2a3-b4c5-6789-3456-012345678901",
+      "name": "口コミ風俗情報局",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "fuzoku_japan",
+      "uuid": "e1f2a3b4-c5d6-7890-4567-123456789012",
+      "name": "風俗じゃぱん！",
+      "category": "general",
+      "isActive": true
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { TabKey } from '../../../types/content-update';
+import { ContentTabKey } from '../../../types/content-update';
 import ContentListTab from '../tabs/ContentListTab';
 import MonthlySiteTab from '../tabs/MonthlySiteTab';
 import FemaleRecruitmentTab from '../tabs/FemaleRecruitmentTab';
 import MaleRecruitmentTab from '../tabs/MaleRecruitmentTab';
 import GroupCreateTab from '../tabs/GroupCreateTab';
 
-export const getTabContent = (activeTab: TabKey): React.ReactNode => {
+export const getTabContent = (activeTab: ContentTabKey): React.ReactNode => {
   switch (activeTab) {
     case 'content-list':
       return <ContentListTab />;
@@ -25,7 +25,7 @@ export const getTabContent = (activeTab: TabKey): React.ReactNode => {
   }
 };
 
-export const getItemCount = (activeTab: TabKey): string => {
+export const getItemCount = (activeTab: ContentTabKey): string => {
   switch (activeTab) {
     case 'content-list':
       return '1-50件 / 74件中';
@@ -38,10 +38,10 @@ export const getItemCount = (activeTab: TabKey): string => {
   }
 };
 
-export const shouldShowGroupButtons = (activeTab: TabKey): boolean => {
+export const shouldShowGroupButtons = (activeTab: ContentTabKey): boolean => {
   return ['monthly-site', 'female-recruitment', 'male-recruitment'].includes(activeTab);
 };
 
-export const shouldShowSecondPage = (activeTab: TabKey): boolean => {
+export const shouldShowSecondPage = (activeTab: ContentTabKey): boolean => {
   return activeTab === 'content-list';
 };
