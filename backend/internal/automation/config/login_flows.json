@@ -155,7 +155,7 @@
         }
       }
     },
-    "deriheru-town": {
+    "deli-town": {
       "name": "デリヘルタウン",
       "loginUrl": "https://admin.dto.jp/a/auth/input?key=281b4f3053fa81c7160a027cb87b66bc",
       "_html_tags": {
@@ -443,7 +443,7 @@
         }
       }
     },
-    "uresen": {
+    "ure-sen": {
       "name": "うれせん【関西・中四国版】",
       "loginUrl": "https://shop.ure-sen.com/login",
       "_html_tags": {

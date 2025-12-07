@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"sync"
 
 	"nissho-dispatch-backend/internal/automation"
 	"nissho-dispatch-backend/internal/middleware"
@@ -310,35 +311,53 @@ func ExecuteRegisteredFlows(w http.ResponseWriter, r *http.Request) {
 		// ログインフロー設定ファイルのパスを取得
 		configPath := filepath.Join("internal", "automation", "config", "login_flows.json")
 
-		// FlowExecutorを作成
-		executor, err := automation.NewFlowExecutor(configPath)
-		if err != nil {
-			fmt.Printf("Failed to create flow executor: %v\n", err)
-			return
+		// 各サイトでログインフローを並列実行（各サイトごとに独立したブラウザ）
+		results := make([]automation.FlowExecutionResult, len(siteCreds))
+		var wg sync.WaitGroup
+
+		for i, cred := range siteCreds {
+			wg.Add(1)
+			go func(index int, c siteCredential) {
+				defer wg.Done()
+
+				// 各goroutineで独立したFlowExecutorとブラウザを作成
+				executor, err := automation.NewFlowExecutor(configPath)
+				if err != nil {
+					fmt.Printf("❌ %s: FlowExecutor作成失敗 - %v\n", c.SiteName, err)
+					results[index] = automation.FlowExecutionResult{
+						Success:  false,
+						FlowCode: "login",
+						Error:    fmt.Sprintf("Failed to create executor: %v", err),
+					}
+					return
+				}
+
+				// 独立したブラウザを起動（ヘッドレス=false で見える）
+				if err := executor.StartBrowser(false); err != nil {
+					fmt.Printf("❌ %s: ブラウザ起動失敗 - %v\n", c.SiteName, err)
+					results[index] = automation.FlowExecutionResult{
+						Success:  false,
+						FlowCode: "login",
+						Error:    fmt.Sprintf("Failed to start browser: %v", err),
+					}
+					return
+				}
+				defer executor.StopBrowser()
+
+				// ExecutionContextを作成
+				ctx := &automation.ExecutionContext{
+					LoginID:  c.LoginID,
+					Password: c.Password,
+				}
+
+				// ログインフローを実行（AutomationIDを使用）
+				fmt.Printf("🔄 フロー実行開始: %s (automation_id: %s)\n", c.SiteName, c.AutomationID)
+				result := executor.ExecuteFlow(c.AutomationID, "login", ctx)
+				results[index] = *result
+			}(i, cred)
 		}
 
-		// ブラウザを起動（ヘッドレス=false で見える）
-		if err := executor.StartBrowser(false); err != nil {
-			fmt.Printf("Failed to start browser: %v\n", err)
-			return
-		}
-		defer executor.StopBrowser()
-
-		// 各サイトでログインフローを実行
-		results := make([]automation.FlowExecutionResult, 0, len(siteCreds))
-
-		for _, cred := range siteCreds {
-			// ExecutionContextを作成
-			ctx := &automation.ExecutionContext{
-				LoginID:  cred.LoginID,
-				Password: cred.Password,
-			}
-
-			// ログインフローを実行（AutomationIDを使用）
-			fmt.Printf("🔄 フロー実行開始: %s (automation_id: %s)\n", cred.SiteName, cred.AutomationID)
-			result := executor.ExecuteFlow(cred.AutomationID, "login", ctx)
-			results = append(results, *result)
-		}
+		wg.Wait()
 
 		// 結果をログ出力
 		successCount := countSuccessResults(results)
