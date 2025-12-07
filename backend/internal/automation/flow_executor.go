@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-rod/rod"
 	"github.com/go-rod/rod/lib/launcher"
+	"github.com/go-rod/rod/lib/proto"
 )
 
 // ============================================
@@ -35,8 +36,8 @@ type FlowDefinition struct {
 	Steps        []FlowStep `json:"steps"`
 }
 
-// SiteConfig represents a site configuration
-type SiteConfig struct {
+// FlowSiteConfig represents a site configuration for flows
+type FlowSiteConfig struct {
 	Name     string                    `json:"name"`
 	LoginURL string                    `json:"loginUrl"`
 	Flows    map[string]FlowDefinition `json:"flows"`
@@ -44,7 +45,7 @@ type SiteConfig struct {
 
 // FlowConfig represents the entire flow configuration file
 type FlowConfig struct {
-	Sites map[string]SiteConfig `json:"sites"`
+	Sites map[string]FlowSiteConfig `json:"sites"`
 }
 
 // FlowExecutor executes flows based on JSON configuration
@@ -68,8 +69,8 @@ type ExecutionContext struct {
 	Custom    map[string]string
 }
 
-// ExecutionResult represents the result of a flow execution
-type ExecutionResult struct {
+// FlowExecutionResult represents the result of a flow execution
+type FlowExecutionResult struct {
 	Success   bool
 	FlowCode  string
 	FlowName  string
@@ -114,7 +115,9 @@ func NewFlowExecutorFromBytes(data []byte) (*FlowExecutor, error) {
 
 // StartBrowser starts the browser
 func (e *FlowExecutor) StartBrowser(headless bool) error {
-	e.launcher = launcher.New().Headless(headless)
+	e.launcher = launcher.New().
+		Headless(headless).
+		Leakless(false) // Disable leakless mode to avoid Windows Defender blocking
 	url := e.launcher.MustLaunch()
 	e.browser = rod.New().ControlURL(url).MustConnect()
 	return nil
@@ -131,7 +134,7 @@ func (e *FlowExecutor) StopBrowser() {
 }
 
 // GetSiteConfig returns the configuration for a site
-func (e *FlowExecutor) GetSiteConfig(siteID string) (*SiteConfig, error) {
+func (e *FlowExecutor) GetSiteConfig(siteID string) (*FlowSiteConfig, error) {
 	site, ok := e.config.Sites[siteID]
 	if !ok {
 		return nil, fmt.Errorf("site not found: %s", siteID)
@@ -154,9 +157,9 @@ func (e *FlowExecutor) GetFlowDefinition(siteID, flowCode string) (*FlowDefiniti
 }
 
 // ExecuteFlow executes a flow
-func (e *FlowExecutor) ExecuteFlow(siteID, flowCode string, ctx *ExecutionContext) *ExecutionResult {
+func (e *FlowExecutor) ExecuteFlow(siteID, flowCode string, ctx *ExecutionContext) *FlowExecutionResult {
 	startTime := time.Now()
-	result := &ExecutionResult{
+	result := &FlowExecutionResult{
 		FlowCode:  flowCode,
 		Timestamp: startTime,
 	}
@@ -225,7 +228,7 @@ func (e *FlowExecutor) executeStep(page *rod.Page, step FlowStep, ctx *Execution
 		if err != nil {
 			return fmt.Errorf("element not found: %s", selector)
 		}
-		return el.Click(rod.MouseLeft, 1)
+		return el.Click(proto.InputMouseButtonLeft, 1)
 
 	case "input":
 		el, err := page.Timeout(timeout).Element(selector)
@@ -239,7 +242,10 @@ func (e *FlowExecutor) executeStep(page *rod.Page, step FlowStep, ctx *Execution
 		if err != nil {
 			return fmt.Errorf("element not found: %s", selector)
 		}
-		return el.SelectAllText().Input("")
+		if err := el.SelectAllText(); err != nil {
+			return err
+		}
+		return el.Input("")
 
 	case "upload":
 		el, err := page.Timeout(timeout).Element(selector)
@@ -355,8 +361,8 @@ func (e *FlowExecutor) ListFlows(siteID string) ([]string, error) {
 }
 
 // ExecuteMultipleFlows executes multiple flows sequentially
-func (e *FlowExecutor) ExecuteMultipleFlows(siteID string, flowCodes []string, ctx *ExecutionContext) []*ExecutionResult {
-	results := make([]*ExecutionResult, 0, len(flowCodes))
+func (e *FlowExecutor) ExecuteMultipleFlows(siteID string, flowCodes []string, ctx *ExecutionContext) []*FlowExecutionResult {
+	results := make([]*FlowExecutionResult, 0, len(flowCodes))
 	for _, flowCode := range flowCodes {
 		result := e.ExecuteFlow(siteID, flowCode, ctx)
 		results = append(results, result)

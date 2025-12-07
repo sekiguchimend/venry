@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Settings, List, Grid, Upload, ChevronDown, RotateCcw, X } from 'lucide-react';
+import { executeRegisteredFlows } from './actions/automation';
 
 interface WomanCard {
   id: string;
@@ -16,6 +17,7 @@ const SortingPage: React.FC = () => {
   const [sortOrder, setSortOrder] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patternName, setPatternName] = useState('');
+  const [isExecuting, setIsExecuting] = useState(false);
 
   const handleGroupTabClick = () => {
     setIsModalOpen(true);
@@ -31,6 +33,27 @@ const SortingPage: React.FC = () => {
       // 保存処理
       console.log('Pattern saved:', patternName);
       handleCloseModal();
+    }
+  };
+
+  const handleExecuteFlows = async () => {
+    if (isExecuting) return;
+
+    const confirmed = window.confirm('登録済みの全サイトでログインフローを実行します。\nブラウザが表示されますが、操作しないでください。\nよろしいですか？');
+    if (!confirmed) return;
+
+    setIsExecuting(true);
+    try {
+      const result = await executeRegisteredFlows();
+      if (result.success) {
+        alert(`✅ ${result.message || 'フロー実行を開始しました'}\nブラウザが表示されます。処理が完了するまでお待ちください。`);
+      } else {
+        alert(`❌ フロー実行失敗\n${result.error || '不明なエラー'}`);
+      }
+    } catch (error) {
+      alert(`❌ エラーが発生しました\n${error}`);
+    } finally {
+      setIsExecuting(false);
     }
   };
 
@@ -198,9 +221,17 @@ const SortingPage: React.FC = () => {
             </button>
 
             <div className="ml-auto">
-              <button className="py-2 px-4 bg-red-500 text-white rounded-full text-sm font-medium hover:bg-red-600 transition-colors flex items-center gap-2">
+              <button
+                onClick={handleExecuteFlows}
+                disabled={isExecuting}
+                className={`py-2 px-4 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+                  isExecuting
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-red-500 hover:bg-red-600'
+                } text-white`}
+              >
                 <Upload size={16} />
-                サイトへ更新
+                {isExecuting ? '実行中...' : 'サイトへ更新'}
               </button>
             </div>
           </div>

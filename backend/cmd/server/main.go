@@ -48,6 +48,12 @@ func main() {
 	mux.Handle("/api/credentials/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveCredential)))
 	mux.Handle("/api/credentials/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteCredential)))
 
+	// 自動化エンドポイント
+	mux.Handle("/api/automation/login", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteLogin)))
+	mux.Handle("/api/automation/login/single", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteSingleLogin)))
+	mux.Handle("/api/automation/login/test", middleware.AuthMiddleware(http.HandlerFunc(handlers.TestLoginCredential)))
+	mux.Handle("/api/automation/execute-flows", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteRegisteredFlows)))
+
 	// ミドルウェアチェーン
 	handler := middleware.LoggerMiddleware(corsMiddleware.Handler(mux))
 

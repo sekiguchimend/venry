@@ -1,0 +1,513 @@
+{
+  "_comment": "全サイトのログインフロー定義 - b.jsonのHTMLタグから正確に抽出",
+  "sites": {
+    "hime-channel": {
+      "name": "HIME CHANNEL",
+      "loginUrl": "https://biz.hime-channel.com/login",
+      "_html_tags": {
+        "email_input": "<input placeholder=\"\" type=\"text\" value=\"\" class=\"ant-input ant-input-lg\" data-v-0b782bc0=\"\" data-v-d2ec1096=\"\">",
+        "password_input": "<input placeholder=\"\" type=\"password\" class=\"ant-input ant-input-lg\" data-v-0b782bc0=\"\" data-v-d2ec1096=\"\">",
+        "submit_button": "<button type=\"button\" class=\"ant-btn ant-btn-primary ant-btn-round ant-btn-lg\" data-v-63aef349=\"\" data-v-d2ec1096=\"\"><span>店舗管理者ログイン</span></button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "waitTime", "ms": 2000 },
+            { "action": "input", "selector": "input[type=\"text\"].ant-input.ant-input-lg", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[type=\"password\"].ant-input.ant-input-lg", "value": "{{password}}" },
+            { "action": "click", "selector": "button.ant-btn-primary.ant-btn-round.ant-btn-lg" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "kf-kyoto": {
+      "name": "KF京都風俗情報",
+      "loginUrl": "https://fufufu.tv/shopadmin/login",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" class=\"login-inp\" required=\"required\" id=\"form_loginId\" name=\"loginId\" value=\"\">",
+        "password_input": "<input type=\"password\" class=\"login-inp\" required=\"required\" id=\"form_password\" name=\"password\" value=\"\">",
+        "submit_button": "<input type=\"submit\" value=\"ログイン\" class=\"submit-login\" id=\"form_submits\" name=\"submit\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#form_loginId", "timeout": 5000 },
+            { "action": "input", "selector": "#form_loginId", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#form_password", "value": "{{password}}" },
+            { "action": "click", "selector": "#form_submits" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "q-pri": {
+      "name": "Qプリ",
+      "loginUrl": "https://q-pri.com/shop/login/",
+      "_html_tags": {
+        "email_input": "<input name=\"data[Shop][login_id]\" type=\"text\" class=\"form-control\" placeholder=\"ログインID\" autofocus=\"1\" id=\"ShopLoginId\">",
+        "password_input": "<input name=\"data[Shop][password]\" type=\"text\" class=\"form-control\" placeholder=\"パスワード\" id=\"ShopPassword\">",
+        "submit_button": "<button class=\"btn btn-lg btn-primary btn-block\" type=\"submit\">ログイン</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#ShopLoginId", "timeout": 5000 },
+            { "action": "input", "selector": "#ShopLoginId", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#ShopPassword", "value": "{{password}}" },
+            { "action": "click", "selector": "button.btn-primary[type=\"submit\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "kyoto-hoteheru": {
+      "name": "オフィシャル(京都ホテヘル倶楽部様)",
+      "loginUrl": "https://kyoto.derikura.com/manage/",
+      "_html_tags": {
+        "email_input": "<input autofocus=\"\" class=\"input-large span10\" name=\"login_id\" id=\"username\" type=\"text\" value=\"\">",
+        "password_input": "<input class=\"input-large span10\" name=\"login_pass\" id=\"password\" type=\"password\" value=\"\">",
+        "submit_button": "<button type=\"submit\" class=\"btn btn-primary\">Login</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#username", "timeout": 5000 },
+            { "action": "input", "selector": "#username", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#password", "value": "{{password}}" },
+            { "action": "click", "selector": "button[type=\"submit\"].btn-primary" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "girls-heaven": {
+      "name": "ガールズヘブン",
+      "loginUrl": "https://manager.girlsheaven-job.net/",
+      "_html_tags": {
+        "email_input": "<input data-name=\"ID\" data-check=\"required\" name=\"loginId\" id=\"loginId\" type=\"text\" style=\"width: 300px;\" maxlength=\"40\">",
+        "password_input": "<input data-name=\"パスワード\" data-check=\"required\" name=\"loginPass\" id=\"loginPass\" type=\"password\" style=\"width: 300px;\" maxlength=\"40\" onkeydown=\"if(event.keyCode==13) loginEnter();\">",
+        "submit_button": "<a class=\"btnDefault\" id=\"login_btn\" href=\"javascript:void(0);\" data-submit=\"\" data-check=\"\">ログイン</a>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "waitTime", "ms": 2000 },
+            { "action": "input", "selector": "#loginId", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#loginPass", "value": "{{password}}" },
+            { "action": "click", "selector": "#login_btn" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "city-heaven": {
+      "name": "シティヘブンネット",
+      "loginUrl": "https://newmanager.cityheaven.net/C1Login.php",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" size=\"20\" id=\"id\" maxlength=\"40\" name=\"txt_account\" value=\"\" tabindex=\"1\" style=\"font-family:tahoma;font-size: 20px;\">",
+        "password_input": "<input type=\"password\" size=\"20\" id=\"pass\" maxlength=\"40\" name=\"txt_password\" value=\"\" tabindex=\"2\" style=\"font-family:tahoma;font-size: 20px;\">",
+        "submit_button": "<img src=\"../img/managersimple/btn_login.gif\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#id", "timeout": 5000 },
+            { "action": "input", "selector": "#id", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#pass", "value": "{{password}}" },
+            { "action": "click", "selector": "img[src*=\"btn_login.gif\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "job-heaven": {
+      "name": "ジョブヘブン【メンズヘブン】",
+      "loginUrl": "https://manager.mensheaven.jp/",
+      "_html_tags": {
+        "email_input": "<input data-name=\"ID\" data-check=\"required\" name=\"loginId\" id=\"loginId\" type=\"text\" style=\"width: 300px;\" maxlength=\"40\">",
+        "password_input": "<input data-name=\"パスワード\" data-check=\"required\" name=\"loginPass\" id=\"loginPass\" type=\"password\" style=\"width: 300px;\" maxlength=\"40\" onkeydown=\"if(event.keyCode==13) loginEnter();\">",
+        "submit_button": "<a class=\"btnDefault\" id=\"login_btn\" href=\"javascript:void(0);\" data-submit=\"\" data-check=\"\">ログイン</a>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "waitTime", "ms": 2000 },
+            { "action": "input", "selector": "#loginId", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#loginPass", "value": "{{password}}" },
+            { "action": "click", "selector": "#login_btn" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "deriheru-town": {
+      "name": "デリヘルタウン",
+      "loginUrl": "https://admin.dto.jp/a/auth/input?key=281b4f3053fa81c7160a027cb87b66bc",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"login_id\" id=\"login_id\" value=\"\" style=\"width: 200px; ime-mode:disabled;\">",
+        "password_input": "<input type=\"password\" name=\"password\" style=\"width: 200px;\">",
+        "submit_button": "<input type=\"submit\" value=\"ログイン\" id=\"login_button\" class=\"button\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#login_id", "timeout": 5000 },
+            { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"password\"][type=\"password\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "#login_button" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "vanilla": {
+      "name": "バニラ",
+      "loginUrl": "https://qzin.jp/entry/",
+      "_html_tags": {
+        "email_input": "<input value=\"\" type=\"text\" id=\"form_username\" class=\"\" width=\"129\" maxlength=\"20\" name=\"username\">",
+        "password_input": "<input type=\"password\" value=\"\" id=\"form_password\" class=\"\" width=\"129\" maxlength=\"8\" name=\"password\">",
+        "submit_button": "<input type=\"submit\" value=\"ログイン\" name=\"button\" id=\"button\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#form_username", "timeout": 5000 },
+            { "action": "input", "selector": "#form_username", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#form_password", "value": "{{password}}" },
+            { "action": "click", "selector": "#button" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "pyuajo": {
+      "name": "ぴゅあじょ",
+      "loginUrl": "https://work.purelovers.com/shop/login/",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"id\" value=\"\" class=\"form-control\">",
+        "password_input": "<input type=\"password\" name=\"password\" value=\"\" class=\"form-control\">",
+        "submit_button": "<button name=\"submit_button\" value=\"ログイン\" class=\"btn btn-secondary\">ログイン</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"id\"].form-control", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"id\"].form-control", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"password\"].form-control", "value": "{{password}}" },
+            { "action": "click", "selector": "button[name=\"submit_button\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "pyuaraba": {
+      "name": "ぴゅあらば",
+      "loginUrl": "https://shop-admin.purelovers.com/shop/login/index/",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"id\" value=\"\" id=\"login_input1\">",
+        "password_input": "<input type=\"password\" name=\"password\" value=\"\" id=\"login_input1\">",
+        "submit_button": "<input type=\"image\" name=\"submit_button\" value=\"ログイン\" src=\"//contents.purelovers.com/shop_admin/common/img/common/btn_login.png\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"id\"][type=\"text\"]", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"id\"][type=\"text\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"password\"][type=\"password\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "input[type=\"image\"][name=\"submit_button\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "pyuaraba-staff": {
+      "name": "ぴゅあらばスタッフ",
+      "loginUrl": "https://cigoto.jp/shop/login/",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"id\" value=\"\" class=\"form-control\">",
+        "password_input": "<input type=\"password\" name=\"password\" value=\"\" class=\"form-control\">",
+        "submit_button": "<button name=\"submit_button\" value=\"ログイン\" class=\"btn btn-secondary\">ログイン</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"id\"].form-control", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"id\"].form-control", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"password\"].form-control", "value": "{{password}}" },
+            { "action": "click", "selector": "button[name=\"submit_button\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "manzoku": {
+      "name": "マンゾクネット",
+      "loginUrl": "https://www.manzoku.or.jp/admin3/index.php",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" class=\"inputtext\" name=\"login_id\" value=\"\">",
+        "password_input": "<input type=\"password\" class=\"inputtext\" name=\"login_pass\" value=\"\">",
+        "submit_button": "<input type=\"submit\" class=\"loginBtn\" value=\"新管理画面にログイン\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"login_id\"]", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"login_id\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"login_pass\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "input.loginBtn[type=\"submit\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "ekichika": {
+      "name": "駅ちか人気！風俗ランキング",
+      "loginUrl": "https://ranking-deli.jp/admin/login",
+      "_html_tags": {
+        "email_input": "<input class=\"input_login\" placeholder=\"ログインID\" autofocus=\"autofocus\" name=\"email\" value=\"\" type=\"text\" id=\"form_email\">",
+        "password_input": "<input class=\"input_login\" placeholder=\"Password\" name=\"password\" value=\"\" type=\"password\" id=\"form_password\">",
+        "submit_button": "<input value=\"ログイン\" name=\"submit\" class=\"btn btn-lg btn-primary btn-block\" type=\"submit\" id=\"form_submit\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#form_email", "timeout": 5000 },
+            { "action": "input", "selector": "#form_email", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#form_password", "value": "{{password}}" },
+            { "action": "click", "selector": "#form_submit" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "kuchikomi": {
+      "name": "口コミ風俗情報局",
+      "loginUrl": "https://fujoho.jp/index.php?p=login",
+      "_html_tags": {
+        "email_input": "<input style=\"width:240px;ime-mode:inactive;\" type=\"text\" name=\"email\" id=\"email\" value=\"\" class=\"form-control\">",
+        "password_input": "<input style=\"width:240px;ime-mode:inactive;\" type=\"password\" name=\"password\" id=\"password\" class=\"form-control\">",
+        "submit_button": "<input style=\"margin-top:10px;padding-left:30px;padding-right:30px;\" type=\"submit\" name=\"login\" value=\"ログイン\" class=\"btn btn-primary\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#email", "timeout": 5000 },
+            { "action": "input", "selector": "#email", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#password", "value": "{{password}}" },
+            { "action": "click", "selector": "input[name=\"login\"][type=\"submit\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "fuzoku-japan": {
+      "name": "風俗じゃぱん！",
+      "loginUrl": "https://fuzoku.jp/entry/login/",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" id=\"form_username\" class=\"ime_mode\" name=\"username\" value=\"\">",
+        "password_input": "<input type=\"password\" id=\"form_password\" name=\"password\" value=\"\">",
+        "submit_button": "<button class=\"loginBtn\" type=\"submit\" name=\"login_btn\" id=\"button\" value=\"ログイン\" disabled=\"\"><img width=\"270\" height=\"44\" alt=\"ログイン\" src=\"https://assets.fuzoku.jp/assets/img/entry/pc/index/btn_login.png?1764814762\"></button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#form_username", "timeout": 5000 },
+            { "action": "input", "selector": "#form_username", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#form_password", "value": "{{password}}" },
+            { "action": "waitTime", "ms": 500 },
+            { "action": "click", "selector": "#button" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "deriheru-japan": {
+      "name": "デリヘルじゃぱん！",
+      "loginUrl": "https://deli-fuzoku.jp/entry/",
+      "_html_tags": {
+        "email_input": "<input value=\"\" type=\"text\" id=\"form_username\" class=\"\" name=\"username\">",
+        "password_input": "<input type=\"password\" value=\"\" id=\"form_password\" class=\"\" name=\"password\">",
+        "submit_button": "<button class=\"loginBtn\" type=\"submit\" name=\"login_btn\" id=\"button\" value=\"ログイン\" disabled=\"\"><img width=\"270\" height=\"44\" alt=\"ログイン\" src=\"https://deli-fuzoku.jp/assets/img/entry/pc/index/btn_login.png?1764813943\"></button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#form_username", "timeout": 5000 },
+            { "action": "input", "selector": "#form_username", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#form_password", "value": "{{password}}" },
+            { "action": "waitTime", "ms": 500 },
+            { "action": "click", "selector": "#button" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "fucolle": {
+      "name": "フーコレ",
+      "loginUrl": "https://manager.fucolle.com/",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"id\" class=\"text_box\">",
+        "password_input": "<input type=\"password\" name=\"pass\" class=\"text_box\">",
+        "submit_button": "<input type=\"submit\" value=\"ログイン\" name=\"submit\" class=\"bt\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"id\"].text_box", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"id\"].text_box", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"pass\"].text_box", "value": "{{password}}" },
+            { "action": "click", "selector": "input[name=\"submit\"].bt" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "dekasegi": {
+      "name": "出稼ぎちゃん",
+      "loginUrl": "https://www.dekasegichan.com/member/index.html",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"shop_acount\" value=\"\">",
+        "password_input": "<input type=\"password\" name=\"shop_pw\" value=\"\">",
+        "submit_button": "<input type=\"button\" id=\"shoplogin\" value=\"認証\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "waitTime", "ms": 2000 },
+            { "action": "input", "selector": "input[name=\"shop_acount\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"shop_pw\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "#shoplogin" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "thirty-fuzoku": {
+      "name": "30からの風俗アルバイト【関西版】",
+      "loginUrl": "https://www.30baito.net/admin/login/",
+      "_html_tags": {
+        "email_input": "<input class=\"input01\" type=\"text\" name=\"mail\" value=\"\" title=\"メールアドレス\" placeholder=\"IDを入力してください\" required=\"\">",
+        "password_input": "<input class=\"input01\" type=\"password\" name=\"password\" value=\"\" title=\"パスワード\" placeholder=\"パスワードを入力してください\" required=\"\">",
+        "submit_button": "<button class=\"submit\" type=\"submit\" name=\"step\" value=\"2\">ログイン</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"mail\"]", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"mail\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"password\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "button[type=\"submit\"][name=\"step\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "uresen": {
+      "name": "うれせん【関西・中四国版】",
+      "loginUrl": "https://shop.ure-sen.com/login",
+      "_html_tags": {
+        "email_input": "<input name=\"data[Shop][login_id]\" type=\"text\" id=\"ShopLoginId\" required=\"required\">",
+        "password_input": "<input name=\"data[Shop][password]\" type=\"password\" id=\"ShopPassword\">",
+        "submit_button": "<button class=\" medium\" rel=\"form-button\" type=\"submit\">ログイン</button>"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "#ShopLoginId", "timeout": 5000 },
+            { "action": "input", "selector": "#ShopLoginId", "value": "{{login_id}}" },
+            { "action": "input", "selector": "#ShopPassword", "value": "{{password}}" },
+            { "action": "click", "selector": "button[type=\"submit\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "nightpi": {
+      "name": "ナイトピ",
+      "loginUrl": "http://naitopi.com/main/cpanel.cgi",
+      "_html_tags": {
+        "email_input": "<input type=\"text\" name=\"scd\" size=\"10\" maxlength=\"16\" value=\"\">",
+        "password_input": "<input type=\"password\" name=\"spw\" size=\"10\" maxlength=\"16\">",
+        "submit_button": "<input type=\"submit\" value=\"ログイン\">"
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "wait", "selector": "input[name=\"scd\"]", "timeout": 5000 },
+            { "action": "input", "selector": "input[name=\"scd\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"spw\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "input[type=\"submit\"]" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    },
+    "mr-venrey": {
+      "name": "Mr.Venrey【他アカウント】",
+      "loginUrl": "https://mrvenrey.jp/#/admin",
+      "_html_tags": {
+        "email_input": "",
+        "password_input": "",
+        "submit_button": ""
+      },
+      "flows": {
+        "login": {
+          "name": "ログイン",
+          "steps": [
+            { "action": "navigate", "url": "{{loginUrl}}" },
+            { "action": "waitTime", "ms": 3000 },
+            { "action": "input", "selector": "input[name=\"user\"]", "value": "{{login_id}}" },
+            { "action": "input", "selector": "input[name=\"pass\"]", "value": "{{password}}" },
+            { "action": "click", "selector": "button" },
+            { "action": "waitTime", "ms": 3000 }
+          ]
+        }
+      }
+    }
+  }
+}

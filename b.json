@@ -1,0 +1,237 @@
+
+{
+  "sites": [
+    {
+      "No": "1",
+      "サイト名": "HIME CHANNEL (アカウント1)",
+      "URL": "https://biz.hime-channel.com/login",
+      "メール": "himechannel7+S2154@gmail.com",
+      "パスワード": "dcphoteheru",
+      "メールアドレスインプット": "<input placeholder="" type="text" value="" class="ant-input ant-input-lg" data-v-0b782bc0="" data-v-d2ec1096="">",
+      "パスワードインプット": "<input placeholder="" type="password" class="ant-input ant-input-lg" data-v-0b782bc0="" data-v-d2ec1096="">",
+      "ボタン": "<button type="button" class="ant-btn ant-btn-primary ant-btn-round ant-btn-lg" data-v-63aef349="" data-v-d2ec1096=""><span>店舗管理者ログイン</span></button>"
+    },
+    {
+      "No": "2",
+      "サイト名": "KF京都風俗情報 (アカウント1)",
+      "URL": "https://fufufu.tv/shopadmin/login",
+      "メール": "khc",
+      "パスワード": "kfjkfj",
+      "メールアドレスインプット": "<input type="text" class="login-inp" required="required" id="form_loginId" name="loginId" value="">",
+      "パスワードインプット": "<input type="password" class="login-inp" required="required" id="form_password" name="password" value="">",
+      "ボタン": "<input type="submit" value="ログイン" class="submit-login" id="form_submits" name="submit">"
+    },
+    {
+      "No": "3",
+      "サイト名": "Qプリ (アカウント1)",
+      "URL": "https://q-pri.com/shop/login/",
+      "メール": "16201",
+      "パスワード": "mDulbQTc",
+      "メールアドレスインプット": "<input name="data[Shop][login_id]" type="text" class="form-control" placeholder="ログインID" autofocus="1" id="ShopLoginId">",
+      "パスワードインプット": "<input name="data[Shop][password]" type="text" class="form-control" placeholder="パスワード" id="ShopPassword">",
+      "ボタン": "<button class="btn btn-lg btn-primary btn-block" type="submit">ログイン</button>"
+    },
+    {
+      "No": "4",
+      "サイト名": "オフィシャル(京都ホテヘル倶楽部様)",
+      "URL": "https://kyoto.derikura.com/manage/",
+      "メール": "dcpg",
+      "パスワード": "K8mX3ZCx",
+      "メールアドレスインプット": "<input autofocus="" class="input-large span10" name="login_id" id="username" type="text" value="">",
+      "パスワードインプット": "<input class="input-large span10" name="login_pass" id="password" type="password" value="">",
+      "ボタン": "<button type="submit" class="btn btn-primary">Login</button>"
+    },
+    {
+      "No": "5",
+      "サイト名": "ガールズヘブン (アカウント1)",
+      "URL": "https://manager.girlsheaven-job.net/",
+      "メール": "1100127",
+      "パスワード": "kt20lo70",
+      "メールアドレスインプット": "<input data-name="ID" data-check="required" name="loginId" id="loginId" type="text" style="width: 300px;" maxlength="40">",
+      "パスワードインプット": "<input data-name="パスワード" data-check="required" name="loginPass" id="loginPass" type="password" style="width: 300px;" maxlength="40" onkeydown="if(event.keyCode==13) loginEnter();">",
+      "ボタン": "<a class="btnDefault" id="login_btn" href="javascript:void(0);" data-submit="" data-check="">ログイン</a>"
+    },
+    {
+      "No": "6",
+      "サイト名": "シティヘブンネット (アカウント1)",
+      "URL": "https://newmanager.cityheaven.net/C1Login.php",
+      "メール": "1100127",
+      "パスワード": "kt20lo70",
+      "メールアドレスインプット": "<input type="text" size="20" id="id" maxlength="40" name="txt_account" value="" tabindex="1" style="font-family:tahoma;font-size: 20px;">",
+      "パスワードインプット": "<input type="password" size="20" id="pass" maxlength="40" name="txt_password" value="" tabindex="2" style="font-family:tahoma;font-size: 20px;">",
+      "ボタン": "<img src="../img/managersimple/btn_login.gif">"
+    },
+    {
+      "No": "7",
+      "サイト名": "ジョブヘブン【メンズヘブン】(アカウント1)",
+      "URL": "https://manager.mensheaven.jp/",
+      "メール": "1100127",
+      "パスワード": "kt20lo70",
+      "メールアドレスインプット": "<input data-name="ID" data-check="required" name="loginId" id="loginId" type="text" style="width: 300px;" maxlength="40">",
+      "パスワードインプット": "<input data-name="パスワード" data-check="required" name="loginPass" id="loginPass" type="password" style="width: 300px;" maxlength="40" onkeydown="if(event.keyCode==13) loginEnter();">",
+      "ボタン": "<a class="btnDefault" id="login_btn" href="javascript:void(0);" data-submit="" data-check="">ログイン</a>"
+    },
+    {
+      "No": "8",
+      "サイト名": "デリヘルタウン (アカウント1)",
+      "URL": "https://admin.dto.jp/a/auth/input?key=281b4f3053fa81c7160a027cb87b66bc",
+      "メール": "neonwork@i.softbank.jp",
+      "パスワード": "dcpdcp",
+      "メールアドレスインプット": "<input type="text" name="login_id" id="login_id" value="" style="width: 200px; ime-mode:disabled;">",
+      "パスワードインプット": "<input type="password" name="password" style="width: 200px;">",
+      "ボタン": "<input type="submit" value="ログイン" id="login_button" class="button">"
+    },
+    {
+      "No": "9",
+      "サイト名": "バニラ (アカウント1)",
+      "URL": "https://qzin.jp/entry/",
+      "メール": "kyotodcp",
+      "パスワード": "a7T4GZYb",
+      "メールアドレスインプット": "<input value="" type="text" id="form_username" class="" width="129" maxlength="20" name="username">",
+      "パスワードインプット": "<input type="password" value="" id="form_password" class="" width="129" maxlength="8" name="password">",
+      "ボタン": "<input type="submit" value="ログイン" name="button" id="button">"
+    },
+    {
+      "No": "10",
+      "サイト名": "ぴゅあじょ (アカウント1)",
+      "URL": "https://work.purelovers.com/shop/login/",
+      "メール": "VFfATHMOP",
+      "パスワード": "t6asx58f",
+      "メールアドレスインプット": "<input type="text" name="id" value="" class="form-control">",
+      "パスワードインプット": "<input type="password" name="password" value="" class="form-control">",
+      "ボタン": "<button name="submit_button" value="ログイン" class="btn btn-secondary">ログイン</button>"
+    },
+    {
+      "No": "11",
+      "サイト名": "ぴゅあらば (アカウント1)",
+      "URL": "https://shop-admin.purelovers.com/shop/login/index/",
+      "メール": "ZhQy2mBk",
+      "パスワード": "5XGkmtbZ",
+      "メールアドレスインプット": "<input type="text" name="id" value="" id="login_input1">",
+      "パスワードインプット": "<input type="password" name="password" value="" id="login_input1">",
+      "ボタン": "<input type="image" name="submit_button" value="ログイン" src="//contents.purelovers.com/shop_admin/common/img/common/btn_login.png">"
+    },
+    {
+      "No": "12",
+      "サイト名": "ぴゅあらばスタッフ (アカウント1)",
+      "URL": "https://cigoto.jp/shop/login/",
+      "メール": "iuIwdAJD",
+      "パスワード": "pSIEZtwy",
+      "メールアドレスインプット": "<input type="text" name="id" value="" class="form-control">",
+      "パスワードインプット": "<input type="password" name="password" value="" class="form-control">",
+      "ボタン": "<button name="submit_button" value="ログイン" class="btn btn-secondary">ログイン</button>"
+    },
+    {
+      "No": "13",
+      "サイト名": "マンゾクネット (アカウント1)",
+      "URL": "https://www.manzoku.or.jp/admin3/index.php",
+      "メール": "45560",
+      "パスワード": "SAv9460w",
+      "メールアドレスインプット": "<input type="text" class="inputtext" name="login_id" value="">",
+      "パスワードインプット": "<input type="password" class="inputtext" name="login_pass" value="">",
+      "ボタン": "<input type="submit" class="loginBtn" value="新管理画面にログイン">"
+    },
+    {
+      "No": "14",
+      "サイト名": "駅ちか人気！風俗ランキング (アカウント1)",
+      "URL": "https://ranking-deli.jp/admin/login",
+      "メール": "16593",
+      "パスワード": "yaber",
+      "メールアドレスインプット": "<input class="input_login" placeholder="ログインID" autofocus="autofocus" name="email" value="" type="text" id="form_email">",
+      "パスワードインプット": "<input class="input_login" placeholder="Password" name="password" value="" type="password" id="form_password">",
+      "ボタン": "<input value="ログイン" name="submit" class="btn btn-lg btn-primary btn-block" type="submit" id="form_submit">"
+    },
+    {
+      "No": "15",
+      "サイト名": "口コミ風俗情報局 (アカウント1)",
+      "URL": "https://fujoho.jp/index.php?p=login",
+      "メール": "info@gall.jp",
+      "パスワード": "54358238",
+      "メールアドレスインプット": "<input style="width:240px;ime-mode:inactive;" type="text" name="email" id="email" value="" class="form-control">",
+      "パスワードインプット": "<input style="width:240px;ime-mode:inactive;" type="password" name="password" id="password" class="form-control">",
+      "ボタン": "<input style="margin-top:10px;padding-left:30px;padding-right:30px;" type="submit" name="login" value="ログイン" class="btn btn-primary">"
+    },
+    {
+      "No": "16",
+      "サイト名": "風俗じゃぱん！(アカウント1)",
+      "URL": "https://fuzoku.jp/entry/login/",
+      "メール": "kkhotel",
+      "パスワード": "gallhote",
+      "メールアドレスインプット": "<input type="text" id="form_username" class="ime_mode" name="username" value="">",
+      "パスワードインプット": "<input type="password" id="form_password" name="password" value="">",
+      "ボタン": "<button class="loginBtn" type="submit" name="login_btn" id="button" value="ログイン" disabled="">
+ <img width="270" height="44" alt="ログイン" src="https://assets.fuzoku.jp/assets/img/entry/pc/index/btn_login.png?1764814762"> </button>"
+    },
+    {
+      "No": "17",
+      "サイト名": "デリヘルじゃぱん！(アカウント1)",
+      "URL": "https://deli-fuzoku.jp/entry/",
+      "メール": "dericlub",
+      "パスワード": "delickyo",
+      "メールアドレスインプット": "<input value="" type="text" id="form_username" class="" name="username">",
+      "パスワードインプット": "<input type="password" value="" id="form_password" class="" name="password">",
+      "ボタン": "<button class="loginBtn" type="submit" name="login_btn" id="button" value="ログイン" disabled="">
+ <img width="270" height="44" alt="ログイン" src="https://deli-fuzoku.jp/assets/img/entry/pc/index/btn_login.png?1764813943"> </button>"
+    },
+    {
+      "No": "18",
+      "サイト名": "フーコレ (アカウント1)",
+      "URL": "https://manager.fucolle.com/",
+      "メール": "075-551-4447",
+      "パスワード": "075-551-4447gyu",
+      "メールアドレスインプット": "<input type="text" name="id" class="text_box">",
+      "パスワードインプット": "<input type="password" name="pass" class="text_box">",
+      "ボタン": "<input type="submit" value="ログイン" name="submit" class="bt">"
+    },
+    {
+      "No": "19",
+      "サイト名": "出稼ぎちゃん",
+      "URL": "https://www.dekasegichan.com/member/index.html",
+      "メール": "3264",
+      "パスワード": "kyodcp",
+      "メールアドレスインプット": "<input type="text" name="shop_acount" value="">",
+      "パスワードインプット": "<input type="password" name="shop_pw" value="">",
+      "ボタン": "<input type="button" id="shoplogin" value="認証">"
+    },
+    {
+      "No": "20",
+      "サイト名": "30からの風俗アルバイト【関西版】",
+      "URL": "https://www.30baito.net/admin/login/",
+      "メール": "edChAxtj",
+      "パスワード": "URPnEdFz",
+      "メールアドレスインプット": "<input class="input01" type="text" name="mail" value="" title="メールアドレス" placeholder="IDを入力してください" required="">",
+      "パスワードインプット": "<input class="input01" type="password" name="password" value="" title="パスワード" placeholder="パスワードを入力してください" required="">",
+      "ボタン": "<button class="submit" type="submit" name="step" value="2">ログイン</button>"
+    },
+    {
+      "No": "21",
+      "サイト名": "うれせん【関西・中四国版】",
+      "URL": "https://shop.ure-sen.com/login",
+      "メール": "derikura",
+      "パスワード": "kPgDxLeX",
+      "メールアドレスインプット": "<input name="data[Shop][login_id]" type="text" id="ShopLoginId" required="required">",
+      "パスワードインプット": "<input name="data[Shop][password]" type="password" id="ShopPassword">",
+      "ボタン": "<button class=" medium" rel="form-button" type="submit">ログイン</button>"
+    },
+    {
+      "No": "22",
+      "サイト名": "ナイトピ (アカウント1)",
+      "URL": "http://naitopi.com/main/cpanel.cgi",
+      "メール": "133524",
+      "パスワード": "1111",
+      "メールアドレスインプット": "<input type="text" name="scd" size="10" maxlength="16" value="">",
+      "パスワードインプット": "<input type="password" name="spw" size="10" maxlength="16">",
+      "ボタン": "<input type="submit" value="ログイン">"
+    },
+    {
+      "No": "23",
+      "サイト名": "Mr.Venrey【他アカウント】",
+      "URL": "https://mrvenrey.jp/#/admin",
+      "メール": "4910",
+      "パスワード": "7hrkjjm",
+      "メールアドレスインプット": "",
+      "パスワードインプット": "",
+      "ボタン": ""
+    }
+  ]
+}
