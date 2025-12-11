@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { TabKey } from '../../../types/id-pass';
+import { TabKey, Site } from '../../../types/id-pass';
 import { SITES_DATA } from '../utils/siteData';
 import { TAB_CONFIG } from '../utils/tabConfig';
 import { filterSites, paginateSites } from '../utils/pagination';
@@ -12,21 +12,34 @@ import TableHeader from './TableHeader';
 import SiteRow from './SiteRow';
 import type { CredentialData } from '../actions/credentials';
 
-interface IdPassClientProps {
-  initialCredentials: CredentialData[];
+interface ApiSite {
+  id: string;
+  name: string;
+  site_url: string;
+  site_type: string;
+  automation_id: string;
+  is_active: boolean;
+  description: string;
+  created_at: string;
+  updated_at: string;
 }
 
-const IdPassClient: React.FC<IdPassClientProps> = ({ initialCredentials }) => {
+interface IdPassClientProps {
+  initialCredentials: CredentialData[];
+  initialSites?: ApiSite[];
+}
+
+const IdPassClient: React.FC<IdPassClientProps> = ({ initialCredentials, initialSites = [] }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [credentials, setCredentials] = useState<CredentialData[]>(initialCredentials);
 
   // 登録済みサイトIDを計算
+  // バックエンドAPIは既にis_registered=trueでフィルタリングしているため、
+  // 取得された認証情報は全て登録済みとして扱う
   const registeredSiteIds = useMemo(() => {
-    return credentials
-      .filter(cred => cred.is_registered)
-      .map(cred => cred.site_id);
+    return credentials.map(cred => cred.site_id);
   }, [credentials]);
 
   // ログインID情報をsiteIdでマッピング
@@ -40,17 +53,58 @@ const IdPassClient: React.FC<IdPassClientProps> = ({ initialCredentials }) => {
 
   const itemsPerPage = 15;
 
+  // データベースから取得したサイト情報を優先し、JSON設定ファイルの情報とマージ
+  const allSites = useMemo(() => {
+    const sitesMap = new Map<string, Site>();
+    
+    // まずバックエンドAPIから取得したサイト情報を追加（データベースの情報を優先）
+    initialSites.forEach(apiSite => {
+      // JSON設定から対応するサイトを探してフロー情報を取得
+      const configSite = SITES_DATA.find(s => s.id === apiSite.id || s.automationId === apiSite.automation_id);
+      
+      sitesMap.set(apiSite.id, {
+        id: apiSite.id,
+        name: apiSite.name,
+        status: apiSite.is_active ? 'active' : 'inactive',
+        automationId: apiSite.automation_id,
+        flows: configSite?.flows || [],
+      });
+    });
+    
+    // JSON設定ファイルのサイトで、データベースに存在しないものを追加
+    SITES_DATA.forEach(site => {
+      if (!sitesMap.has(site.id)) {
+        sitesMap.set(site.id, site);
+      }
+    });
+    
+    // 認証情報から取得したサイトで、まだ存在しないものを追加（フォールバック）
+    credentials.forEach(cred => {
+      if (!sitesMap.has(cred.site_id) && cred.site_id) {
+        sitesMap.set(cred.site_id, {
+          id: cred.site_id,
+          name: cred.site_name || '不明なサイト',
+          status: cred.status === 'active' ? 'active' : 'inactive',
+          automationId: cred.site_automation_id || '',
+          flows: [],
+        });
+      }
+    });
+    
+    return Array.from(sitesMap.values());
+  }, [initialSites, credentials]);
+
   // タブに応じてサイトをフィルタリング
   const tabFilteredSites = useMemo(() => {
     switch (activeTab) {
       case 'registered':
-        return SITES_DATA.filter(site => registeredSiteIds.includes(site.id));
+        return allSites.filter(site => registeredSiteIds.includes(site.id));
       case 'unregistered':
-        return SITES_DATA.filter(site => !registeredSiteIds.includes(site.id));
+        return allSites.filter(site => !registeredSiteIds.includes(site.id));
       default:
-        return SITES_DATA;
+        return allSites;
     }
-  }, [activeTab, registeredSiteIds]);
+  }, [activeTab, registeredSiteIds, allSites]);
 
   const filteredSites = useMemo(() =>
     filterSites(tabFilteredSites, searchTerm),

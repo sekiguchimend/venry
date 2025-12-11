@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Search, Plus, Download, Users, Settings, Upload, List, Grid, Trash2, ChevronDown, ChevronLeft, ChevronRight, Edit, SlidersHorizontal, MessageSquare } from 'lucide-react';
 
 interface GirlData {
@@ -22,6 +23,7 @@ interface GirlData {
 }
 
 const GirlListPage: React.FC = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +44,10 @@ const GirlListPage: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex flex-wrap items-center gap-2">
           {/* Primary Buttons */}
-          <button className="flex items-center gap-1.5 py-2 px-4 bg-green-600 text-white border-none rounded-full text-sm font-medium cursor-pointer hover:bg-green-700 transition-colors">
+          <button
+            onClick={() => router.push('/girl-list/new')}
+            className="flex items-center gap-1.5 py-2 px-4 bg-green-600 text-white border-none rounded-full text-sm font-medium cursor-pointer hover:bg-green-700 transition-colors"
+          >
             <Plus size={16} />
             新規登録
           </button>

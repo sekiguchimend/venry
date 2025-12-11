@@ -122,9 +122,9 @@ func convertRawCredentials(rawList []rawCredentialWithSite) []CompanySiteCredent
 	return credentials
 }
 
-// GetCompanySiteCredentials は会社のサイト認証情報を取得
+// GetCompanySiteCredentials は会社のサイト認証情報を取得（登録済みのみ）
 func GetCompanySiteCredentials(companyID string, token string) ([]CompanySiteCredential, error) {
-	endpoint := fmt.Sprintf("company_site_credentials?company_id=eq.%s&select=id,company_id,site_id,login_id,login_password,is_registered,status,created_at,updated_at,sites(name,automation_id)&order=site_id", companyID)
+	endpoint := fmt.Sprintf("company_site_credentials?company_id=eq.%s&is_registered=eq.true&select=id,company_id,site_id,login_id,login_password,is_registered,status,created_at,updated_at,sites(name,automation_id)&order=site_id", companyID)
 
 	var rawCredentials []rawCredentialWithSite
 	if err := SupabaseGet(endpoint, &rawCredentials, token); err != nil {
