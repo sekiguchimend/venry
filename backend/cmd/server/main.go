@@ -53,6 +53,13 @@ func main() {
 	mux.Handle("/api/automation/login/single", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteSingleLogin)))
 	mux.Handle("/api/automation/login/test", middleware.AuthMiddleware(http.HandlerFunc(handlers.TestLoginCredential)))
 	mux.Handle("/api/automation/execute-flows", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteRegisteredFlows)))
+	mux.Handle("/api/automation/execute-flow", middleware.AuthMiddleware(http.HandlerFunc(handlers.ExecuteSingleFlow)))
+
+	// コンテンツ投稿エンドポイント
+	mux.Handle("/api/content/posts", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentPosts)))
+	mux.Handle("/api/content/posts/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveContentPosts)))
+	mux.Handle("/api/content/posts/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteContentPost)))
+	mux.Handle("/api/content/id", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentID)))
 
 	// ミドルウェアチェーン
 	handler := middleware.LoggerMiddleware(corsMiddleware.Handler(mux))

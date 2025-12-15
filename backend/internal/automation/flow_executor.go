@@ -27,6 +27,7 @@ type FlowStep struct {
 	Timeout  int    `json:"timeout,omitempty"`
 	Ms       int    `json:"ms,omitempty"`
 	Path     string `json:"path,omitempty"`
+	Index    int    `json:"index,omitempty"` // 複数要素から特定のインデックスを選択（1始まり、0=未指定）
 }
 
 // FlowDefinition represents a flow with its steps
@@ -53,6 +54,7 @@ type FlowExecutor struct {
 	config   *FlowConfig
 	browser  *rod.Browser
 	launcher *launcher.Launcher
+	page     *rod.Page // 再利用可能なページ
 }
 
 // ExecutionContext holds variables for step execution
@@ -125,6 +127,10 @@ func (e *FlowExecutor) StartBrowser(headless bool) error {
 
 // StopBrowser stops the browser
 func (e *FlowExecutor) StopBrowser() {
+	if e.page != nil {
+		e.page.MustClose()
+		e.page = nil
+	}
 	if e.browser != nil {
 		e.browser.MustClose()
 	}
@@ -186,9 +192,11 @@ func (e *FlowExecutor) ExecuteFlow(siteID, flowCode string, ctx *ExecutionContex
 		ctx.LoginURL = site.LoginURL
 	}
 
-	// Create new page
-	page := e.browser.MustPage()
-	defer page.MustClose()
+	// ページを再利用（なければ新規作成）
+	if e.page == nil {
+		e.page = e.browser.MustPage()
+	}
+	page := e.page
 
 	// Execute steps
 	for i, step := range flow.Steps {
@@ -231,9 +239,24 @@ func (e *FlowExecutor) executeStep(page *rod.Page, step FlowStep, ctx *Execution
 		return el.Click(proto.InputMouseButtonLeft, 1)
 
 	case "input":
-		el, err := page.Timeout(timeout).Element(selector)
-		if err != nil {
-			return fmt.Errorf("element not found: %s", selector)
+		var el *rod.Element
+		var err error
+		if step.Index > 0 {
+			// インデックス指定がある場合、複数要素から選択（1始まり）
+			els, err := page.Timeout(timeout).Elements(selector)
+			if err != nil || len(els) == 0 {
+				return fmt.Errorf("elements not found: %s", selector)
+			}
+			idx := step.Index - 1 // 1始まりを0始まりに変換
+			if idx >= len(els) {
+				return fmt.Errorf("index %d out of range (found %d elements): %s", step.Index, len(els), selector)
+			}
+			el = els[idx]
+		} else {
+			el, err = page.Timeout(timeout).Element(selector)
+			if err != nil {
+				return fmt.Errorf("element not found: %s", selector)
+			}
 		}
 		return el.Input(value)
 

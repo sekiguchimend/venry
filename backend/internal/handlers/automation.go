@@ -63,8 +63,8 @@ func ExecuteLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ブラウザを起動
-	if err := executor.StartBrowser(true); err != nil {
+	// ブラウザを起動（ヘッドレス=false で見える）
+	if err := executor.StartBrowser(false); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(ExecuteLoginResponse{
@@ -171,8 +171,8 @@ func ExecuteSingleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ブラウザを起動
-	if err := executor.StartBrowser(true); err != nil {
+	// ブラウザを起動（ヘッドレス=false で見える）
+	if err := executor.StartBrowser(false); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -372,6 +372,147 @@ func ExecuteRegisteredFlows(w http.ResponseWriter, r *http.Request) {
 	}(siteCreds)
 }
 
+// ExecuteSingleFlow 単一サイトの特定フローを実行
+func ExecuteSingleFlow(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	user, token, ok := getUserFromRequest(w, r)
+	if !ok {
+		return
+	}
+
+	// リクエストボディをパース
+	var req struct {
+		SiteID   string `json:"site_id"`
+		FlowCode string `json:"flow_code"`
+		FlowName string `json:"flow_name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	if req.SiteID == "" || req.FlowCode == "" {
+		http.Error(w, "site_id and flow_code are required", http.StatusBadRequest)
+		return
+	}
+
+	// automation_idからsite UUIDを取得
+	siteUUID, err := models.GetSiteUUIDByAutomationID(req.SiteID, token)
+	fmt.Printf("🔍 GetSiteUUIDByAutomationID: automation_id=%s -> uuid=%s, err=%v\n", req.SiteID, siteUUID, err)
+	if err != nil || siteUUID == "" {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   fmt.Sprintf("サイトが見つかりません: %s", req.SiteID),
+		})
+		return
+	}
+
+	// 認証情報を取得（site UUIDで検索）
+	fmt.Printf("🔍 GetCredentialByCompanyAndSite: company_id=%s, site_uuid=%s\n", user.CompanyID, siteUUID)
+	cred, err := models.GetCredentialByCompanyAndSite(user.CompanyID, siteUUID, token)
+	fmt.Printf("🔍 GetCredentialByCompanyAndSite result: cred=%v, err=%v\n", cred, err)
+	if err != nil || cred == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   fmt.Sprintf("認証情報が見つかりません。site_uuid=%s, company_id=%s", siteUUID, user.CompanyID),
+		})
+		return
+	}
+
+	// コンテンツデータを取得（フロー実行に必要な入力値）
+	var contentData map[string]string
+	if req.FlowCode != "login" && req.FlowName != "" {
+		// フロー名でコンテンツを検索
+		fmt.Printf("🔍 GetContentBySiteAndFlow: siteID=%s, flowName=%s\n", req.SiteID, req.FlowName)
+		content, err := models.GetContentBySiteAndFlow(req.SiteID, req.FlowName, token)
+		if err != nil {
+			fmt.Printf("⚠️ GetContentBySiteAndFlow error: %v\n", err)
+		} else if content == nil {
+			fmt.Printf("⚠️ Content not found for site=%s, flowName=%s\n", req.SiteID, req.FlowName)
+		} else {
+			fmt.Printf("✅ Content found: id=%s, name=%s\n", content.ID, content.Name)
+			// コンテンツの投稿内容を取得
+			posts, err := models.GetContentPosts(content.ID, token)
+			if err != nil {
+				fmt.Printf("⚠️ GetContentPosts error: %v\n", err)
+			} else if len(posts) == 0 {
+				fmt.Printf("⚠️ No posts found for content_id=%s\n", content.ID)
+			} else {
+				post := posts[0]
+				contentData = map[string]string{
+					"title":        post.Title,
+					"normal_time":  post.NormalTime,
+					"normal_price": post.NormalPrice,
+					"coupon_time":  post.CouponTime,
+					"coupon_price": post.CouponPrice,
+					"conditions":   post.Conditions,
+				}
+				fmt.Printf("📝 コンテンツデータ取得: %+v\n", contentData)
+			}
+		}
+	}
+
+	// 即座にレスポンスを返す
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"message": fmt.Sprintf("フロー実行を開始しました: %s / %s", req.SiteID, req.FlowCode),
+	})
+
+	// 非同期でフロー実行
+	go func(siteID, flowCode, loginID, password string, data map[string]string) {
+		configPath := filepath.Join("internal", "automation", "config", "login_flows.json")
+
+		executor, err := automation.NewFlowExecutor(configPath)
+		if err != nil {
+			fmt.Printf("❌ FlowExecutor作成失敗: %v\n", err)
+			return
+		}
+
+		// ブラウザを起動（ヘッドレス=false で見える）
+		if err := executor.StartBrowser(false); err != nil {
+			fmt.Printf("❌ ブラウザ起動失敗: %v\n", err)
+			return
+		}
+		defer executor.StopBrowser()
+
+		// ExecutionContextを作成（コンテンツデータをCustomに設定）
+		ctx := &automation.ExecutionContext{
+			LoginID:  loginID,
+			Password: password,
+			Custom:   data,
+		}
+
+		// まずログインフローを実行
+		fmt.Printf("🔄 ログインフロー実行開始: %s\n", siteID)
+		loginResult := executor.ExecuteFlow(siteID, "login", ctx)
+		if !loginResult.Success {
+			fmt.Printf("❌ ログイン失敗: %s - %s\n", siteID, loginResult.Error)
+			return
+		}
+		fmt.Printf("✅ ログイン成功: %s\n", siteID)
+
+		// 指定されたフローを実行
+		if flowCode != "login" {
+			fmt.Printf("🔄 フロー実行開始: %s / %s\n", siteID, flowCode)
+			result := executor.ExecuteFlow(siteID, flowCode, ctx)
+			if result.Success {
+				fmt.Printf("✅ フロー成功: %s / %s\n", siteID, flowCode)
+			} else {
+				fmt.Printf("❌ フロー失敗: %s / %s - %s\n", siteID, flowCode, result.Error)
+			}
+		}
+	}(req.SiteID, req.FlowCode, cred.LoginID, cred.LoginPassword, contentData)
+}
+
 // TestLoginCredential ログイン認証情報のテスト
 func TestLoginCredential(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -424,8 +565,8 @@ func TestLoginCredential(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// ブラウザを起動（ヘッドレスモード）
-	if err := executor.StartBrowser(true); err != nil {
+	// ブラウザを起動（ヘッドレス=false で見える）
+	if err := executor.StartBrowser(false); err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]interface{}{

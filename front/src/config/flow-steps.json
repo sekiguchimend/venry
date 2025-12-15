@@ -24,10 +24,11 @@
   },
 
   "steps": {
-    "hime_channel": {
-      "shop_post": {
-        "name": "HIME CHANNEL(店舗投稿)",
-        "loginUrl": "https://hime-channel.com/shop/login",
+    "_common": {
+      "hime_channel_login": {
+        "name": "HIME CHANNEL共通ログイン",
+        "loginUrl": "",
+        "postLoginUrl": "https://biz.hime-channel.com/post/post",
         "steps": [
           { "action": "navigate", "url": "{{loginUrl}}" },
           { "action": "wait", "selector": "#login_id", "timeout": 5000 },
@@ -35,48 +36,38 @@
           { "action": "input", "selector": "#password", "value": "{{password}}" },
           { "action": "click", "selector": "button[type='submit']" },
           { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
-          { "action": "click", "selector": "a[href*='diary']" },
-          { "action": "wait", "selector": "#post_form", "timeout": 5000 },
-          { "action": "input", "selector": "#title", "value": "{{title}}" },
-          { "action": "input", "selector": "#content", "value": "{{content}}" },
-          { "action": "upload", "selector": "#photo", "file": "{{photo_path}}" },
-          { "action": "click", "selector": "#submit_btn" },
-          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
+          { "action": "navigate", "url": "https://biz.hime-channel.com/post/post" }
         ]
+      }
+    },
+    "hime_channel": {
+      "utaka": {
+        "name": "HIME CHANNEL(宇高)",
+        "useCommonLogin": "hime_channel_login",
+        "steps": []
+      },
+      "shop_post": {
+        "name": "HIME CHANNEL(店舗投稿)",
+        "useCommonLogin": "hime_channel_login",
+        "steps": []
       },
       "coupon": {
         "name": "HIME CHANNEL(クーポン)",
-        "loginUrl": "https://hime-channel.com/shop/login",
+        "useCommonLogin": "hime_channel_login",
         "steps": [
-          { "action": "navigate", "url": "{{loginUrl}}" },
-          { "action": "wait", "selector": "#login_id", "timeout": 5000 },
-          { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
-          { "action": "input", "selector": "#password", "value": "{{password}}" },
-          { "action": "click", "selector": "button[type='submit']" },
-          { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
-          { "action": "click", "selector": "a[href*='coupon']" },
-          { "action": "wait", "selector": "#coupon_form", "timeout": 5000 },
-          { "action": "click", "selector": "#update_btn" },
-          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
+          { "action": "wait", "selector": "input[placeholder='限定クーポン']", "timeout": 5000 },
+          { "action": "input", "selector": "input[placeholder='限定クーポン']", "value": "{{title}}" },
+          { "action": "input", "selector": "input[step='10']:nth-of-type(1)", "value": "{{normal_time}}" },
+          { "action": "input", "selector": "input[step='1000']:nth-of-type(1)", "value": "{{normal_price}}" },
+          { "action": "input", "selector": "input[step='10']:nth-of-type(2)", "value": "{{coupon_time}}" },
+          { "action": "input", "selector": "input[step='1000']:nth-of-type(2)", "value": "{{coupon_price}}" }
         ]
       },
       "available_now_bulk": {
         "name": "HIME CHANNEL(今すぐ遊べる)【一括更新専用】",
-        "loginUrl": "https://hime-channel.com/shop/login",
+        "useCommonLogin": "hime_channel_login",
         "isBulkUpdate": true,
-        "steps": [
-          { "action": "navigate", "url": "{{loginUrl}}" },
-          { "action": "wait", "selector": "#login_id", "timeout": 5000 },
-          { "action": "input", "selector": "#login_id", "value": "{{login_id}}" },
-          { "action": "input", "selector": "#password", "value": "{{password}}" },
-          { "action": "click", "selector": "button[type='submit']" },
-          { "action": "wait", "selector": ".dashboard", "timeout": 10000 },
-          { "action": "click", "selector": "a[href*='available']" },
-          { "action": "wait", "selector": ".girl-list", "timeout": 5000 },
-          { "action": "click", "selector": "#select_all" },
-          { "action": "click", "selector": "#bulk_update_btn" },
-          { "action": "wait", "selector": ".success-message", "timeout": 10000 }
-        ]
+        "steps": []
       }
     },
 

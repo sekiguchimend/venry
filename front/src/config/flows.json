@@ -26,6 +26,14 @@
   "flows": {
     "hime_channel": [
       {
+        "code": "utaka",
+        "name": "HIME CHANNEL(宇高)",
+        "types": ["news", "content"],
+        "pages": ["content-list"],
+        "isPaid": false,
+        "isActive": true
+      },
+      {
         "code": "shop_post",
         "name": "HIME CHANNEL(店舗投稿)",
         "types": ["news", "content"],

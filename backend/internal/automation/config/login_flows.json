@@ -1,9 +1,10 @@
 {
   "_comment": "全サイトのログインフロー定義 - b.jsonのHTMLタグから正確に抽出",
   "sites": {
-    "hime-channel": {
+    "hime_channel": {
       "name": "HIME CHANNEL",
       "loginUrl": "https://biz.hime-channel.com/login",
+      "postLoginUrl": "https://biz.hime-channel.com/post/post",
       "_html_tags": {
         "email_input": "<input placeholder=\"\" type=\"text\" value=\"\" class=\"ant-input ant-input-lg\" data-v-0b782bc0=\"\" data-v-d2ec1096=\"\">",
         "password_input": "<input placeholder=\"\" type=\"password\" class=\"ant-input ant-input-lg\" data-v-0b782bc0=\"\" data-v-d2ec1096=\"\">",
@@ -18,8 +19,42 @@
             { "action": "input", "selector": "input[type=\"text\"].ant-input.ant-input-lg", "value": "{{login_id}}" },
             { "action": "input", "selector": "input[type=\"password\"].ant-input.ant-input-lg", "value": "{{password}}" },
             { "action": "click", "selector": "button.ant-btn-primary.ant-btn-round.ant-btn-lg" },
-            { "action": "waitTime", "ms": 3000 }
+            { "action": "waitTime", "ms": 3000 },
+            { "action": "navigate", "url": "https://biz.hime-channel.com/post/post" },
+            { "action": "waitTime", "ms": 2000 }
           ]
+        },
+        "coupon": {
+          "name": "クーポン",
+          "_html_tags": {
+            "coupon_switch": "<button data-v-4300580d=\"\" type=\"button\" role=\"switch\" class=\"ant-switch\" style=\"margin-left: 8px;\">",
+            "title_input": "<input data-v-0b782bc0=\"\" data-v-4300580d=\"\" placeholder=\"限定クーポン\" type=\"text\" maxlength=\"10\" class=\"ant-input ant-input-lg\">",
+            "normal_time_input": "<input role=\"spinbutton\" step=\"10\" class=\"ant-input-number-input\"> (index: 0)",
+            "normal_price_input": "<input role=\"spinbutton\" step=\"1000\" class=\"ant-input-number-input\"> (index: 0)",
+            "coupon_time_input": "<input role=\"spinbutton\" step=\"10\" class=\"ant-input-number-input\"> (index: 1)",
+            "coupon_price_input": "<input role=\"spinbutton\" step=\"1000\" class=\"ant-input-number-input\"> (index: 1)"
+          },
+          "steps": [
+            { "action": "waitTime", "ms": 2000 },
+            { "action": "click", "selector": "button.ant-switch[role=\"switch\"]" },
+            { "action": "waitTime", "ms": 1000 },
+            { "action": "wait", "selector": "input[placeholder=\"限定クーポン\"]", "timeout": 5000 },
+            { "action": "input", "selector": "input[placeholder=\"限定クーポン\"]", "value": "{{title}}" },
+            { "action": "input", "selector": "input.ant-input-number-input[step=\"10\"]", "value": "{{normal_time}}", "index": 1 },
+            { "action": "input", "selector": "input.ant-input-number-input[step=\"1000\"]", "value": "{{normal_price}}", "index": 1 },
+            { "action": "input", "selector": "input.ant-input-number-input[step=\"10\"]", "value": "{{coupon_time}}", "index": 2 },
+            { "action": "input", "selector": "input.ant-input-number-input[step=\"1000\"]", "value": "{{coupon_price}}", "index": 2 }
+          ]
+        },
+        "utaka": {
+          "name": "宇高",
+          "_html_tags": {},
+          "steps": []
+        },
+        "shop_post": {
+          "name": "店舗投稿",
+          "_html_tags": {},
+          "steps": []
         }
       }
     },
