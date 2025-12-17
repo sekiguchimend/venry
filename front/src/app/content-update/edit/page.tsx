@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, Pencil, Plus, FileText, Trash2, Copy } from 'lucide-react';
+import { HelpCircle, Pencil, FileText, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow, type ContentPost } from '@/lib/api/content';
+import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow } from '@/lib/api/content';
 
 const ContentEditPage: React.FC = () => {
   const router = useRouter();
@@ -15,14 +15,7 @@ const ContentEditPage: React.FC = () => {
 
   const [contentId, setContentId] = useState(contentIdParam);
   const [activeTab, setActiveTab] = useState('content');
-  const [contentName, setContentName] = useState('ぴゅあらば(速報)');
-  const [titleTab, setTitleTab] = useState('基本');
-  const [contentTab, setContentTab] = useState('基本');
-  const [titleText, setTitleText] = useState('店頭限定！くじイベント開催！');
-  const [contentText, setContentText] = useState(`店頭限定！くじイベント開催！
-
-今月はいつもと違い店頭受付のお客様限定のイベントを開催します！
-店頭に来て頂いたお客様ならどなたでも利用出来るイベント回数制限等もないので`);
+  const [, setContentName] = useState('ぴゅあらば(速報)');
 
   // 投稿内容設定
   const [postTitle, setPostTitle] = useState('');
@@ -48,11 +41,8 @@ const ContentEditPage: React.FC = () => {
   const [couponPrice3, setCouponPrice3] = useState('');
   const [conditions3, setConditions3] = useState('');
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-
-  const titleTabs = ['基本', '10文字', '15文字', '20文字', '25文字', '30文字', '40文字', '50文字', '100文字'];
-  const contentTabs = ['基本', '100文字', '200文字', '300文字', '400文字', '500文字', '1000文字', 'HTMLタグ'];
 
   // コンテンツIDを取得
   useEffect(() => {
@@ -99,8 +89,7 @@ const ContentEditPage: React.FC = () => {
     };
 
     fetchContentId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [siteId, flowCode, flowName, contentIdParam]);
+  }, [siteId, flowCode, flowName, contentIdParam, contentId]);
 
   const loadContentPostsWithId = async (id: string) => {
     try {
@@ -154,18 +143,12 @@ const ContentEditPage: React.FC = () => {
     }
   };
 
-  const loadContentPosts = async () => {
-    if (!contentId) return;
-    await loadContentPostsWithId(contentId);
-  };
-
   const handleSave = async () => {
     let targetContentId = contentId;
 
     // contentIdがない場合は、siteIdとflowNameから取得を試みる（存在しない場合は自動作成される）
     if (!targetContentId && siteId && (flowName || flowCode)) {
       try {
-        const searchName = flowName || flowCode;
         const content = await getContentIdBySiteAndFlow(siteId, flowCode, flowName);
         if (content.id) {
           targetContentId = content.id;
@@ -189,7 +172,6 @@ const ContentEditPage: React.FC = () => {
     // コンテンツIDが取得できない場合は、もう一度試す
     if (!targetContentId && siteId && (flowName || flowCode)) {
       try {
-        const searchName = flowName || flowCode;
         const content = await getContentIdBySiteAndFlow(siteId, flowCode, flowName);
         if (content.id) {
           targetContentId = content.id;

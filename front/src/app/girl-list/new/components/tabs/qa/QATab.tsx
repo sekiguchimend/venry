@@ -13,7 +13,7 @@ function makeEmptyItems(count: number): QaItem[] {
 
 const QA_ITEM_COUNT = 10;
 
-export default function QATab({ siteOptions }: { siteOptions: SiteOption[] }) {
+export default function QATab({ siteOptions: _siteOptions }: { siteOptions: SiteOption[] }) {
   const tabs = useMemo(
     () =>
       [
@@ -72,7 +72,7 @@ export default function QATab({ siteOptions }: { siteOptions: SiteOption[] }) {
           <br />
           未入力の箇所は、サイト側で登録済みのQ&Aの内容が削除されるのでご注意ください。
           <br />
-          (例：質問1　入力あり、回答1　未入力)
+          (例：質問1 入力あり、回答1 未入力)
         </div>
         <div className="mt-3">
           すべての項目が未入力の場合は更新されません。

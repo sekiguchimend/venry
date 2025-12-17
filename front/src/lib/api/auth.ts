@@ -47,7 +47,7 @@ export async function login(email: string, password: string): Promise<AuthResult
     let data: AuthResponse;
     try {
       data = JSON.parse(text);
-    } catch (parseErr) {
+    } catch {
       return { success: false, error: `[${step}] JSONパース失敗: ${text.substring(0, 200)}` };
     }
 
