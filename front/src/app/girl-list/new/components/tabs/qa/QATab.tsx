@@ -13,7 +13,8 @@ function makeEmptyItems(count: number): QaItem[] {
 
 const QA_ITEM_COUNT = 10;
 
-export default function QATab({ siteOptions: _siteOptions }: { siteOptions: SiteOption[] }) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default function QATab({ siteOptions }: { siteOptions: SiteOption[] }) {
   const tabs = useMemo(
     () =>
       [

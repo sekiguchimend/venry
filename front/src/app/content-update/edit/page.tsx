@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { HelpCircle, Pencil, FileText, Trash2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow } from '@/lib/api/content';
 
-const ContentEditPage: React.FC = () => {
+const ContentEditPageInner: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const contentIdParam = searchParams.get('id') || '';
@@ -1001,4 +1001,10 @@ const ContentEditPage: React.FC = () => {
   );
 };
 
-export default ContentEditPage;
+export default function ContentEditPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-100 flex items-center justify-center">読み込み中...</div>}>
+      <ContentEditPageInner />
+    </Suspense>
+  );
+}
