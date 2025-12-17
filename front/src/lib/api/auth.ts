@@ -177,9 +177,11 @@ export async function getAccessToken(): Promise<string | null> {
 // ヘルパー関数
 async function setAuthCookies(data: AuthResponse) {
   const cookieStore = await cookies();
+  // NOTE: HTTPS環境でない場合は secure: false にする必要がある
+  const isHttps = process.env.NEXT_PUBLIC_USE_HTTPS === 'true';
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: isHttps,
     sameSite: 'lax' as const,
     path: '/',
   };
