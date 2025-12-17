@@ -24,26 +24,47 @@ interface AuthResult {
  * ログイン
  */
 export async function login(email: string, password: string): Promise<AuthResult> {
+  let step = 'init';
   try {
+    // ステップ1: fetch開始
+    step = `fetch to ${API_BASE_URL}/api/auth/login`;
     const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
 
+    // ステップ2: レスポンス確認
+    step = `response status: ${response.status}`;
     if (!response.ok) {
-      const error = await response.json();
-      return { success: false, error: error.message || 'ログインに失敗しました' };
+      const errorText = await response.text();
+      return { success: false, error: `[${step}] ${errorText}` };
     }
 
-    const data: AuthResponse = await response.json();
+    // ステップ3: JSONパース
+    step = 'json parse';
+    const text = await response.text();
+    let data: AuthResponse;
+    try {
+      data = JSON.parse(text);
+    } catch (parseErr) {
+      return { success: false, error: `[${step}] JSONパース失敗: ${text.substring(0, 200)}` };
+    }
 
-    // トークンをクッキーに保存
+    // ステップ4: データ検証
+    step = `data check: access_token=${!!data.access_token}, refresh_token=${!!data.refresh_token}`;
+    if (!data.access_token || !data.refresh_token) {
+      return { success: false, error: `[${step}] トークンが不足` };
+    }
+
+    // ステップ5: Cookie設定
+    step = 'setAuthCookies';
     await setAuthCookies(data);
 
+    // ステップ6: 完了
     return { success: true };
-  } catch {
-    return { success: false, error: 'サーバーとの通信に失敗しました' };
+  } catch (e) {
+    return { success: false, error: `[${step}] 例外: ${e instanceof Error ? e.message : String(e)}` };
   }
 }
 
