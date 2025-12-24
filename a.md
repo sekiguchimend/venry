@@ -1,7 +1,7 @@
 1	HIME CHANNEL (アカウント1)	https://biz.hime-channel.com/login	himechannel7+S2154@gmail.com	dcphoteheru
 2	KF京都風俗情報 (アカウント1)	https://fufufu.tv/shopadmin/login	khc	kfjkfj
 3	Qプリ (アカウント1)	https://q-pri.com/shop/login/	16201	mDulbQTc
-4	No	https://kyoto.derikura.com/manage/	dcpg	K8mX3ZCx
+4	オフィシャル(京都ホテヘル倶楽部様)	https://kyoto.derikura.com/manage/	dcpg	K8mX3ZCx
 5	ガールズヘブン (アカウント1)	https://manager.girlsheaven-job.net/	1100127	kt20lo70
 6	シティヘブンネット (アカウント1)	https://newmanager.cityheaven.net/C1Login.php	1100127	kt20lo70
 7	ジョブヘブン【メンズヘブン】(アカウント1)	https://manager.mensheaven.jp/	1100127	kt20lo70

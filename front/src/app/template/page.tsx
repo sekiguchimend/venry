@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2, X } from 'lucide-react';
+import { getTemplates, type Template, type TemplateFolderType } from './actions/templates';
 
 const TemplatePage: React.FC = () => {
   const router = useRouter();
@@ -11,45 +12,62 @@ const TemplatePage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState('');
   const [selectedGirl, setSelectedGirl] = useState('');
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const labels = ['新着', 'イベント', '割引', '新人', '出勤', '待機', '写メ', 'その他'];
 
-  const templates = [
-    {
-      no: 1,
-      image: '/images/template1.png',
-      name: '5月くじイベント',
-      hasWoman: false,
-      label: 'イベント',
-      settingCount: 7,
-      hasMemo: false
-    },
-    {
-      no: 2,
-      image: '/images/template2.png',
-      name: '【SUPER RALLY】※使用不可！使用時は要確集！',
-      hasWoman: false,
-      label: 'イベント',
-      settingCount: 8,
-      hasMemo: false
-    },
-    {
-      no: 3,
-      image: '/images/template3.png',
-      name: 'スーパータイム割！※使用不可！使用時は要確集！',
-      hasWoman: false,
-      label: '割引',
-      settingCount: 7,
-      hasMemo: false
+  const folderType: TemplateFolderType = useMemo(() => {
+    if (activeTab === 'regularly-used-folder') return 'regular';
+    if (activeTab === 'usage-disabled') return 'disabled';
+    return 'normal';
+  }, [activeTab]);
+
+  const visibleTemplates = useMemo(() => {
+    const q = searchTerm.trim();
+    if (!q) return templates;
+    return templates.filter((t) => t.name.toLowerCase().includes(q.toLowerCase()));
+  }, [templates, searchTerm]);
+
+  const reload = async () => {
+    setIsLoading(true);
+    setLoadError(null);
+    try {
+      const templateRes = await getTemplates({ folder_type: folderType });
+      setTemplates(templateRes);
+    } catch (e) {
+      setLoadError(e instanceof Error ? e.message : '取得に失敗しました');
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    void reload();
+  }, [folderType]);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+
+  const handleConfirmNew = () => {
+    if (!selectedLabel) {
+      alert('ラベル（カテゴリー）を選択してください');
+      return;
+    }
+    const params = new URLSearchParams();
+    params.set('folderType', folderType);
+    params.set('label', selectedLabel);
+    if (selectedGirl) params.set('girlId', selectedGirl);
+    router.push(`/template/edit?${params.toString()}`);
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="p-3 md:p-5 min-h-screen bg-gray-100">
       {/* Header Button Section */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between mb-5 gap-3">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenModal}
           className="py-2 px-3 md:px-4 bg-green-700 border-none rounded-full text-xs md:text-sm text-white cursor-pointer flex items-center gap-1 transition-colors hover:bg-green-800 self-start"
         >
           <Plus size={14} className="md:w-4 md:h-4" />
@@ -159,14 +177,24 @@ const TemplatePage: React.FC = () => {
         </div>
 
         {/* Content Rows */}
-        {templates.map((template) => (
-          <div key={template.no}>
+        {loadError && (
+          <div className="p-4 text-sm text-red-600">
+            {loadError}
+          </div>
+        )}
+        {isLoading && (
+          <div className="p-4 text-sm text-gray-600">
+            読み込み中...
+          </div>
+        )}
+        {!isLoading && visibleTemplates.map((template, idx) => (
+          <div key={template.id}>
             {/* Desktop Layout */}
             <div className="hidden md:grid py-2 px-4 border-b border-gray-100 items-center min-h-[60px]" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
               {/* Edit Button */}
               <div className="flex items-center justify-center">
                 <button
-                  onClick={() => router.push('/template/edit')}
+                  onClick={() => router.push(`/template/edit?id=${encodeURIComponent(template.id)}&folderType=${encodeURIComponent(folderType)}`)}
                   className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal"
                 >
                   <Edit size={11} />
@@ -176,27 +204,15 @@ const TemplatePage: React.FC = () => {
 
               {/* Number */}
               <div className="text-center text-[13px] text-gray-800">
-                {template.no}
+                {idx + 1}
               </div>
 
               {/* Image */}
               <div className="flex justify-center items-center">
                 <div className="w-[60px] h-10 bg-gray-200 rounded-sm flex items-center justify-center">
-                  {template.no === 1 && (
-                    <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[9px]">
-                      画像
-                    </div>
-                  )}
-                  {template.no === 2 && (
-                    <div className="bg-yellow-400 text-gray-800 py-0.5 px-1 rounded-sm text-[8px] font-bold">
-                      SUPER
-                    </div>
-                  )}
-                  {template.no === 3 && (
-                    <div className="bg-red-400 text-white py-0.5 px-1 rounded-sm text-[9px]">
-                      タイム
-                    </div>
-                  )}
+                  <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[9px]">
+                    画像
+                  </div>
                 </div>
               </div>
 
@@ -221,7 +237,7 @@ const TemplatePage: React.FC = () => {
 
               {/* Setting Count Column */}
               <div className="flex items-center justify-center text-[13px] text-blue-600 underline cursor-pointer">
-                {template.settingCount}
+                0
               </div>
 
               {/* Memo Column */}
@@ -238,24 +254,12 @@ const TemplatePage: React.FC = () => {
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-8 bg-gray-200 rounded-sm flex items-center justify-center mb-2">
-                    {template.no === 1 && (
-                      <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[8px]">
-                        画像
-                      </div>
-                    )}
-                    {template.no === 2 && (
-                      <div className="bg-yellow-400 text-gray-800 py-0.5 px-1 rounded-sm text-[7px] font-bold">
-                        SUPER
-                      </div>
-                    )}
-                    {template.no === 3 && (
-                      <div className="bg-red-400 text-white py-0.5 px-1 rounded-sm text-[8px]">
-                        タイム
-                      </div>
-                    )}
+                    <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[8px]">
+                      画像
+                    </div>
                   </div>
                   <div className="text-center text-xs text-gray-600">
-                    No.{template.no}
+                    No.{idx + 1}
                   </div>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -264,17 +268,17 @@ const TemplatePage: React.FC = () => {
                       {template.name}
                     </div>
                     <button
-                      onClick={() => router.push('/template/edit')}
+                      onClick={() => router.push(`/template/edit?id=${encodeURIComponent(template.id)}&folderType=${encodeURIComponent(folderType)}`)}
                       className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2"
                     >
                       <Edit size={12} />
                       編集
                     </button>
                   </div>
-                  {template.no === 1 && (
+                  {template.label && (
                     <div className="flex items-center gap-2">
                       <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-xs text-gray-600 cursor-pointer">
-                        イベント
+                        {template.label}
                       </button>
                     </div>
                   )}
@@ -304,7 +308,10 @@ const TemplatePage: React.FC = () => {
             <div className="p-6">
               {/* Label Selection */}
               <div className="mb-6">
-                <h3 className="text-base font-medium text-[#323232] mb-4">ラベルを選択してください</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-base font-medium text-[#323232]">ラベル（カテゴリー）を選択してください</h3>
+                  <span className="px-2 py-0.5 bg-red-500 text-white text-xs rounded">必須</span>
+                </div>
                 <div className="grid grid-cols-4 gap-3 mb-4">
                   {labels.map((label) => (
                     <label key={label} className="flex items-center gap-2 cursor-pointer">
@@ -354,8 +361,11 @@ const TemplatePage: React.FC = () => {
                 キャンセル
               </button>
               <button
-                className="px-8 py-2 border-none rounded text-sm text-white bg-gray-400 cursor-not-allowed"
-                disabled
+                onClick={handleConfirmNew}
+                className={`px-8 py-2 border-none rounded text-sm text-white transition-colors ${
+                  selectedLabel ? 'bg-green-700 hover:bg-green-800 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'
+                }`}
+                disabled={!selectedLabel}
               >
                 決定
               </button>

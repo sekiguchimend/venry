@@ -61,6 +61,14 @@ func main() {
 	mux.Handle("/api/content/posts/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteContentPost)))
 	mux.Handle("/api/content/id", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentID)))
 
+	// テンプレートエンドポイント
+	mux.Handle("/api/template-folders", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateFolders)))
+	mux.Handle("/api/templates", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplates)))
+	mux.Handle("/api/templates/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveTemplate)))
+	mux.Handle("/api/templates/upload-image", middleware.AuthMiddleware(http.HandlerFunc(handlers.UploadTemplateImage)))
+	mux.Handle("/api/templates/flow-mappings", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateFlowMappings)))
+	mux.Handle("/api/templates/flow-mappings/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveTemplateFlowMappings)))
+
 	// ミドルウェアチェーン
 	handler := middleware.LoggerMiddleware(corsMiddleware.Handler(mux))
 

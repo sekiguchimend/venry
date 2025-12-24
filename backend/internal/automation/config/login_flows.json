@@ -58,7 +58,7 @@
         }
       }
     },
-    "kf-kyoto": {
+    "kfj_kyoto": {
       "name": "KF京都風俗情報",
       "loginUrl": "https://fufufu.tv/shopadmin/login",
       "_html_tags": {
@@ -77,10 +77,42 @@
             { "action": "click", "selector": "#form_submits" },
             { "action": "waitTime", "ms": 3000 }
           ]
+        },
+        "news": {
+          "name": "ニュース",
+          "_html_tags": {
+            "title_input": "<input type=\"text\" style=\"width:90%;\" required=\"required\" id=\"form_title\" name=\"title\" value=\"\">",
+            "content_textarea": "<textarea cols=\"120\" rows=\"20\" class=\"\" id=\"form_note\" style=\"\" name=\"notes\"></textarea>",
+            "image_input": "<input type=\"file\" id=\"form_news_img\" name=\"news_img\" value=\"\">"
+          },
+          "steps": [
+            { "action": "navigate", "url": "https://fufufu.tv/shopadmin/news/detail" },
+            { "action": "wait", "selector": "#form_title", "timeout": 5000 },
+            { "action": "input", "selector": "#form_title", "value": "{{title}}" },
+            { "action": "input", "selector": "#form_note", "value": "{{content}}" },
+            { "action": "upload", "selector": "#form_news_img", "file": "{{photo_path}}" },
+            { "action": "waitTime", "ms": 1000 }
+          ]
+        },
+        "discount_ticket": {
+          "name": "割引チケット",
+          "_html_tags": {
+            "title_input": "<input type=\"text\" size=\"100\" placeholder=\"タイトル\" id=\"form_title\" name=\"title\" value=\"\">",
+            "comment_textarea": "<textarea cols=\"80\" rows=\"10\" placeholder=\"コメント\" id=\"form_comment\" name=\"comment\"></textarea>",
+            "image_input": "<input type=\"file\" id=\"form_ticket_img\" name=\"ticket_img\" value=\"\">"
+          },
+          "steps": [
+            { "action": "navigate", "url": "https://fufufu.tv/shopadmin/ticket/detail" },
+            { "action": "wait", "selector": "#form_title", "timeout": 5000 },
+            { "action": "input", "selector": "#form_title", "value": "{{title}}" },
+            { "action": "input", "selector": "#form_comment", "value": "{{content}}" },
+            { "action": "upload", "selector": "#form_ticket_img", "file": "{{photo_path}}" },
+            { "action": "waitTime", "ms": 1000 }
+          ]
         }
       }
     },
-    "q-pri": {
+    "qpri": {
       "name": "Qプリ",
       "loginUrl": "https://q-pri.com/shop/login/",
       "_html_tags": {
@@ -102,7 +134,7 @@
         }
       }
     },
-    "kyoto-hoteheru": {
+    "official_kyoto_hoteheru": {
       "name": "オフィシャル(京都ホテヘル倶楽部様)",
       "loginUrl": "https://kyoto.derikura.com/manage/",
       "_html_tags": {
@@ -124,7 +156,7 @@
         }
       }
     },
-    "girls-heaven": {
+    "girls_heaven": {
       "name": "ガールズヘブン",
       "loginUrl": "https://manager.girlsheaven-job.net/",
       "_html_tags": {
@@ -146,7 +178,7 @@
         }
       }
     },
-    "city-heaven": {
+    "cityheaven": {
       "name": "シティヘブンネット",
       "loginUrl": "https://newmanager.cityheaven.net/C1Login.php",
       "_html_tags": {
@@ -168,7 +200,7 @@
         }
       }
     },
-    "job-heaven": {
+    "job_heaven": {
       "name": "ジョブヘブン【メンズヘブン】",
       "loginUrl": "https://manager.mensheaven.jp/",
       "_html_tags": {
@@ -190,7 +222,7 @@
         }
       }
     },
-    "deli-town": {
+    "deliheru_town": {
       "name": "デリヘルタウン",
       "loginUrl": "https://admin.dto.jp/a/auth/input?key=281b4f3053fa81c7160a027cb87b66bc",
       "_html_tags": {
@@ -234,7 +266,7 @@
         }
       }
     },
-    "pyuajo": {
+    "pureajo": {
       "name": "ぴゅあじょ",
       "loginUrl": "https://work.purelovers.com/shop/login/",
       "_html_tags": {
@@ -256,7 +288,7 @@
         }
       }
     },
-    "pyuaraba": {
+    "purela": {
       "name": "ぴゅあらば",
       "loginUrl": "https://shop-admin.purelovers.com/shop/login/index/",
       "_html_tags": {
@@ -278,7 +310,7 @@
         }
       }
     },
-    "pyuaraba-staff": {
+    "purela_staff": {
       "name": "ぴゅあらばスタッフ",
       "loginUrl": "https://cigoto.jp/shop/login/",
       "_html_tags": {
@@ -366,7 +398,7 @@
         }
       }
     },
-    "fuzoku-japan": {
+    "fuzoku_japan": {
       "name": "風俗じゃぱん！",
       "loginUrl": "https://fuzoku.jp/entry/login/",
       "_html_tags": {
@@ -389,7 +421,7 @@
         }
       }
     },
-    "deriheru-japan": {
+    "deriheru_japan": {
       "name": "デリヘルじゃぱん！",
       "loginUrl": "https://deli-fuzoku.jp/entry/",
       "_html_tags": {
@@ -456,7 +488,7 @@
         }
       }
     },
-    "thirty-fuzoku": {
+    "thirty_fuzoku": {
       "name": "30からの風俗アルバイト【関西版】",
       "loginUrl": "https://www.30baito.net/admin/login/",
       "_html_tags": {
@@ -478,7 +510,7 @@
         }
       }
     },
-    "ure-sen": {
+    "uresen": {
       "name": "うれせん【関西・中四国版】",
       "loginUrl": "https://shop.ure-sen.com/login",
       "_html_tags": {
@@ -522,7 +554,7 @@
         }
       }
     },
-    "mr-venrey": {
+    "mr_venrey": {
       "name": "Mr.Venrey【他アカウント】",
       "loginUrl": "https://mrvenrey.jp/#/admin",
       "_html_tags": {

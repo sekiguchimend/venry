@@ -2,29 +2,29 @@ package automation
 
 // サイトID定数
 const (
-	SiteHimeChannel   = "hime-channel"
-	SiteKFKyoto       = "kf-kyoto"
-	SiteQPri          = "q-pri"
-	SiteKyotoHoteheru = "kyoto-hoteheru"
-	SiteGirlsHeaven   = "girls-heaven"
-	SiteCityHeaven    = "city-heaven"
-	SiteJobHeaven     = "job-heaven"
-	SiteDeriheruTown  = "deriheru-town"
+	SiteHimeChannel   = "hime_channel"
+	SiteKFKyoto       = "kfj_kyoto"
+	SiteQPri          = "qpri"
+	SiteKyotoHoteheru = "official_kyoto_hoteheru"
+	SiteGirlsHeaven   = "girls_heaven"
+	SiteCityHeaven    = "cityheaven"
+	SiteJobHeaven     = "job_heaven"
+	SiteDeriheruTown  = "deliheru_town"
 	SiteVanilla       = "vanilla"
-	SitePyuajo        = "pyuajo"
-	SitePyuaraba      = "pyuaraba"
-	SitePyuarabaStaff = "pyuaraba-staff"
+	SitePureajo       = "pureajo"
+	SitePurela        = "purela"
+	SitePurelaStaff   = "purela_staff"
 	SiteManzoku       = "manzoku"
 	SiteEkichika      = "ekichika"
 	SiteKuchikomi     = "kuchikomi"
-	SiteFuzokuJapan   = "fuzoku-japan"
-	SiteDeriheruJapan = "deriheru-japan"
+	SiteFuzokuJapan   = "fuzoku_japan"
+	SiteDeriheruJapan = "deriheru_japan"
 	SiteFucolle       = "fucolle"
 	SiteDekasegi      = "dekasegi"
-	SiteThirtyFuzoku  = "thirty-fuzoku"
+	SiteThirtyFuzoku  = "thirty_fuzoku"
 	SiteUresen        = "uresen"
 	SiteNightpi       = "nightpi"
-	SiteMrVenrey      = "mr-venrey"
+	SiteMrVenrey      = "mr_venrey"
 )
 
 // SiteConfigs 全サイト設定
@@ -131,7 +131,7 @@ var SiteConfigs = []SiteConfig{
 		},
 	},
 	{
-		ID:       SitePyuajo,
+		ID:       SitePureajo,
 		Name:     "ぴゅあじょ",
 		LoginURL: "https://work.purelovers.com/shop/login/",
 		Selectors: Selectors{
@@ -142,7 +142,7 @@ var SiteConfigs = []SiteConfig{
 		},
 	},
 	{
-		ID:       SitePyuaraba,
+		ID:       SitePurela,
 		Name:     "ぴゅあらば",
 		LoginURL: "https://shop-admin.purelovers.com/shop/login/index/",
 		Selectors: Selectors{
@@ -153,7 +153,7 @@ var SiteConfigs = []SiteConfig{
 		},
 	},
 	{
-		ID:       SitePyuarabaStaff,
+		ID:       SitePurelaStaff,
 		Name:     "ぴゅあらばスタッフ",
 		LoginURL: "https://cigoto.jp/shop/login/",
 		Selectors: Selectors{
@@ -300,9 +300,9 @@ var FrontendToSiteID = map[int]string{
 	7:  SiteJobHeaven,
 	8:  SiteDeriheruTown,
 	9:  SiteVanilla,
-	10: SitePyuajo,
-	11: SitePyuaraba,
-	12: SitePyuarabaStaff,
+	10: SitePureajo,
+	11: SitePurela,
+	12: SitePurelaStaff,
 	13: SiteManzoku,
 	14: SiteEkichika,
 	15: SiteKuchikomi,

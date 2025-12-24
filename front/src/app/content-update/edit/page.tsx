@@ -1,9 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { HelpCircle, Pencil, FileText, Trash2 } from 'lucide-react';
+import { HelpCircle, Pencil, FileText } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow } from '@/lib/api/content';
+import { getTemplates, getTemplateFolders, type Template, type TemplateFolder } from '@/app/template/actions/templates';
+import PostContentSection from './components/PostContentSection';
+import ScheduleTab from './components/ScheduleTab';
+import { getFlow, getTypeName } from '@/config';
 
 const ContentEditPageInner: React.FC = () => {
   const router = useRouter();
@@ -43,6 +47,102 @@ const ContentEditPageInner: React.FC = () => {
 
   const [, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // 時刻指定更新用のstate
+  const [isTimerRunning, setIsTimerRunning] = useState(true);
+  const [showTimerOverlay, setShowTimerOverlay] = useState(true);
+  const [scheduleItems, setScheduleItems] = useState<{
+    id: number;
+    time: string;
+    templateId: string;
+    templateName: string;
+  }[]>([]);
+  const [templateSearch, setTemplateSearch] = useState('');
+  const [selectedTemplateTab, setSelectedTemplateTab] = useState<'normal' | 'regular'>('normal');
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('');
+
+  // テンプレート関連state
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templateFolders, setTemplateFolders] = useState<TemplateFolder[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+
+  // 時刻オプション生成（5分刻み）
+  const timeOptions = Array.from({ length: 24 * 12 }, (_, i) => {
+    const hours = Math.floor(i / 12).toString().padStart(2, '0');
+    const minutes = ((i % 12) * 5).toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  });
+
+  // テンプレート一覧を取得
+  useEffect(() => {
+    const loadTemplates = async () => {
+      setIsLoadingTemplates(true);
+      try {
+        const [templatesData, foldersData] = await Promise.all([
+          getTemplates({ folder_type: selectedTemplateTab }),
+          getTemplateFolders(selectedTemplateTab),
+        ]);
+        setTemplates(templatesData);
+        setTemplateFolders(foldersData);
+      } catch (error) {
+        console.error('Failed to load templates:', error);
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+    loadTemplates();
+  }, [selectedTemplateTab]);
+
+  // フォルダでフィルタされたテンプレート
+  const currentFlowTypes = (() => {
+    if (!siteId || !flowCode) return [] as string[];
+    const flow = getFlow(siteId, flowCode);
+    const types = flow?.types || [];
+    return Array.from(new Set(types.filter(Boolean)));
+  })();
+
+  // 「専用テンプレート」はフローtypeごと（例: blog）に表示を固定する
+  const typeFolderIds = (() => {
+    if (selectedTemplateTab !== 'regular') return [] as string[];
+    if (currentFlowTypes.length === 0) return [] as string[];
+
+    const ids = new Set<string>();
+    for (const folder of templateFolders) {
+      const folderFlowType = (folder as { flow_type?: string | null }).flow_type || null;
+      for (const t of currentFlowTypes) {
+        const label = getTypeName(t);
+        if (folderFlowType && folderFlowType === t) ids.add(folder.id);
+        if (folder.name === label) ids.add(folder.id);
+        if (folder.name === t) ids.add(folder.id);
+      }
+    }
+    return Array.from(ids);
+  })();
+
+  const filteredTemplates = templates.filter((t) => {
+    const matchesSearch = !templateSearch || t.name.toLowerCase().includes(templateSearch.toLowerCase());
+
+    // normal: フォルダ選択に従う
+    if (selectedTemplateTab === 'normal') {
+      const matchesFolder = !selectedFolderId || t.folder_id === selectedFolderId;
+      return matchesFolder && matchesSearch;
+    }
+
+    // regular: type に一致するフォルダのみ（ユーザーが「すべて」を選んでも type から外れない）
+    if (typeFolderIds.length === 0) return false;
+    const matchesTypeFolder = t.folder_id != null && typeFolderIds.includes(t.folder_id);
+    const matchesFolder = !selectedFolderId || t.folder_id === selectedFolderId;
+    return matchesTypeFolder && matchesFolder && matchesSearch;
+  });
+
+  // regularタブへ切り替えた時は、該当typeのフォルダを自動選択（存在しない場合は空のまま）
+  useEffect(() => {
+    if (selectedTemplateTab !== 'regular') return;
+    if (selectedFolderId) return; // ユーザー選択を尊重
+    if (typeFolderIds.length === 0) return;
+    setSelectedFolderId(typeFolderIds[0] || '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTemplateTab, typeFolderIds.join('|')]);
 
   // コンテンツIDを取得
   useEffect(() => {
@@ -366,6 +466,17 @@ const ContentEditPageInner: React.FC = () => {
             タイマー設定
             <HelpCircle size={14} className="text-[#2196F3]" />
           </button>
+          <button
+            onClick={() => setActiveTab('schedule')}
+            className={`px-6 py-3 text-[13px] cursor-pointer transition-all bg-white border-0 flex items-center gap-1 ${
+              activeTab === 'schedule'
+                ? 'text-[#323232] border-b-2 border-b-[#2196F3]'
+                : 'text-gray-500'
+            }`}
+          >
+            時刻指定更新
+            <HelpCircle size={14} className="text-[#2196F3]" />
+          </button>
         </div>
 
         {/* Main Content Area */}
@@ -374,464 +485,53 @@ const ContentEditPageInner: React.FC = () => {
         {/* Content Tab */}
         {activeTab === 'content' && (
           <div className="p-6">
-            {/* Post Content Settings */}
-            <div className="mb-8">
-              {/* Post Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-black text-white rounded flex items-center justify-center font-bold text-base">
-                    1
-                  </div>
-                  <h3 className="text-base font-medium text-gray-800">1件目の投稿内容を設定</h3>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setPostTitle('');
-                      setNormalTime('');
-                      setNormalPrice('');
-                      setCouponTime('');
-                      setCouponPrice('');
-                      setConditions('');
-                    }}
-                    className="text-sm text-blue-600 hover:underline cursor-pointer bg-transparent border-none"
-                  >
-                    内容を消去
-                  </button>
-                  <button className="flex items-center gap-1 text-sm text-red-600 hover:underline cursor-pointer bg-transparent border-none">
-                    <Trash2 size={14} />
-                    枠を削除
-                  </button>
-                </div>
-              </div>
+            <PostContentSection
+              index={1}
+              postTitle={postTitle}
+              setPostTitle={setPostTitle}
+              normalTime={normalTime}
+              setNormalTime={setNormalTime}
+              normalPrice={normalPrice}
+              setNormalPrice={setNormalPrice}
+              couponTime={couponTime}
+              setCouponTime={setCouponTime}
+              couponPrice={couponPrice}
+              setCouponPrice={setCouponPrice}
+              conditions={conditions}
+              setConditions={setConditions}
+            />
 
-              {/* Form Fields */}
-              <div className="space-y-6">
-                {/* Title */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      タイトル
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={postTitle}
-                        onChange={(e) => setPostTitle(e.target.value)}
-                        placeholder="新規割MAX3000円"
-                        maxLength={1000}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-                        {postTitle.length}/1000
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <PostContentSection
+              index={2}
+              postTitle={postTitle2}
+              setPostTitle={setPostTitle2}
+              normalTime={normalTime2}
+              setNormalTime={setNormalTime2}
+              normalPrice={normalPrice2}
+              setNormalPrice={setNormalPrice2}
+              couponTime={couponTime2}
+              setCouponTime={setCouponTime2}
+              couponPrice={couponPrice2}
+              setCouponPrice={setCouponPrice2}
+              conditions={conditions2}
+              setConditions={setConditions2}
+            />
 
-                {/* Normal Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      通常価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalTime}
-                        onChange={(e) => setNormalTime(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{normalTime.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalPrice}
-                        onChange={(e) => setNormalPrice(e.target.value)}
-                        placeholder="16000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{normalPrice.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Coupon Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-40 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      クーポン価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponTime}
-                        onChange={(e) => setCouponTime(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{couponTime.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponPrice}
-                        onChange={(e) => setCouponPrice(e.target.value)}
-                        placeholder="13000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{couponPrice.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conditions */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700">使用条件、有効期限など</label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <textarea
-                        value={conditions}
-                        onChange={(e) => setConditions(e.target.value)}
-                        placeholder="受付時に新規割(HIMEチャンネル見た）とお申し付けください。&#10;※合算禁ありで適用、他の割引との併用不可、時間指定、本指名、のお客様は対象外"
-                        rows={8}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 resize-none"
-                      />
-                      <span className="absolute right-3 bottom-3 text-xs text-gray-400">
-                        {conditions.length}/∞
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2件目 */}
-            <div className="mb-8">
-              {/* Post Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-black text-white rounded flex items-center justify-center font-bold text-base">
-                    2
-                  </div>
-                  <h3 className="text-base font-medium text-gray-800">2件目の投稿内容を設定</h3>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setPostTitle2('');
-                      setNormalTime2('');
-                      setNormalPrice2('');
-                      setCouponTime2('');
-                      setCouponPrice2('');
-                      setConditions2('');
-                    }}
-                    className="text-sm text-blue-600 hover:underline cursor-pointer bg-transparent border-none"
-                  >
-                    内容を消去
-                  </button>
-                  <button className="flex items-center gap-1 text-sm text-red-600 hover:underline cursor-pointer bg-transparent border-none">
-                    <Trash2 size={14} />
-                    枠を削除
-                  </button>
-                </div>
-              </div>
-
-              {/* Form Fields */}
-              <div className="space-y-6">
-                {/* Title */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      タイトル
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={postTitle2}
-                        onChange={(e) => setPostTitle2(e.target.value)}
-                        placeholder="新規割MAX3000円"
-                        maxLength={1000}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-                        {postTitle2.length}/1000
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Normal Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      通常価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalTime2}
-                        onChange={(e) => setNormalTime2(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{normalTime2.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalPrice2}
-                        onChange={(e) => setNormalPrice2(e.target.value)}
-                        placeholder="16000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{normalPrice2.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Coupon Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-40 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      クーポン価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponTime2}
-                        onChange={(e) => setCouponTime2(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{couponTime2.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponPrice2}
-                        onChange={(e) => setCouponPrice2(e.target.value)}
-                        placeholder="13000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{couponPrice2.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conditions */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700">使用条件、有効期限など</label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <textarea
-                        value={conditions2}
-                        onChange={(e) => setConditions2(e.target.value)}
-                        placeholder="受付時に新規割(HIMEチャンネル見た）とお申し付けください。&#10;※合算禁ありで適用、他の割引との併用不可、時間指定、本指名、のお客様は対象外"
-                        rows={8}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 resize-none"
-                      />
-                      <span className="absolute right-3 bottom-3 text-xs text-gray-400">
-                        {conditions2.length}/∞
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 3件目 */}
-            <div className="mb-8">
-              {/* Post Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-black text-white rounded flex items-center justify-center font-bold text-base">
-                    3
-                  </div>
-                  <h3 className="text-base font-medium text-gray-800">3件目の投稿内容を設定</h3>
-                </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setPostTitle3('');
-                      setNormalTime3('');
-                      setNormalPrice3('');
-                      setCouponTime3('');
-                      setCouponPrice3('');
-                      setConditions3('');
-                    }}
-                    className="text-sm text-blue-600 hover:underline cursor-pointer bg-transparent border-none"
-                  >
-                    内容を消去
-                  </button>
-                  <button className="flex items-center gap-1 text-sm text-red-600 hover:underline cursor-pointer bg-transparent border-none">
-                    <Trash2 size={14} />
-                    枠を削除
-                  </button>
-                </div>
-              </div>
-
-              {/* Form Fields */}
-              <div className="space-y-6">
-                {/* Title */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      タイトル
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={postTitle3}
-                        onChange={(e) => setPostTitle3(e.target.value)}
-                        placeholder="新規割MAX3000円"
-                        maxLength={1000}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">
-                        {postTitle3.length}/1000
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Normal Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      通常価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalTime3}
-                        onChange={(e) => setNormalTime3(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{normalTime3.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={normalPrice3}
-                        onChange={(e) => setNormalPrice3(e.target.value)}
-                        placeholder="16000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{normalPrice3.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Coupon Price */}
-                <div className="flex items-start gap-8">
-                  <div className="w-40 pt-2">
-                    <label className="text-sm text-gray-700 flex items-center gap-2">
-                      クーポン価格
-                      <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded">必須</span>
-                    </label>
-                  </div>
-                  <div className="flex-1 flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponTime3}
-                        onChange={(e) => setCouponTime3(e.target.value)}
-                        placeholder="60"
-                        maxLength={1000}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">分</span>
-                      <span className="text-xs text-gray-400">{couponTime3.length}/1000</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={couponPrice3}
-                        onChange={(e) => setCouponPrice3(e.target.value)}
-                        placeholder="13000"
-                        maxLength={1000}
-                        className="w-32 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 text-right"
-                      />
-                      <span className="text-sm text-gray-600">円</span>
-                      <span className="text-xs text-gray-400">{couponPrice3.length}/1000</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Conditions */}
-                <div className="flex items-start gap-8">
-                  <div className="w-32 pt-2">
-                    <label className="text-sm text-gray-700">使用条件、有効期限など</label>
-                  </div>
-                  <div className="flex-1">
-                    <div className="relative">
-                      <textarea
-                        value={conditions3}
-                        onChange={(e) => setConditions3(e.target.value)}
-                        placeholder="受付時に新規割(HIMEチャンネル見た）とお申し付けください。&#10;※合算禁ありで適用、他の割引との併用不可、時間指定、本指名、のお客様は対象外"
-                        rows={8}
-                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-blue-500 resize-none"
-                      />
-                      <span className="absolute right-3 bottom-3 text-xs text-gray-400">
-                        {conditions3.length}/∞
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <PostContentSection
+              index={3}
+              postTitle={postTitle3}
+              setPostTitle={setPostTitle3}
+              normalTime={normalTime3}
+              setNormalTime={setNormalTime3}
+              normalPrice={normalPrice3}
+              setNormalPrice={setNormalPrice3}
+              couponTime={couponTime3}
+              setCouponTime={setCouponTime3}
+              couponPrice={couponPrice3}
+              setCouponPrice={setCouponPrice3}
+              conditions={conditions3}
+              setConditions={setConditions3}
+            />
 
             {/* Bottom Save Button */}
             <div className="flex justify-center pt-6">
@@ -994,6 +694,29 @@ const ContentEditPageInner: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Schedule Tab - 時刻指定更新 */}
+        {activeTab === 'schedule' && (
+          <ScheduleTab
+            isTimerRunning={isTimerRunning}
+            setIsTimerRunning={setIsTimerRunning}
+            showTimerOverlay={showTimerOverlay}
+            setShowTimerOverlay={setShowTimerOverlay}
+            scheduleItems={scheduleItems}
+            setScheduleItems={setScheduleItems}
+            timeOptions={timeOptions}
+            templates={templates}
+            templateFolders={templateFolders}
+            isLoadingTemplates={isLoadingTemplates}
+            templateSearch={templateSearch}
+            setTemplateSearch={setTemplateSearch}
+            selectedTemplateTab={selectedTemplateTab}
+            setSelectedTemplateTab={setSelectedTemplateTab}
+            selectedFolderId={selectedFolderId}
+            setSelectedFolderId={setSelectedFolderId}
+            filteredTemplates={filteredTemplates}
+          />
         )}
         </div>
       </div>

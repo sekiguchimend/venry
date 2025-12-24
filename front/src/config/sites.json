@@ -111,6 +111,48 @@
       "name": "風俗じゃぱん！",
       "category": "general",
       "isActive": true
+    },
+    {
+      "id": "deriheru_japan",
+      "uuid": "f2a3b4c5-d6e7-8901-5678-234567890123",
+      "name": "デリヘルじゃぱん！",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "fucolle",
+      "uuid": "a3b4c5d6-e7f8-9012-6789-345678901234",
+      "name": "フーコレ",
+      "category": "general",
+      "isActive": true
+    },
+    {
+      "id": "dekasegi",
+      "uuid": "b4c5d6e7-f8a9-0123-7890-456789012345",
+      "name": "出稼ぎちゃん",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "thirty_fuzoku",
+      "uuid": "c5d6e7f8-a9b0-1234-8901-567890123456",
+      "name": "30からの風俗アルバイト【関西版】",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "uresen",
+      "uuid": "d6e7f8a9-b0c1-2345-9012-678901234567",
+      "name": "うれせん【関西・中四国版】",
+      "category": "recruit",
+      "isActive": true
+    },
+    {
+      "id": "nightpi",
+      "uuid": "e7f8a9b0-c1d2-3456-0123-789012345678",
+      "name": "ナイトピ",
+      "category": "general",
+      "isActive": true
     }
   ]
 }

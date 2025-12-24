@@ -149,6 +149,7 @@ CREATE TABLE template_folders (
     company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
     folder_type VARCHAR(20) DEFAULT 'normal' CHECK (folder_type IN ('normal', 'regular', 'disabled')),
+    flow_type VARCHAR(50),
     is_custom BOOLEAN DEFAULT TRUE,
     sort_order INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
