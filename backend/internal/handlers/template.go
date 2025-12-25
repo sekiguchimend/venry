@@ -82,6 +82,7 @@ func SaveTemplate(w http.ResponseWriter, r *http.Request) {
 		ID                  string  `json:"id"`
 		FolderID            *string `json:"folder_id"`
 		FolderType          string  `json:"folder_type"`
+		FlowType            string  `json:"flow_type"`
 		Name                string  `json:"name"`
 		Content             *string `json:"content"`
 		ImageURL            *string `json:"image_url"`
@@ -108,6 +109,7 @@ func SaveTemplate(w http.ResponseWriter, r *http.Request) {
 	if folderType == "" {
 		folderType = "normal"
 	}
+	flowType := strings.TrimSpace(req.FlowType)
 
 	if req.FolderID == nil || strings.TrimSpace(*req.FolderID) == "" {
 		// folder_idが無い場合はラベルをカテゴリ（フォルダ名）として扱う
@@ -127,6 +129,10 @@ func SaveTemplate(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, "Failed to create template folder", http.StatusInternalServerError)
 				return
 			}
+		}
+		// flow_type が渡されている場合はフォルダに保持（既存フォルダも更新）
+		if flowType != "" {
+			_ = models.UpdateTemplateFolderFlowType(user.CompanyID, f.ID, flowType, token)
 		}
 		req.FolderID = &f.ID
 	}

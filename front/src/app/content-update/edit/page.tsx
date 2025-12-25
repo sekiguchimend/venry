@@ -73,14 +73,14 @@ const ContentEditPageInner: React.FC = () => {
     return `${hours}:${minutes}`;
   });
 
-  // テンプレート一覧を取得
+  // テンプレート一覧を取得（全件取得→画面側で分類。folder_id=null の既存テンプレも漏れなく表示する）
   useEffect(() => {
     const loadTemplates = async () => {
       setIsLoadingTemplates(true);
       try {
         const [templatesData, foldersData] = await Promise.all([
-          getTemplates({ folder_type: selectedTemplateTab }),
-          getTemplateFolders(selectedTemplateTab),
+          getTemplates(),
+          getTemplateFolders(),
         ]);
         setTemplates(templatesData);
         setTemplateFolders(foldersData);
@@ -91,7 +91,7 @@ const ContentEditPageInner: React.FC = () => {
       }
     };
     loadTemplates();
-  }, [selectedTemplateTab]);
+  }, []);
 
   // フォルダでフィルタされたテンプレート
   const currentFlowTypes = (() => {
@@ -101,13 +101,15 @@ const ContentEditPageInner: React.FC = () => {
     return Array.from(new Set(types.filter(Boolean)));
   })();
 
+  const dedicatedFlowType = currentFlowTypes[0] || '';
+  const dedicatedFolderLabel = getTypeName(dedicatedFlowType || '専用');
+
   // 「専用テンプレート」はフローtypeごと（例: blog）に表示を固定する
   const typeFolderIds = (() => {
-    if (selectedTemplateTab !== 'regular') return [] as string[];
     if (currentFlowTypes.length === 0) return [] as string[];
 
     const ids = new Set<string>();
-    for (const folder of templateFolders) {
+    for (const folder of templateFolders.filter((f) => f.folder_type === 'regular')) {
       const folderFlowType = (folder as { flow_type?: string | null }).flow_type || null;
       for (const t of currentFlowTypes) {
         const label = getTypeName(t);
@@ -119,30 +121,34 @@ const ContentEditPageInner: React.FC = () => {
     return Array.from(ids);
   })();
 
-  const filteredTemplates = templates.filter((t) => {
+  const normalFolderIds = (() => {
+    const ids = new Set<string>();
+    for (const f of templateFolders) {
+      if (f.folder_type === 'normal') ids.add(f.id);
+    }
+    return Array.from(ids);
+  })();
+
+  const baseTemplates = selectedTemplateTab === 'regular'
+    ? templates.filter((t) => t.folder_id != null && typeFolderIds.includes(t.folder_id))
+    : templates.filter((t) => t.folder_id == null || normalFolderIds.includes(t.folder_id));
+
+  const filteredTemplates = baseTemplates.filter((t) => {
     const matchesSearch = !templateSearch || t.name.toLowerCase().includes(templateSearch.toLowerCase());
 
-    // normal: フォルダ選択に従う
-    if (selectedTemplateTab === 'normal') {
-      const matchesFolder = !selectedFolderId || t.folder_id === selectedFolderId;
-      return matchesFolder && matchesSearch;
-    }
+    // 専用テンプレート側はグループ選択を出さないため、folderフィルタはかけない
+    if (selectedTemplateTab === 'regular') return matchesSearch;
 
-    // regular: type に一致するフォルダのみ（ユーザーが「すべて」を選んでも type から外れない）
-    if (typeFolderIds.length === 0) return false;
-    const matchesTypeFolder = t.folder_id != null && typeFolderIds.includes(t.folder_id);
     const matchesFolder = !selectedFolderId || t.folder_id === selectedFolderId;
-    return matchesTypeFolder && matchesFolder && matchesSearch;
+    return matchesFolder && matchesSearch;
   });
 
-  // regularタブへ切り替えた時は、該当typeのフォルダを自動選択（存在しない場合は空のまま）
+  // 専用テンプレートはグループ選択を出さないため、常に未選択に戻す
   useEffect(() => {
     if (selectedTemplateTab !== 'regular') return;
-    if (selectedFolderId) return; // ユーザー選択を尊重
-    if (typeFolderIds.length === 0) return;
-    setSelectedFolderId(typeFolderIds[0] || '');
+    if (selectedFolderId) setSelectedFolderId('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTemplateTab, typeFolderIds.join('|')]);
+  }, [selectedTemplateTab]);
 
   // コンテンツIDを取得
   useEffect(() => {
@@ -716,6 +722,9 @@ const ContentEditPageInner: React.FC = () => {
             selectedFolderId={selectedFolderId}
             setSelectedFolderId={setSelectedFolderId}
             filteredTemplates={filteredTemplates}
+            dedicatedFolderLabel={dedicatedFolderLabel}
+            dedicatedFlowType={dedicatedFlowType}
+            onTemplateCreated={(t) => setTemplates((prev) => [t, ...prev])}
           />
         )}
         </div>

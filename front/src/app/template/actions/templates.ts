@@ -58,6 +58,7 @@ export interface SaveTemplateRequest {
   id?: string;
   folder_id?: string;
   folder_type?: TemplateFolderType;
+  flow_type?: string;
   name: string;
   content?: string | null;
   image_url?: string | null;
@@ -74,6 +75,7 @@ export async function saveTemplate(req: SaveTemplateRequest): Promise<Template> 
     id: req.id || '',
     folder_id: req.folder_id ?? null,
     folder_type: req.folder_type ?? 'normal',
+    flow_type: req.flow_type ?? '',
     name: req.name,
     content: req.content ?? null,
     image_url: req.image_url ?? null,

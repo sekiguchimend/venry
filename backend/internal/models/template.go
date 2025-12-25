@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -43,6 +44,7 @@ func CreateTemplateFolder(companyID string, name string, folderType string, toke
 		"company_id":   companyID,
 		"name":         name,
 		"folder_type":  folderType,
+		"flow_type":    nil,
 		"is_custom":    true,
 		"sort_order":   0,
 		"created_at":   time.Now().UTC().Format(time.RFC3339),
@@ -56,6 +58,22 @@ func CreateTemplateFolder(companyID string, name string, folderType string, toke
 		return &result[0], nil
 	}
 	return nil, fmt.Errorf("failed to create template folder")
+}
+
+// UpdateTemplateFolderFlowType はフォルダのflow_typeを更新する（既存フォルダにtypeを付与する用途）
+func UpdateTemplateFolderFlowType(companyID string, folderID string, flowType string, token string) error {
+	if strings.TrimSpace(folderID) == "" || strings.TrimSpace(flowType) == "" {
+		return nil
+	}
+	endpoint := fmt.Sprintf(
+		"template_folders?id=eq.%s&company_id=eq.%s",
+		url.QueryEscape(folderID),
+		url.QueryEscape(companyID),
+	)
+	body := map[string]any{
+		"flow_type": flowType,
+	}
+	return SupabasePatch(endpoint, body, nil, token)
 }
 
 // Template はテンプレートを表す構造体

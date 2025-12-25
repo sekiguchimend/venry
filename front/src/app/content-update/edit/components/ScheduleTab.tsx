@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react';
+'use client';
+
+import React, { useMemo, useState } from 'react';
 import {
   ArrowUpDown,
   Calendar,
@@ -15,6 +17,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import type { Template, TemplateFolder } from '@/app/template/actions/templates';
+import DedicatedTemplateEditor from './DedicatedTemplateEditor';
 
 type ScheduleItem = {
   id: number;
@@ -45,6 +48,10 @@ type Props = {
   setSelectedFolderId: (v: string) => void;
 
   filteredTemplates: Template[];
+
+  dedicatedFolderLabel: string; // 専用テンプレ作成時のカテゴリ（フォルダ名）に使う
+  dedicatedFlowType: string; // 専用テンプレ作成時のflow_type（例: blog）
+  onTemplateCreated: (t: Template) => void;
 };
 
 const ScheduleTab: React.FC<Props> = ({
@@ -65,6 +72,9 @@ const ScheduleTab: React.FC<Props> = ({
   selectedFolderId,
   setSelectedFolderId,
   filteredTemplates,
+  dedicatedFolderLabel,
+  dedicatedFlowType,
+  onTemplateCreated,
 }) => {
   const templateIndexById = useMemo(() => {
     const map = new Map<string, number>();
@@ -72,10 +82,41 @@ const ScheduleTab: React.FC<Props> = ({
     return map;
   }, [templates]);
 
+  const normalFolders = useMemo(() => {
+    return templateFolders.filter((f) => f.folder_type === 'normal');
+  }, [templateFolders]);
+
+  const [isDedicatedEditorOpen, setIsDedicatedEditorOpen] = useState(false);
+
+  const handleOpenDedicatedEditor = () => {
+    setSelectedTemplateTab('regular');
+    setIsDedicatedEditorOpen(true);
+  };
+
+  const handleCloseDedicatedEditor = () => setIsDedicatedEditorOpen(false);
+
   return (
     <div className="flex">
+      {/* 専用テンプレート追加（編集パネル） */}
+      {isDedicatedEditorOpen ? (
+        <DedicatedTemplateEditor
+          templateIndexById={templateIndexById}
+          filteredTemplates={filteredTemplates}
+          isLoadingTemplates={isLoadingTemplates}
+          templateSearch={templateSearch}
+          setTemplateSearch={setTemplateSearch}
+          selectedTemplateTab={selectedTemplateTab}
+          setSelectedTemplateTab={setSelectedTemplateTab}
+          setSelectedFolderId={setSelectedFolderId}
+          dedicatedFolderLabel={dedicatedFolderLabel}
+          dedicatedFlowType={dedicatedFlowType}
+          onTemplateCreated={onTemplateCreated}
+          onClose={handleCloseDedicatedEditor}
+        />
+      ) : null}
+
       {/* メインコンテンツエリア */}
-      <div className="flex-1 border-r border-gray-200">
+      <div className={`flex-1 border-r border-gray-200 ${isDedicatedEditorOpen ? 'hidden' : ''}`}>
         {/* ヘッダー部分 */}
         <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
           <div className="flex items-center justify-between">
@@ -242,7 +283,7 @@ const ScheduleTab: React.FC<Props> = ({
       </div>
 
       {/* 右側テンプレートパネル */}
-      <div className="w-80 bg-[#eef4ff]">
+      <div className={`w-80 bg-[#eef4ff] ${isDedicatedEditorOpen ? 'hidden' : ''}`}>
         {/* タブ */}
         <div className="flex border-b border-gray-200">
           <button
@@ -250,7 +291,7 @@ const ScheduleTab: React.FC<Props> = ({
               setSelectedTemplateTab('normal');
               setSelectedFolderId('');
             }}
-            className={`flex-1 px-4 py-4 text-sm font-medium ${
+            className={`flex-1 px-3 py-2 text-sm font-medium ${
               selectedTemplateTab === 'normal'
                 ? 'bg-[#eef4ff] text-[#323232] border-t-2 border-t-[#2196F3]'
                 : 'bg-[#dfe6ef] text-gray-700 hover:bg-gray-200'
@@ -264,7 +305,7 @@ const ScheduleTab: React.FC<Props> = ({
               setSelectedTemplateTab('regular');
               setSelectedFolderId('');
             }}
-            className={`flex-1 px-4 py-4 text-sm font-medium ${
+            className={`flex-1 px-3 py-2 text-sm font-medium ${
               selectedTemplateTab === 'regular'
                 ? 'bg-[#eef4ff] text-[#323232] border-t-2 border-t-[#2196F3]'
                 : 'bg-[#dfe6ef] text-gray-700 hover:bg-gray-200'
@@ -276,23 +317,25 @@ const ScheduleTab: React.FC<Props> = ({
         </div>
 
         {/* グループ選択 */}
-        <div className="p-4 border-b border-gray-200 bg-[#eef4ff]">
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 whitespace-nowrap">グループ選択:</label>
-            <select
-              value={selectedFolderId}
-              onChange={(e) => setSelectedFolderId(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm bg-white"
-            >
-              <option value="">すべて</option>
-              {templateFolders.map((folder) => (
-                <option key={folder.id} value={folder.id}>
-                  {folder.name}
-                </option>
-              ))}
-            </select>
+        {selectedTemplateTab === 'normal' && (
+          <div className="p-4 border-b border-gray-200 bg-[#eef4ff]">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-gray-600 whitespace-nowrap">グループ選択:</label>
+              <select
+                value={selectedFolderId}
+                onChange={(e) => setSelectedFolderId(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded text-sm bg-white"
+              >
+                <option value="">すべて</option>
+                {normalFolders.map((folder) => (
+                  <option key={folder.id} value={folder.id}>
+                    {folder.name}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 検索 */}
         <div className="px-4 pt-3 pb-2 bg-[#eef4ff]">
@@ -362,16 +405,19 @@ const ScheduleTab: React.FC<Props> = ({
           )}
         </div>
 
-        {/* 追加ボタン（スクショ寄せ） */}
-        <div className="p-4 bg-[#eef4ff] border-t border-gray-200">
-          <button
-            className="w-full flex items-center justify-center gap-2 py-3 rounded bg-[#e8f0ff] border border-[#b7c9ff] text-[#1f4fbf] text-sm font-medium hover:bg-[#dbe8ff]"
-            type="button"
-          >
-            <Plus size={18} />
-            専用テンプレート追加
-          </button>
-        </div>
+        {/* 追加ボタン（専用テンプレートのみ） */}
+        {selectedTemplateTab === 'regular' && (
+          <div className="p-4 bg-[#eef4ff] border-t border-gray-200">
+            <button
+              className="w-full flex items-center justify-center gap-2 py-3 rounded bg-[#e8f0ff] border border-[#b7c9ff] text-[#1f4fbf] text-sm font-medium hover:bg-[#dbe8ff]"
+              type="button"
+              onClick={handleOpenDedicatedEditor}
+            >
+              <Plus size={18} />
+              専用テンプレート追加
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

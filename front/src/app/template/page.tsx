@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2, X } from 'lucide-react';
-import { getTemplates, type Template, type TemplateFolderType } from './actions/templates';
+import { getTemplateFolders, getTemplates, type Template, type TemplateFolder, type TemplateFolderType } from './actions/templates';
 
 const TemplatePage: React.FC = () => {
   const router = useRouter();
@@ -13,6 +13,7 @@ const TemplatePage: React.FC = () => {
   const [selectedLabel, setSelectedLabel] = useState('');
   const [selectedGirl, setSelectedGirl] = useState('');
   const [templates, setTemplates] = useState<Template[]>([]);
+  const [templateFolders, setTemplateFolders] = useState<TemplateFolder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -24,18 +25,40 @@ const TemplatePage: React.FC = () => {
     return 'normal';
   }, [activeTab]);
 
+  const allowedFolderIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const f of templateFolders) {
+      if (f.folder_type === folderType) ids.add(f.id);
+    }
+    return Array.from(ids);
+  }, [templateFolders, folderType]);
+
+  const templatesByTab = useMemo(() => {
+    // folder_id=null（旧データ）も漏れなく表示したいので、normalタブでは含める
+    if (folderType === 'normal') {
+      return templates.filter((t) => t.folder_id == null || allowedFolderIds.includes(t.folder_id));
+    }
+    // regular/disabled はフォルダ紐付け必須
+    return templates.filter((t) => t.folder_id != null && allowedFolderIds.includes(t.folder_id));
+  }, [templates, allowedFolderIds, folderType]);
+
   const visibleTemplates = useMemo(() => {
     const q = searchTerm.trim();
-    if (!q) return templates;
-    return templates.filter((t) => t.name.toLowerCase().includes(q.toLowerCase()));
-  }, [templates, searchTerm]);
+    if (!q) return templatesByTab;
+    return templatesByTab.filter((t) => t.name.toLowerCase().includes(q.toLowerCase()));
+  }, [templatesByTab, searchTerm]);
 
   const reload = async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      const templateRes = await getTemplates({ folder_type: folderType });
+      // 全件取得→画面側で folderType に分類（folder_id=null の既存テンプレも含めるため）
+      const [templateRes, folderRes] = await Promise.all([
+        getTemplates(),
+        getTemplateFolders(),
+      ]);
       setTemplates(templateRes);
+      setTemplateFolders(folderRes);
     } catch (e) {
       setLoadError(e instanceof Error ? e.message : '取得に失敗しました');
     } finally {
