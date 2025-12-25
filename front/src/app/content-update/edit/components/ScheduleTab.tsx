@@ -52,6 +52,9 @@ type Props = {
   dedicatedFolderLabel: string; // 専用テンプレ作成時のカテゴリ（フォルダ名）に使う
   dedicatedFlowType: string; // 専用テンプレ作成時のflow_type（例: blog）
   onTemplateCreated: (t: Template) => void;
+
+  onSaveSchedules: () => void;
+  isSavingSchedules: boolean;
 };
 
 const ScheduleTab: React.FC<Props> = ({
@@ -75,6 +78,8 @@ const ScheduleTab: React.FC<Props> = ({
   dedicatedFolderLabel,
   dedicatedFlowType,
   onTemplateCreated,
+  onSaveSchedules,
+  isSavingSchedules,
 }) => {
   const templateIndexById = useMemo(() => {
     const map = new Map<string, number>();
@@ -159,8 +164,13 @@ const ScheduleTab: React.FC<Props> = ({
                 <ClipboardPaste size={16} />
               </button>
             </div>
-            <button className="px-4 py-2 bg-gray-200 text-gray-600 rounded text-sm hover:bg-gray-300">
-              設定を保存
+            <button
+              className="px-4 py-2 bg-gray-200 text-gray-600 rounded text-sm hover:bg-gray-300 disabled:opacity-60 disabled:cursor-not-allowed"
+              type="button"
+              onClick={onSaveSchedules}
+              disabled={isSavingSchedules}
+            >
+              {isSavingSchedules ? '保存中...' : '設定を保存'}
             </button>
           </div>
           <div className="flex items-center gap-2 mt-3 text-sm text-gray-600">

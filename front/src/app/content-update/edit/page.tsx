@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { HelpCircle, Pencil, FileText } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow } from '@/lib/api/content';
+import { getContentPosts, saveContentPosts, getContentIdBySiteAndFlow, getContentSchedules, saveContentSchedules } from '@/lib/api/content';
 import { getTemplates, getTemplateFolders, type Template, type TemplateFolder } from '@/app/template/actions/templates';
 import PostContentSection from './components/PostContentSection';
 import ScheduleTab from './components/ScheduleTab';
@@ -47,6 +47,7 @@ const ContentEditPageInner: React.FC = () => {
 
   const [, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingSchedules, setIsSavingSchedules] = useState(false);
 
   // 時刻指定更新用のstate
   const [isTimerRunning, setIsTimerRunning] = useState(true);
@@ -147,7 +148,6 @@ const ContentEditPageInner: React.FC = () => {
   useEffect(() => {
     if (selectedTemplateTab !== 'regular') return;
     if (selectedFolderId) setSelectedFolderId('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTemplateTab]);
 
   // コンテンツIDを取得
@@ -158,6 +158,7 @@ const ContentEditPageInner: React.FC = () => {
         console.log('Using contentId from URL:', contentIdParam);
         setContentId(contentIdParam);
         await loadContentPostsWithId(contentIdParam);
+        await loadSchedulesWithContentId(contentIdParam);
         return;
       }
 
@@ -165,6 +166,7 @@ const ContentEditPageInner: React.FC = () => {
       if (contentId) {
         console.log('Using contentId from state:', contentId);
         await loadContentPostsWithId(contentId);
+        await loadSchedulesWithContentId(contentId);
         return;
       }
 
@@ -181,6 +183,7 @@ const ContentEditPageInner: React.FC = () => {
             setContentName(content.name);
             // コンテンツIDが取得できたら投稿内容を読み込む
             await loadContentPostsWithId(content.id);
+            await loadSchedulesWithContentId(content.id);
           } else {
             // コンテンツが見つからない場合は空の状態で続行
             console.log('Content not found, will create new one on save');
@@ -246,6 +249,47 @@ const ContentEditPageInner: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to load content posts:', error);
+    }
+  };
+
+  const loadSchedulesWithContentId = async (id: string) => {
+    try {
+      const rows = await getContentSchedules(id);
+      const items = rows
+        .slice()
+        .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+        .map((r, idx) => ({
+          id: idx + 1,
+          time: r.time || '12:00',
+          templateId: r.template_id || '',
+          templateName: '',
+        }));
+      setScheduleItems(items);
+    } catch (error) {
+      console.error('Failed to load content schedules:', error);
+    }
+  };
+
+  const handleSaveSchedules = async () => {
+    if (!contentId) {
+      alert('コンテンツIDがありません。先に内容を保存してから、時刻指定更新を保存してください。');
+      return;
+    }
+    setIsSavingSchedules(true);
+    try {
+      await saveContentSchedules({
+        content_id: contentId,
+        items: scheduleItems.map((it) => ({
+          time: it.time,
+          template_id: it.templateId || '',
+        })),
+      });
+      await loadSchedulesWithContentId(contentId);
+    } catch (error) {
+      console.error('Failed to save content schedules:', error);
+      alert('時刻指定更新の保存に失敗しました');
+    } finally {
+      setIsSavingSchedules(false);
     }
   };
 
@@ -725,6 +769,8 @@ const ContentEditPageInner: React.FC = () => {
             dedicatedFolderLabel={dedicatedFolderLabel}
             dedicatedFlowType={dedicatedFlowType}
             onTemplateCreated={(t) => setTemplates((prev) => [t, ...prev])}
+            onSaveSchedules={handleSaveSchedules}
+            isSavingSchedules={isSavingSchedules}
           />
         )}
         </div>

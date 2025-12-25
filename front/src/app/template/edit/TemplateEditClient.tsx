@@ -128,7 +128,6 @@ const TemplateEditClient: React.FC = () => {
 
   useEffect(() => {
     void rebuildFlowRows(templateId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateId]);
 
   const handleSave = async () => {

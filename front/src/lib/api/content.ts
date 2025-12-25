@@ -48,6 +48,39 @@ export interface Content {
   name: string;
 }
 
+export interface ContentSchedule {
+  id: string;
+  company_id: string;
+  content_id: string;
+  sort_order: number;
+  time: string;
+  template_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SaveContentSchedulesRequest {
+  content_id: string;
+  items: Array<{
+    time: string;
+    template_id: string;
+  }>;
+}
+
+/**
+ * コンテンツの時刻指定更新スケジュール一覧を取得
+ */
+export async function getContentSchedules(contentId: string): Promise<ContentSchedule[]> {
+  return getAPI<ContentSchedule[]>(`/api/content-schedules?content_id=${encodeURIComponent(contentId)}`);
+}
+
+/**
+ * コンテンツの時刻指定更新スケジュールを保存（全置換）
+ */
+export async function saveContentSchedules(data: SaveContentSchedulesRequest): Promise<ContentSchedule[]> {
+  return postAPI<ContentSchedule[]>(`/api/content-schedules/save`, data);
+}
+
 /**
  * siteIdとflowCode/flowNameからコンテンツIDを取得（見つからない場合は空のContentを返す）
  */

@@ -60,6 +60,8 @@ func main() {
 	mux.Handle("/api/content/posts/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveContentPosts)))
 	mux.Handle("/api/content/posts/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteContentPost)))
 	mux.Handle("/api/content/id", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentID)))
+	mux.Handle("/api/content-schedules", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentSchedules)))
+	mux.Handle("/api/content-schedules/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveContentSchedules)))
 
 	// テンプレートエンドポイント
 	mux.Handle("/api/template-folders", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateFolders)))
