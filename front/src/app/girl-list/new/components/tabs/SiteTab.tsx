@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import { FormRow } from '../ui/FormRow';
 import { Section } from '../ui/Section';
 import { Select, TextInput, Textarea } from '../ui/Inputs';
@@ -23,12 +24,16 @@ export default function SiteTab() {
   const [dhtOptionPlay, setDhtOptionPlay] = useState('');
 
   // ぴゅあらば
+  const [pyJobFilter, setPyJobFilter] = useState('未設定');
   const [pySmokeUpdate, setPySmokeUpdate] = useState('更新する');
   const [pyAlcohol, setPyAlcohol] = useState('基本項目の「お酒」を反映');
   const [pyNewIcon, setPyNewIcon] = useState('未選択');
   const [pyNewIconY, setPyNewIconY] = useState('未選択');
   const [pyNewIconM, setPyNewIconM] = useState('未選択');
   const [pyNewIconD, setPyNewIconD] = useState('未選択');
+  
+  // サブタグ
+  const [subTags, setSubTags] = useState<string[]>([]);
 
   // シティヘブンネット
   const [heavenRoute, setHeavenRoute] = useState('変更しない(新規登録時は未選択)');
@@ -57,6 +62,12 @@ export default function SiteTab() {
   const [ekichikaGenre1, setEkichikaGenre1] = useState('未選択');
   const [ekichikaGenre2, setEkichikaGenre2] = useState('未選択');
   const [ekichikaGenre3, setEkichikaGenre3] = useState('未選択');
+  const [ekichikaPossibleOptionText, setEkichikaPossibleOptionText] = useState('');
+  const [ekichikaNewTrial, setEkichikaNewTrial] = useState('未選択可');
+  const [ekichikaPriority1, setEkichikaPriority1] = useState('未選択');
+  const [ekichikaPriority2, setEkichikaPriority2] = useState('未選択');
+  const [ekichikaPriority3, setEkichikaPriority3] = useState('未選択');
+  const [ekichikaShopMessageTitle, setEkichikaShopMessageTitle] = useState('');
 
   const ekichikaJobs = useMemo(
     () =>
@@ -66,13 +77,50 @@ export default function SiteTab() {
         'お嬢様', '可愛い系', 'ロリ系', 'ギャル系', 'キレカワ', '美少女系',
         '綺麗系', 'ハーフ', 'グラマー', 'スレンダー', 'ぽっちゃり', 'ミニマム',
         '美肌', '美脚', '色白', 'スタイル抜群', 'モデル系', '高身長',
-        '低身長', '外タトゥー・刺青', 'OL系', '女子大生', 'キャバ系', 'セクシー系',
+        '低身長', 'タトゥー・刺青', 'OL系', '女子大生', 'キャバ系', 'セクシー系',
         '癒し系', '清楚', '萌え系', 'おっとり', '天然', 'テクニシャン',
         'サービス抜群', '愛嬌抜群',
       ]),
     [],
   );
   const ekichikaJobsSet = useCheckboxSet(ekichikaJobs.map((i) => i.id));
+
+  // デリヘル、ホテヘル、ヘルス、風俗エステ
+  const ekichikaDeliverHealth = useMemo(
+    () =>
+      makeItems([
+        'av女優', 'パイパン', '妊婦プレイ', '敏感', '攻め好き', '受身好き',
+        '痴女', '濃厚サービス', '潮吹き', 'ドM(ドエム)', 'ドS(ドエス)', '母乳プレイ',
+        'パイズリ', 'AF可', 'イラマチオ可', '3P可', 'ごっくん', 'アジアン',
+        'ブロンド・金髪', 'ニューハーフ', '熟女系', '巨乳', '爆乳', '貧乳',
+        '美乳', '巨尻', '美尻', '人妻系', 'イヤイヤ好き',
+      ]),
+    [],
+  );
+  const ekichikaDeliverHealthSet = useCheckboxSet(ekichikaDeliverHealth.map((i) => i.id), 19);
+
+  // ソープ、ピンサロ
+  const ekichikaSoapPinsaro = useMemo(
+    () =>
+      makeItems([
+        'アジアン', 'ブロンド・金髪', 'ニューハーフ', '熟女系', '人妻系', '巨乳',
+        '爆乳', '貧乳', '美乳', '巨尻', '美尻', 'イヤイヤ好き',
+      ]),
+    [],
+  );
+  const ekichikaSoapPinsaroSet = useCheckboxSet(ekichikaSoapPinsaro.map((i) => i.id));
+
+  // メンズエステ
+  const ekichikaMensEsthe = useMemo(
+    () =>
+      makeItems([
+        'エステ経験者', 'エステ未経験', '資格あり', 'インテリ', 'ツンデレ', '話し上手',
+        '聞き上手', 'リピート高確率', '好感度抜群', '礼儀正しい', '好奇心旺盛', '真面目',
+        'マッサージが得意', '極液施術可', 'バリエーション豊富', '出張サービス可能', '丁寧な施術',
+      ]),
+    [],
+  );
+  const ekichikaMensEstheSet = useCheckboxSet(ekichikaMensEsthe.map((i) => i.id));
 
   // 可能基本プレイ/可能オプション（スクショにある大きなグリッド）
   const playOptions = useMemo(
@@ -100,13 +148,6 @@ export default function SiteTab() {
   const [fjNominationFee1Reflect, setFjNominationFee1Reflect] = useState('未選択');
   const [fjNominationFee2, setFjNominationFee2] = useState('');
   const [fjNominationFee2Reflect, setFjNominationFee2Reflect] = useState('未選択');
-
-  const [fjPossibleOptionText, setFjPossibleOptionText] = useState('');
-  const [fjNewTrial, setFjNewTrial] = useState('未選択可');
-  const [fjPriority1, setFjPriority1] = useState('未選択');
-  const [fjPriority2, setFjPriority2] = useState('未選択');
-  const [fjPriority3, setFjPriority3] = useState('未選択');
-  const [fjShopMessageTitle, setFjShopMessageTitle] = useState('');
 
   const fjTypeTags = useMemo(() => makeItems(['ロリ系', 'ギャル系', '人妻系', 'キレイ系', 'カワイイ系', 'モデル系', '美少女系', '癒し系', 'キャバ系', '清楚', 'アイドル系', 'OL系', 'お姉さん系', '萌え系', 'お嬢様']), []);
   const fjPlayTags = useMemo(() => makeItems(['黄金', '聖水', 'マット', 'アナル', 'パイズリ', '潮吹き']), []);
@@ -154,7 +195,7 @@ export default function SiteTab() {
   const fjPersonalitySet = useCheckboxSet(fjPersonality.map((i) => i.id), 2);
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <Section badge={{ variant: 'recommended', label: '推奨' }} title="複数サイト共通">
         <SubTabs
           tabs={[
@@ -186,8 +227,17 @@ export default function SiteTab() {
         </div>
       </Section>
 
-      <Section badge={{ variant: 'required', label: '必須' }} title="ぴゅあらば">
-        <div className="max-w-[820px] mx-auto">
+      <Section
+        badge={{ variant: 'required', label: '必須' }}
+        title="ぴゅあらば"
+        right={
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">業種絞り込み:</span>
+            <Select value={pyJobFilter} onChange={setPyJobFilter} options={['未設定']} />
+          </div>
+        }
+      >
+        <div className="max-w-[820px] mx-auto space-y-4">
           <FormRow label="喫煙項目の更新有無">
             <Select value={pySmokeUpdate} onChange={setPySmokeUpdate} options={['更新する', '更新しない']} />
           </FormRow>
@@ -206,6 +256,92 @@ export default function SiteTab() {
           <FormRow label="新人アイコン表示開始日付(日)">
             <Select value={pyNewIconD} onChange={setPyNewIconD} options={['未選択']} />
           </FormRow>
+        </div>
+
+        {/* 可能基本プレイ/可能オプション */}
+        <div className="mt-10 max-w-[1200px] mx-auto">
+          <FormRow label="可能基本プレイ/可能オプション">
+            <CheckboxGrid
+              items={playOptions}
+              selectedIds={playOptionsSet.selected}
+              onToggle={playOptionsSet.toggle}
+              onSelectAll={playOptionsSet.selectAll}
+              onClear={playOptionsSet.clear}
+              columnsClassName="grid-cols-7"
+            />
+          </FormRow>
+        </div>
+
+        {/* サブタグ */}
+        <div className="mt-10 max-w-[820px] mx-auto">
+          <div className="flex items-start gap-4">
+            <div className="text-sm font-medium text-gray-800 min-w-[80px]">サブタグ</div>
+            <div className="flex-1 space-y-4">
+              <p className="text-sm text-gray-600">
+                サイト側で付与されていない自動タグは無視されます。ドラッグで並び替えができます
+              </p>
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newTag = `タグ${subTags.length + 1}`;
+                    setSubTags([...subTags, newTag]);
+                  }}
+                  className="flex items-center gap-1 text-sm text-blue-500 hover:underline"
+                >
+                  <Plus size={14} />
+                  サブタグ追加
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSubTags([])}
+                  className="text-sm text-blue-500 hover:underline"
+                >
+                  すべて削除
+                </button>
+              </div>
+              {subTags.length > 0 && (
+                <div className="space-y-2">
+                  {subTags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded hover:border-blue-300 transition-colors"
+                      draggable
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData('tagIndex', index.toString());
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const draggedIndex = parseInt(e.dataTransfer.getData('tagIndex'), 10);
+                        if (draggedIndex === index) return;
+                        const newTags = [...subTags];
+                        const [removed] = newTags.splice(draggedIndex, 1);
+                        newTags.splice(index, 0, removed);
+                        setSubTags(newTags);
+                      }}
+                    >
+                      <div className="text-gray-300 cursor-grab">
+                        <GripVertical size={16} />
+                      </div>
+                      <div className="flex-1 text-sm text-gray-800">{tag}</div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSubTags(subTags.filter((_, i) => i !== index));
+                        }}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </Section>
 
@@ -259,6 +395,7 @@ export default function SiteTab() {
             </FormRow>
           </div>
 
+          {/* すべての業種 */}
           <div className="mt-10">
             <div className="text-base font-semibold text-gray-800 text-center mb-6">すべての業種</div>
             <CheckboxGrid
@@ -267,84 +404,119 @@ export default function SiteTab() {
               onToggle={ekichikaJobsSet.toggle}
               onSelectAll={ekichikaJobsSet.selectAll}
               onClear={ekichikaJobsSet.clear}
+              columnsClassName="grid-cols-7"
+            />
+          </div>
+
+          {/* デリヘル、ホテヘル、ヘルス、風俗エステ */}
+          <div className="mt-10">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="text-base font-semibold text-gray-800">デリヘル、ホテヘル、ヘルス、風俗エステ</div>
+              <span className="text-sm text-gray-600">ジャンル(ジャンル1~3(大)とあわせて19個まで)</span>
+            </div>
+            <CheckboxGrid
+              items={ekichikaDeliverHealth}
+              selectedIds={ekichikaDeliverHealthSet.selected}
+              onToggle={ekichikaDeliverHealthSet.toggle}
+              onSelectAll={ekichikaDeliverHealthSet.selectAll}
+              onClear={ekichikaDeliverHealthSet.clear}
+              columnsClassName="grid-cols-7"
+              maxSelected={19}
+            />
+          </div>
+
+          {/* ソープ、ピンサロ */}
+          <div className="mt-10">
+            <div className="text-base font-semibold text-gray-800 mb-6">ソープ、ピンサロ</div>
+            <CheckboxGrid
+              items={ekichikaSoapPinsaro}
+              selectedIds={ekichikaSoapPinsaroSet.selected}
+              onToggle={ekichikaSoapPinsaroSet.toggle}
+              onSelectAll={ekichikaSoapPinsaroSet.selectAll}
+              onClear={ekichikaSoapPinsaroSet.clear}
               columnsClassName="grid-cols-6"
             />
           </div>
-        </div>
-      </Section>
 
-      <Section badge={{ variant: 'recommended', label: '推奨' }} title="可能基本プレイ/可能オプション">
-        <div className="max-w-[1200px] mx-auto">
-          <FormRow label="可能基本プレイ/可能オプション">
+          {/* メンズエステ */}
+          <div className="mt-10">
+            <div className="text-base font-semibold text-gray-800 mb-6">メンズエステ</div>
             <CheckboxGrid
-              items={playOptions}
-              selectedIds={playOptionsSet.selected}
-              onToggle={playOptionsSet.toggle}
-              onSelectAll={playOptionsSet.selectAll}
-              onClear={playOptionsSet.clear}
+              items={ekichikaMensEsthe}
+              selectedIds={ekichikaMensEstheSet.selected}
+              onToggle={ekichikaMensEstheSet.toggle}
+              onSelectAll={ekichikaMensEstheSet.selectAll}
+              onClear={ekichikaMensEstheSet.clear}
               columnsClassName="grid-cols-6"
             />
-          </FormRow>
+          </div>
+
+          {/* 可能オプション（駅ちか人気！風俗ランキング） */}
+          <div className="mt-10">
+            <FormRow label="可能オプション">
+              <Textarea
+                value={ekichikaPossibleOptionText}
+                onChange={setEkichikaPossibleOptionText}
+                maxLength={145}
+                heightClassName="h-64"
+              />
+            </FormRow>
+
+            <div className="max-w-[980px] mt-6 space-y-4">
+              <FormRow label="新人・体験入店">
+                <Select value={ekichikaNewTrial} onChange={setEkichikaNewTrial} options={['未選択可']} />
+              </FormRow>
+              <FormRow label="優先タグ1">
+                <Select value={ekichikaPriority1} onChange={setEkichikaPriority1} options={['未選択']} />
+              </FormRow>
+              <FormRow label="優先タグ2">
+                <Select value={ekichikaPriority2} onChange={setEkichikaPriority2} options={['未選択']} />
+              </FormRow>
+              <FormRow label="優先タグ3">
+                <Select value={ekichikaPriority3} onChange={setEkichikaPriority3} options={['未選択']} />
+              </FormRow>
+              <FormRow label="お店からのメッセージ(メッセージタイトル)">
+                <TextInput
+                  value={ekichikaShopMessageTitle}
+                  onChange={setEkichikaShopMessageTitle}
+                  maxLength={80}
+                  showCount
+                />
+              </FormRow>
+            </div>
+          </div>
+
         </div>
       </Section>
 
-      <Section badge={{ variant: 'recommended', label: '推奨' }} title="風俗じゃぱん！">
-        <div className="max-w-[980px] mx-auto">
-          <FormRow label="X(Twitter)URL">
-            <TextInput
-              value={fjXUrl}
-              onChange={setFjXUrl}
-              placeholder="例：https://x.com/XXXXXX（XXXXXXはアカウント名）"
-              showCount
-            />
-          </FormRow>
-        </div>
-      </Section>
-
-      <Section badge={{ variant: 'recommended', label: '推奨' }} title="風俗じゃぱん！">
-        <div className="max-w-[980px] mx-auto space-y-6">
-          <FormRow label="本指名料">
-            <div className="flex items-center gap-6">
-              <TextInput value={fjNominationFee1} onChange={setFjNominationFee1} showCount />
-              <div className="text-sm text-gray-700">
-                コース・料金設定で登録した金額を反映する(風俗じゃぱん！のみ)
-              </div>
-              <Select value={fjNominationFee1Reflect} onChange={setFjNominationFee1Reflect} options={['未選択']} />
-            </div>
-          </FormRow>
-          <FormRow label="指名料">
-            <div className="flex items-center gap-6">
-              <TextInput value={fjNominationFee2} onChange={setFjNominationFee2} showCount />
-              <div className="text-sm text-gray-700">
-                コース・料金設定で登録した金額を反映する(風俗じゃぱん！のみ)
-              </div>
-              <Select value={fjNominationFee2Reflect} onChange={setFjNominationFee2Reflect} options={['未選択']} />
-            </div>
-          </FormRow>
-        </div>
-      </Section>
 
       <Section badge={{ variant: 'recommended', label: '推奨' }} title="風俗じゃぱん！">
         <div className="max-w-[1200px] mx-auto space-y-10">
-          <FormRow label="可能オプション">
-            <Textarea value={fjPossibleOptionText} onChange={setFjPossibleOptionText} maxLength={145} heightClassName="h-64" />
-          </FormRow>
-
           <div className="max-w-[980px]">
-            <FormRow label="新人・体験入店">
-              <Select value={fjNewTrial} onChange={setFjNewTrial} options={['未選択可']} />
+            <FormRow label="X(Twitter)URL">
+              <TextInput
+                value={fjXUrl}
+                onChange={setFjXUrl}
+                placeholder="例：https://x.com/XXXXXX（XXXXXXはアカウント名）"
+                showCount
+              />
             </FormRow>
-            <FormRow label="優先タグ1">
-              <Select value={fjPriority1} onChange={setFjPriority1} options={['未選択']} />
+          </div>
+
+          <div className="max-w-[980px] space-y-6">
+            <FormRow label="本指名料">
+              <div className="flex items-center gap-6">
+                <TextInput value={fjNominationFee1} onChange={setFjNominationFee1} showCount />
+                <div className="text-sm text-gray-700">コース・料金設定で登録した金額を反映する(風俗じゃぱん！のみ)</div>
+                <Select value={fjNominationFee1Reflect} onChange={setFjNominationFee1Reflect} options={['未選択']} />
+              </div>
             </FormRow>
-            <FormRow label="優先タグ2">
-              <Select value={fjPriority2} onChange={setFjPriority2} options={['未選択']} />
-            </FormRow>
-            <FormRow label="優先タグ3">
-              <Select value={fjPriority3} onChange={setFjPriority3} options={['未選択']} />
-            </FormRow>
-            <FormRow label="お店からのメッセージ(メッセージタイトル)">
-              <TextInput value={fjShopMessageTitle} onChange={setFjShopMessageTitle} maxLength={80} showCount />
+            <FormRow label="指名料">
+              <div className="flex items-center gap-6">
+                <TextInput value={fjNominationFee2} onChange={setFjNominationFee2} showCount />
+                <div className="text-sm text-gray-700">コース・料金設定で登録した金額を反映する(風俗じゃぱん！のみ)</div>
+                <Select value={fjNominationFee2Reflect} onChange={setFjNominationFee2Reflect} options={['未選択']} />
+              </div>
             </FormRow>
           </div>
 
