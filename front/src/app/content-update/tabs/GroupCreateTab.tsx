@@ -1,40 +1,84 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
+import { getFlowItemsByPage } from '../utils/flowUtils';
+import { FlowItem } from '../../../types/content-update';
+import { createContentGroup, getContentId, getContentGroupItems, getContentGroups, updateContentGroup } from '../actions/content-groups';
 
-interface ContentItem {
-  id: number;
-  name: string;
-  category: string;
-  categoryColor: string;
-  hasUpperIcon: boolean;
-  time: string;
+interface GroupCreateTabProps {
+  editingGroupId?: string | null;
+  onGroupUpdated?: () => void;
 }
 
-const GroupCreateTab: React.FC = () => {
+const GroupCreateTab: React.FC<GroupCreateTabProps> = ({ editingGroupId, onGroupUpdated }) => {
   const [groupName, setGroupName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [hideGroupSettings, setHideGroupSettings] = useState(false);
+  const [contentItems, setContentItems] = useState<FlowItem[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isLoadingGroup, setIsLoadingGroup] = useState(false);
 
-  const contentItems: ContentItem[] = [
-    { id: 1, name: 'HIME CHANNEL(クーポン)', category: '割引', categoryColor: '#3b82f6', hasUpperIcon: false, time: '60分' },
-    { id: 2, name: 'HIME CHANNEL(今すぐ遊べる)【一括更新専用】', category: '即姫', categoryColor: '#f97316', hasUpperIcon: false, time: '60分' },
-    { id: 3, name: 'HIME CHANNEL(店舗投稿)', category: 'その他', categoryColor: '#6b7280', hasUpperIcon: true, time: '60分' },
-    { id: 4, name: 'KFJ京都風俗情報(ニュース)', category: '速報', categoryColor: '#3b82f6', hasUpperIcon: true, time: '10分' },
-    { id: 5, name: 'KFJ京都風俗情報(割引チケット)', category: '割引', categoryColor: '#3b82f6', hasUpperIcon: true, time: '10分' },
-    { id: 6, name: 'KFJ京都風俗情報(リアルタイム)', category: '即姫', categoryColor: '#f97316', hasUpperIcon: true, time: '10分' },
-    { id: 7, name: 'オフィシャル(京都ホテヘル倶楽部様)(即姫)【一括更新専用】', category: '即姫', categoryColor: '#f97316', hasUpperIcon: false, time: '60分' },
-    { id: 8, name: 'ガールズヘブン(お店検索表示順アップ)', category: '上位化', categoryColor: '#22c55e', hasUpperIcon: true, time: '30分' },
-    { id: 9, name: 'ガールズヘブン(求人)', category: '求人', categoryColor: '#ef4444', hasUpperIcon: false, time: '60分' },
-    { id: 10, name: 'ガールズヘブン(先輩ボイス(旧))', category: 'その他', categoryColor: '#6b7280', hasUpperIcon: false, time: '14分' },
-    { id: 11, name: 'ガールズヘブン(店長ブログ)', category: 'その他', categoryColor: '#6b7280', hasUpperIcon: true, time: '15分' },
-    { id: 12, name: 'シティヘブンネット(ヘブン更新ボタン)', category: '上位化', categoryColor: '#22c55e', hasUpperIcon: true, time: '5分' },
-    { id: 13, name: 'シティヘブンネット(直送便/プラチナメール)', category: '速報', categoryColor: '#3b82f6', hasUpperIcon: true, time: '10分' },
-  ];
+  const isEditing = !!editingGroupId;
 
-  const handleCheckboxChange = (id: number) => {
+  // コンテンツリストを取得
+  useEffect(() => {
+    const items = getFlowItemsByPage('content-list');
+    setContentItems(items);
+  }, []);
+
+  // 編集モード時にグループ情報を取得
+  useEffect(() => {
+    const loadGroupData = async () => {
+      if (!editingGroupId) {
+        setGroupName('');
+        setSelectedItems([]);
+        return;
+      }
+
+      setIsLoadingGroup(true);
+      try {
+        // グループ情報を取得
+        const groupsResult = await getContentGroups();
+        if (groupsResult.success && groupsResult.groups) {
+          const group = groupsResult.groups.find(g => g.id === editingGroupId);
+          if (group) {
+            setGroupName(group.name);
+          }
+        }
+
+        // グループアイテムを取得
+        const itemsResult = await getContentGroupItems(editingGroupId);
+        if (itemsResult.success && itemsResult.items) {
+          // グループアイテムのsite_id + content_nameからFlowItemを探してselectedItemsに設定
+          const allItems = getFlowItemsByPage('content-list');
+          const selectedIds: string[] = [];
+
+          for (const groupItem of itemsResult.items) {
+            // automation_idとcontent_nameでマッチング
+            const matchingItem = allItems.find(item =>
+              item.siteId === groupItem.automation_id &&
+              item.flowName === groupItem.content_name
+            );
+            if (matchingItem) {
+              selectedIds.push(matchingItem.id);
+            }
+          }
+
+          setSelectedItems(selectedIds);
+        }
+      } catch (error) {
+        console.error('Failed to load group data:', error);
+      } finally {
+        setIsLoadingGroup(false);
+      }
+    };
+
+    loadGroupData();
+  }, [editingGroupId]);
+
+  const handleCheckboxChange = (id: string) => {
     setSelectedItems(prev =>
       prev.includes(id)
         ? prev.filter(item => item !== id)
@@ -52,6 +96,81 @@ const GroupCreateTab: React.FC = () => {
 
   const getSelectedContents = () => {
     return contentItems.filter(item => selectedItems.includes(item.id));
+  };
+
+  // グループ作成/更新ハンドラー
+  const handleSaveGroup = async () => {
+    // バリデーション
+    if (!groupName.trim()) {
+      alert('グループ名を入力してください');
+      return;
+    }
+
+    if (selectedItems.length === 0) {
+      alert('コンテンツを少なくとも1つ選択してください');
+      return;
+    }
+
+    setIsCreating(true);
+
+    try {
+      // 選択されたコンテンツからコンテンツIDを取得
+      const selectedFlowItems = contentItems.filter(item => selectedItems.includes(item.id));
+
+      // コンテンツIDを取得（server actionを使用）
+      const contentIds: string[] = [];
+
+      for (const flowItem of selectedFlowItems) {
+        try {
+          const result = await getContentId(
+            flowItem.siteId,
+            flowItem.flowCode,
+            flowItem.flowName
+          );
+
+          if (result.id) {
+            contentIds.push(result.id);
+          }
+        } catch (error) {
+          console.error('Failed to get content ID:', error);
+        }
+      }
+
+      if (contentIds.length === 0) {
+        alert('コンテンツIDの取得に失敗しました');
+        setIsCreating(false);
+        return;
+      }
+
+      let result;
+      if (isEditing && editingGroupId) {
+        // グループを更新
+        result = await updateContentGroup(editingGroupId, groupName, contentIds);
+        if (result.success) {
+          alert('グループを更新しました');
+          onGroupUpdated?.();
+        } else {
+          alert(`グループの更新に失敗しました: ${result.error || '不明なエラー'}`);
+        }
+      } else {
+        // グループを作成
+        result = await createContentGroup(groupName, contentIds);
+        if (result.success) {
+          alert('グループを作成しました');
+          // リセット
+          setGroupName('');
+          setSelectedItems([]);
+          onGroupUpdated?.();
+        } else {
+          alert(`グループの作成に失敗しました: ${result.error || '不明なエラー'}`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to save group:', error);
+      alert(isEditing ? 'グループの更新に失敗しました' : 'グループの作成に失敗しました');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -93,17 +212,19 @@ const GroupCreateTab: React.FC = () => {
           <span style={{ fontSize: '12px', color: '#9ca3af' }}>{groupName.length}/20</span>
         </div>
         <button
+          onClick={handleSaveGroup}
+          disabled={isCreating || isLoadingGroup || !groupName.trim() || selectedItems.length === 0}
           style={{
             padding: '8px 24px',
-            backgroundColor: '#3b82f6',
+            backgroundColor: isCreating || isLoadingGroup || !groupName.trim() || selectedItems.length === 0 ? '#9ca3af' : '#3b82f6',
             border: 'none',
             borderRadius: '4px',
             fontSize: '14px',
             color: '#fff',
-            cursor: 'pointer'
+            cursor: isCreating || isLoadingGroup || !groupName.trim() || selectedItems.length === 0 ? 'not-allowed' : 'pointer'
           }}
         >
-          グループを作成
+          {isCreating ? (isEditing ? '更新中...' : '作成中...') : (isEditing ? 'グループを更新' : 'グループを作成')}
         </button>
       </div>
 
@@ -268,25 +389,22 @@ const GroupCreateTab: React.FC = () => {
                     style={{ width: '14px', height: '14px' }}
                   />
                 </div>
-                <div style={{ fontSize: '13px', color: '#333' }}>{item.name}</div>
+                <div style={{ fontSize: '13px', color: '#333' }}>{item.flowName}</div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <span style={{
                     padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    color: item.categoryColor,
-                    border: `1px solid ${item.categoryColor}`,
-                    backgroundColor: '#fff'
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    color: '#666',
+                    backgroundColor: item.category.backgroundColor
                   }}>
-                    {item.category}
+                    {item.category.label}
                   </span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  {item.hasUpperIcon && (
-                    <span style={{ color: '#9ca3af', fontSize: '16px' }}>↗</span>
-                  )}
+                  {/* 上位アイコンは今は表示しない */}
                 </div>
-                <div style={{ textAlign: 'center', fontSize: '13px', color: '#333' }}>{item.time}</div>
+                <div style={{ textAlign: 'center', fontSize: '13px', color: '#333' }}>-</div>
               </div>
             ))}
           </div>
@@ -354,24 +472,22 @@ const GroupCreateTab: React.FC = () => {
                     backgroundColor: '#fff'
                   }}
                 >
-                  <div style={{ fontSize: '13px', color: '#333' }}>{item.name}</div>
+                  <div style={{ fontSize: '13px', color: '#333' }}>{item.flowName}</div>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <span style={{
                       padding: '2px 6px',
-                      borderRadius: '4px',
+                      borderRadius: '8px',
                       fontSize: '10px',
-                      color: item.categoryColor,
-                      border: `1px solid ${item.categoryColor}`
+                      color: '#666',
+                      backgroundColor: item.category.backgroundColor
                     }}>
-                      {item.category}
+                      {item.category.label}
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    {item.hasUpperIcon && (
-                      <span style={{ color: '#9ca3af', fontSize: '14px' }}>↗</span>
-                    )}
+                    {/* 上位アイコンは今は表示しない */}
                   </div>
-                  <div style={{ textAlign: 'center', fontSize: '12px', color: '#333' }}>{item.time}</div>
+                  <div style={{ textAlign: 'center', fontSize: '12px', color: '#333' }}>-</div>
                 </div>
               ))
             )}

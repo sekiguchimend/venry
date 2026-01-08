@@ -504,6 +504,29 @@ func ExecuteSingleFlow(w http.ResponseWriter, r *http.Request) {
 		if flowCode != "login" {
 			fmt.Printf("🔄 フロー実行開始: %s / %s\n", siteID, flowCode)
 			result := executor.ExecuteFlow(siteID, flowCode, ctx)
+			
+			// 更新履歴を記録
+			historyStatus := "success"
+			var errorMsg *string
+			if !result.Success {
+				historyStatus = "failed"
+				errorMsg = &result.Error
+			}
+
+			flowNamePtr := &req.FlowName
+			history := models.UpdateHistory{
+				CompanyID:    user.CompanyID,
+				UpdateType:   "content_update",
+				Title:        flowNamePtr,
+				Label:        flowNamePtr,
+				Status:       historyStatus,
+				ErrorMessage: errorMsg,
+			}
+			
+			if _, err := models.CreateUpdateHistory(history, token); err != nil {
+				fmt.Printf("⚠️ 更新履歴の記録に失敗: %v\n", err)
+			}
+
 			if result.Success {
 				fmt.Printf("✅ フロー成功: %s / %s\n", siteID, flowCode)
 			} else {

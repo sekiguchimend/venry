@@ -478,6 +478,52 @@ CREATE TABLE content_group_items (
     UNIQUE(content_group_id, content_id)
 );
 
+CREATE TABLE template_groups (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE template_group_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    template_group_id UUID NOT NULL REFERENCES template_groups(id) ON DELETE CASCADE,
+    template_id UUID NOT NULL REFERENCES templates(id) ON DELETE CASCADE,
+    sort_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(template_group_id, template_id)
+);
+
+CREATE TABLE content_schedules (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+    sort_order INTEGER DEFAULT 0,
+    time VARCHAR(10) NOT NULL,
+    template_id UUID REFERENCES templates(id) ON DELETE SET NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE content_posts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    content_id UUID NOT NULL REFERENCES contents(id) ON DELETE CASCADE,
+    post_number INTEGER NOT NULL DEFAULT 1,
+    title VARCHAR(1000),
+    normal_time VARCHAR(100),
+    normal_price VARCHAR(100),
+    coupon_time VARCHAR(100),
+    coupon_price VARCHAR(100),
+    conditions TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(content_id, post_number)
+);
+
 CREATE INDEX idx_girls_company_id ON girls(company_id);
 CREATE INDEX idx_girls_name ON girls(name);
 CREATE INDEX idx_girls_is_public ON girls(is_public);
@@ -500,6 +546,10 @@ CREATE INDEX idx_contents_company_id ON contents(company_id);
 CREATE INDEX idx_contents_type ON contents(content_type);
 CREATE INDEX idx_templates_company_id ON templates(company_id);
 CREATE INDEX idx_templates_folder_id ON templates(folder_id);
+CREATE INDEX idx_content_schedules_content_id ON content_schedules(content_id);
+CREATE INDEX idx_content_schedules_company_id ON content_schedules(company_id);
+CREATE INDEX idx_content_posts_content_id ON content_posts(content_id);
+CREATE INDEX idx_content_posts_company_id ON content_posts(company_id);
 CREATE INDEX idx_company_site_credentials_company_id ON company_site_credentials(company_id);
 CREATE INDEX idx_system_notices_published_at ON system_notices(published_at);
 CREATE INDEX idx_system_notices_type ON system_notices(notice_type);
@@ -516,6 +566,8 @@ ALTER TABLE immediate_status ENABLE ROW LEVEL SECURITY;
 ALTER TABLE immediate_exclusions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE template_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE template_group_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE update_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sync_logs ENABLE ROW LEVEL SECURITY;
@@ -525,6 +577,8 @@ ALTER TABLE company_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE attendance_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE female_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE immediate_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_schedules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_posts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "companies_all" ON companies FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "users_all" ON users FOR ALL USING (true) WITH CHECK (true);
@@ -538,6 +592,8 @@ CREATE POLICY "immediate_status_all" ON immediate_status FOR ALL USING (true) WI
 CREATE POLICY "immediate_exclusions_all" ON immediate_exclusions FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "contents_all" ON contents FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "content_groups_all" ON content_groups FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "template_groups_all" ON template_groups FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "template_group_items_all" ON template_group_items FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "templates_all" ON templates FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "update_history_all" ON update_history FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "sync_logs_all" ON sync_logs FOR ALL USING (true) WITH CHECK (true);
@@ -547,6 +603,8 @@ CREATE POLICY "company_settings_all" ON company_settings FOR ALL USING (true) WI
 CREATE POLICY "attendance_settings_all" ON attendance_settings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "female_settings_all" ON female_settings FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "immediate_settings_all" ON immediate_settings FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "content_schedules_all" ON content_schedules FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "content_posts_all" ON content_posts FOR ALL USING (true) WITH CHECK (true);
 
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -581,3 +639,6 @@ CREATE TRIGGER update_immediate_status_updated_at BEFORE UPDATE ON immediate_sta
 CREATE TRIGGER update_contents_updated_at BEFORE UPDATE ON contents FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_templates_updated_at BEFORE UPDATE ON templates FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_content_groups_updated_at BEFORE UPDATE ON content_groups FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_template_groups_updated_at BEFORE UPDATE ON template_groups FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_content_schedules_updated_at BEFORE UPDATE ON content_schedules FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_content_posts_updated_at BEFORE UPDATE ON content_posts FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

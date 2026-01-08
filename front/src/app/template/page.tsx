@@ -1,29 +1,51 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2, X } from 'lucide-react';
+import { Search, Edit, Plus, HelpCircle, RefreshCw, Trash2, X, Pencil } from 'lucide-react';
 import { getTemplateFolders, getTemplates, type Template, type TemplateFolder, type TemplateFolderType } from './actions/templates';
+import { getTemplateGroups, getTemplateGroupItems } from './actions/template-groups';
+import TemplateGroupCreateTab from './tabs/TemplateGroupCreateTab';
+
+interface TemplateGroup {
+  id: string;
+  company_id: string;
+  name: string;
+  description?: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TemplateGroupItem {
+  id: string;
+  template_group_id: string;
+  template_id: string;
+  template_name: string;
+  label: string;
+  sort_order: number;
+  created_at: string;
+}
 
 const TemplatePage: React.FC = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState('template-list');
+  const [activeTab, setActiveTab] = useState<'template-list' | 'group-create'>('template-list');
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
+  const [editingGroupId, setEditingGroupId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState('');
   const [selectedGirl, setSelectedGirl] = useState('');
   const [templates, setTemplates] = useState<Template[]>([]);
   const [templateFolders, setTemplateFolders] = useState<TemplateFolder[]>([]);
+  const [templateGroups, setTemplateGroups] = useState<TemplateGroup[]>([]);
+  const [selectedGroupItems, setSelectedGroupItems] = useState<TemplateGroupItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const labels = ['新着', 'イベント', '割引', '新人', '出勤', '待機', '写メ', 'その他'];
 
-  const folderType: TemplateFolderType = useMemo(() => {
-    if (activeTab === 'regularly-used-folder') return 'regular';
-    if (activeTab === 'usage-disabled') return 'disabled';
-    return 'normal';
-  }, [activeTab]);
+  const folderType: TemplateFolderType = 'normal';
 
   const allowedFolderIds = useMemo(() => {
     const ids = new Set<string>();
@@ -34,25 +56,37 @@ const TemplatePage: React.FC = () => {
   }, [templateFolders, folderType]);
 
   const templatesByTab = useMemo(() => {
-    // folder_id=null（旧データ）も漏れなく表示したいので、normalタブでは含める
-    if (folderType === 'normal') {
-      return templates.filter((t) => t.folder_id == null || allowedFolderIds.includes(t.folder_id));
-    }
-    // regular/disabled はフォルダ紐付け必須
-    return templates.filter((t) => t.folder_id != null && allowedFolderIds.includes(t.folder_id));
-  }, [templates, allowedFolderIds, folderType]);
+    return templates.filter((t) => t.folder_id == null || allowedFolderIds.includes(t.folder_id));
+  }, [templates, allowedFolderIds]);
 
   const visibleTemplates = useMemo(() => {
-    const q = searchTerm.trim();
-    if (!q) return templatesByTab;
-    return templatesByTab.filter((t) => t.name.toLowerCase().includes(q.toLowerCase()));
-  }, [templatesByTab, searchTerm]);
+    let filtered = templatesByTab;
 
-  const reload = async () => {
+    // グループが選択されている場合は、そのグループに属するテンプレートのみ表示
+    if (selectedGroupId && selectedGroupItems.length > 0) {
+      const groupTemplateIds = new Set(selectedGroupItems.map(item => item.template_id));
+      filtered = filtered.filter((t) => groupTemplateIds.has(t.id));
+      // グループ内のsort_orderでソート
+      filtered = filtered.sort((a, b) => {
+        const aItem = selectedGroupItems.find(item => item.template_id === a.id);
+        const bItem = selectedGroupItems.find(item => item.template_id === b.id);
+        return (aItem?.sort_order ?? 0) - (bItem?.sort_order ?? 0);
+      });
+    }
+
+    // 検索フィルター
+    const q = searchTerm.trim();
+    if (q) {
+      filtered = filtered.filter((t) => t.name.toLowerCase().includes(q.toLowerCase()));
+    }
+
+    return filtered;
+  }, [templatesByTab, searchTerm, selectedGroupId, selectedGroupItems]);
+
+  const reload = useCallback(async () => {
     setIsLoading(true);
     setLoadError(null);
     try {
-      // 全件取得→画面側で folderType に分類（folder_id=null の既存テンプレも含めるため）
       const [templateRes, folderRes] = await Promise.all([
         getTemplates(),
         getTemplateFolders(),
@@ -64,11 +98,53 @@ const TemplatePage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // グループ一覧を取得
+  const fetchGroups = useCallback(async () => {
+    try {
+      const result = await getTemplateGroups();
+      if (result.success && result.groups) {
+        setTemplateGroups(result.groups);
+      }
+    } catch (error) {
+      console.error('Failed to fetch template groups:', error);
+    }
+  }, []);
 
   useEffect(() => {
     void reload();
-  }, [folderType]);
+    void fetchGroups();
+  }, [reload, fetchGroups]);
+
+  // グループ作成タブから戻ったときにグループを再取得
+  useEffect(() => {
+    if (activeTab !== 'group-create') {
+      fetchGroups();
+    }
+  }, [activeTab, fetchGroups]);
+
+  // グループが選択されたときにそのグループのアイテムを取得
+  useEffect(() => {
+    const fetchGroupItems = async () => {
+      if (selectedGroupId) {
+        try {
+          const result = await getTemplateGroupItems(selectedGroupId);
+          if (result.success && result.items) {
+            setSelectedGroupItems(result.items);
+          } else {
+            setSelectedGroupItems([]);
+          }
+        } catch (error) {
+          console.error('Failed to fetch group items:', error);
+          setSelectedGroupItems([]);
+        }
+      } else {
+        setSelectedGroupItems([]);
+      }
+    };
+    fetchGroupItems();
+  }, [selectedGroupId]);
 
   const handleOpenModal = () => setIsModalOpen(true);
 
@@ -83,6 +159,23 @@ const TemplatePage: React.FC = () => {
     if (selectedGirl) params.set('girlId', selectedGirl);
     router.push(`/template/edit?${params.toString()}`);
     setIsModalOpen(false);
+  };
+
+  // グループ編集画面へ遷移
+  const handleEditGroup = () => {
+    if (selectedGroupId) {
+      // グループタブ選択時は編集モード
+      setEditingGroupId(selectedGroupId);
+    } else {
+      // 通常タブ時は新規作成モード
+      setEditingGroupId(null);
+    }
+    setActiveTab('group-create');
+  };
+
+  // グループ解除
+  const handleClearGroup = () => {
+    setSelectedGroupId(null);
   };
 
   return (
@@ -106,10 +199,11 @@ const TemplatePage: React.FC = () => {
       <div className="bg-white border border-gray-200 rounded overflow-hidden">
         {/* Navigation Tabs */}
         <div className="flex border-b border-gray-200 overflow-x-auto">
+          {/* テンプレート一覧タブ */}
           <button
-            onClick={() => setActiveTab('template-list')}
+            onClick={() => { setActiveTab('template-list'); setSelectedGroupId(null); }}
             className={`py-4 px-4 md:px-6 border-0 bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 relative ${
-              activeTab === 'template-list'
+              activeTab === 'template-list' && !selectedGroupId
                 ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
                 : 'text-gray-600 font-normal'
             }`}
@@ -117,199 +211,238 @@ const TemplatePage: React.FC = () => {
             <span className="hidden md:inline">テンプレート一覧</span>
             <span className="md:hidden">テンプレート</span>
           </button>
+
+          {/* グループタブ */}
+          {templateGroups.map((group) => (
+            <button
+              key={`group-${group.id}`}
+              onClick={() => {
+                setActiveTab('template-list');
+                setSelectedGroupId(group.id);
+              }}
+              className={`py-4 px-4 md:px-6 border-0 bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 relative ${
+                selectedGroupId === group.id
+                  ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
+                  : 'text-gray-600 font-normal'
+              }`}
+            >
+              {group.name}
+            </button>
+          ))}
+
+          {/* + ボタン */}
           <button
-            onClick={() => setActiveTab('regularly-used-folder')}
-            className={`py-4 px-4 md:px-6 border-0 bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 relative ${
-              activeTab === 'regularly-used-folder'
-                ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
-                : 'text-gray-600 font-normal'
+            onClick={() => { setActiveTab('group-create'); setSelectedGroupId(null); setEditingGroupId(null); }}
+            className={`py-4 px-4 md:px-4 border-0 bg-white cursor-pointer text-sm transition-colors hover:bg-gray-50 flex-shrink-0 relative ${
+              activeTab === 'group-create'
+                ? 'text-blue-700 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
+                : 'text-gray-600'
             }`}
           >
-            <span className="hidden md:inline">定期用中フォルダ</span>
-            <span className="md:hidden">定期用</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('usage-disabled')}
-            className={`py-4 px-4 md:px-6 border-0 bg-white text-xs md:text-sm cursor-pointer transition-all whitespace-nowrap flex-shrink-0 relative ${
-              activeTab === 'usage-disabled'
-                ? 'text-blue-700 font-medium after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:bg-blue-700'
-                : 'text-gray-600 font-normal'
-            }`}
-          >
-            <span className="hidden md:inline">の要確集・使用不可</span>
-            <span className="md:hidden">使用不可</span>
-          </button>
-          <button className="py-4 px-4 md:px-4 border-0 bg-white text-gray-600 cursor-pointer text-sm transition-colors hover:bg-gray-50 flex-shrink-0">
             <Plus size={14} className="md:w-4 md:h-4" />
           </button>
         </div>
 
-        {/* Search Bar and Actions Row */}
-        <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
-          {/* Search Bar and Action Links */}
-          <div className="flex flex-wrap items-center gap-3 md:gap-4">
-            <div className="relative w-full sm:w-[280px] md:w-[350px]">
-              <Search
-                size={16}
-                className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
-              />
-              <input
-                type="text"
-                placeholder="テンプレート名で検索"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
-              />
-            </div>
-            <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
-              <RefreshCw size={14} className="text-blue-500" />
-              <span className="hidden sm:inline">テンプレート並び替え</span><span className="sm:hidden">並び替え</span>
-            </a>
-            <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
-              <Trash2 size={14} className="text-blue-500" />
-              選択削除
-            </a>
-          </div>
-
-          {/* Count */}
-          <div className="text-xs md:text-sm text-gray-600 text-center sm:text-left">
-            登録件数29/上限400件
-          </div>
-        </div>
-
-        {/* Table Header - Hidden on mobile */}
-        <div className="hidden md:grid py-3 px-4 bg-gray-50 border-b border-gray-200 text-xs font-normal text-gray-600 items-center" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
-          <div></div>
-          <div className="text-center">No.</div>
-          <div className="text-center">画像</div>
-          <div className="pl-2">テンプレート名</div>
-          <div className="flex items-center justify-center gap-1">
-            <span>女性</span>
-            <HelpCircle size={14} className="text-blue-500" />
-          </div>
-          <div className="flex items-center justify-center gap-1">
-            <span>ラベル</span>
-            <HelpCircle size={14} className="text-blue-500" />
-          </div>
-          <div className="flex items-center justify-center gap-1">
-            <span>設定数</span>
-            <HelpCircle size={14} className="text-blue-500" />
-          </div>
-          <div className="flex items-center justify-center">メモ</div>
-          <div></div>
-        </div>
-
-        {/* Content Rows */}
-        {loadError && (
-          <div className="p-4 text-sm text-red-600">
-            {loadError}
-          </div>
+        {/* グループ作成画面 */}
+        {activeTab === 'group-create' && (
+          <TemplateGroupCreateTab
+            editingGroupId={editingGroupId}
+            onGroupCreated={() => {
+              fetchGroups();
+              setEditingGroupId(null);
+              setActiveTab('template-list');
+            }}
+          />
         )}
-        {isLoading && (
-          <div className="p-4 text-sm text-gray-600">
-            読み込み中...
-          </div>
-        )}
-        {!isLoading && visibleTemplates.map((template, idx) => (
-          <div key={template.id}>
-            {/* Desktop Layout */}
-            <div className="hidden md:grid py-2 px-4 border-b border-gray-100 items-center min-h-[60px]" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
-              {/* Edit Button */}
-              <div className="flex items-center justify-center">
-                <button
-                  onClick={() => router.push(`/template/edit?id=${encodeURIComponent(template.id)}&folderType=${encodeURIComponent(folderType)}`)}
-                  className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal"
-                >
-                  <Edit size={11} />
-                  編集
-                </button>
-              </div>
 
-              {/* Number */}
-              <div className="text-center text-[13px] text-gray-800">
-                {idx + 1}
-              </div>
-
-              {/* Image */}
-              <div className="flex justify-center items-center">
-                <div className="w-[60px] h-10 bg-gray-200 rounded-sm flex items-center justify-center">
-                  <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[9px]">
-                    画像
-                  </div>
+        {/* テンプレート一覧画面 */}
+        {activeTab === 'template-list' && (
+          <>
+            {/* Search Bar and Actions Row */}
+            <div className="p-3 md:p-4 flex flex-col md:flex-row items-stretch md:items-center justify-between border-b border-gray-100 gap-3">
+              {/* Search Bar and Action Links */}
+              <div className="flex flex-wrap items-center gap-3 md:gap-4">
+                <div className="relative w-full sm:w-[280px] md:w-[350px]">
+                  <Search
+                    size={16}
+                    className="md:w-[18px] md:h-[18px] absolute left-3 top-1/2 -translate-y-1/2 text-gray-600"
+                  />
+                  <input
+                    type="text"
+                    placeholder="テンプレート名で検索"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full py-2 pr-10 pl-10 border border-gray-200 rounded-full text-xs md:text-sm outline-none transition-colors focus:border-blue-700"
+                  />
                 </div>
-              </div>
-
-              {/* Template Name */}
-              <div className="text-[13px] text-gray-800 pl-2 font-normal">
-                {template.name}
-              </div>
-
-              {/* Woman Column */}
-              <div className="flex items-center justify-center text-[13px] text-gray-800">
-                {/* Empty for now */}
-              </div>
-
-              {/* Label Column */}
-              <div className="flex items-center justify-center">
-                {template.label && (
-                  <span className="py-0.5 px-2 bg-transparent border border-green-500 rounded-sm text-[11px] text-green-600">
-                    {template.label}
-                  </span>
+                <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
+                  <RefreshCw size={14} className="text-blue-500" />
+                  <span className="hidden sm:inline">テンプレート並び替え</span><span className="sm:hidden">並び替え</span>
+                </a>
+                <a href="#" className="text-xs md:text-sm text-blue-700 no-underline flex items-center gap-1">
+                  <Trash2 size={14} className="text-blue-500" />
+                  選択削除
+                </a>
+                {/* グループボタン */}
+                <button
+                  onClick={handleEditGroup}
+                  className="text-xs md:text-sm text-blue-700 bg-transparent border-none cursor-pointer underline flex items-center gap-1"
+                >
+                  <Pencil size={14} className="text-blue-500" />
+                  グループを編集
+                </button>
+                {selectedGroupId && (
+                  <button
+                    onClick={handleClearGroup}
+                    className="text-xs md:text-sm text-blue-700 bg-transparent border-none cursor-pointer underline flex items-center gap-1"
+                  >
+                    <X size={14} className="text-blue-500" />
+                    解除
+                  </button>
                 )}
               </div>
 
-              {/* Setting Count Column */}
-              <div className="flex items-center justify-center text-[13px] text-blue-600 underline cursor-pointer">
-                0
+              {/* Count */}
+              <div className="text-xs md:text-sm text-gray-600 text-center sm:text-left">
+                登録件数{visibleTemplates.length}/上限400件
               </div>
+            </div>
 
-              {/* Memo Column */}
-              <div className="flex items-center justify-center text-[13px] text-gray-800">
-                {/* Empty */}
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden md:grid py-3 px-4 bg-gray-50 border-b border-gray-200 text-xs font-normal text-gray-600 items-center" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
+              <div></div>
+              <div className="text-center">No.</div>
+              <div className="text-center">画像</div>
+              <div className="pl-2">テンプレート名</div>
+              <div className="flex items-center justify-center gap-1">
+                <span>女性</span>
+                <HelpCircle size={14} className="text-blue-500" />
               </div>
-
-              {/* Empty spacer */}
+              <div className="flex items-center justify-center gap-1">
+                <span>ラベル</span>
+                <HelpCircle size={14} className="text-blue-500" />
+              </div>
+              <div className="flex items-center justify-center gap-1">
+                <span>設定数</span>
+                <HelpCircle size={14} className="text-blue-500" />
+              </div>
+              <div className="flex items-center justify-center">メモ</div>
               <div></div>
             </div>
 
-            {/* Mobile Card Layout */}
-            <div className="md:hidden p-4 border-b border-gray-100">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-8 bg-gray-200 rounded-sm flex items-center justify-center mb-2">
-                    <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[8px]">
-                      画像
-                    </div>
-                  </div>
-                  <div className="text-center text-xs text-gray-600">
-                    No.{idx + 1}
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="text-sm text-gray-800 font-normal">
-                      {template.name}
-                    </div>
+            {/* Content Rows */}
+            {loadError && (
+              <div className="p-4 text-sm text-red-600">
+                {loadError}
+              </div>
+            )}
+            {isLoading && (
+              <div className="p-4 text-sm text-gray-600">
+                読み込み中...
+              </div>
+            )}
+            {!isLoading && visibleTemplates.map((template, idx) => (
+              <div key={template.id}>
+                {/* Desktop Layout */}
+                <div className="hidden md:grid py-2 px-4 border-b border-gray-100 items-center min-h-[60px]" style={{ gridTemplateColumns: '50px 40px 80px 1fr 100px 100px 80px 100px 1fr' }}>
+                  {/* Edit Button */}
+                  <div className="flex items-center justify-center">
                     <button
                       onClick={() => router.push(`/template/edit?id=${encodeURIComponent(template.id)}&folderType=${encodeURIComponent(folderType)}`)}
-                      className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2"
+                      className="flex items-center gap-0.5 py-0.5 px-1.5 bg-transparent text-blue-700 border-none rounded-sm text-[11px] cursor-pointer font-normal"
                     >
-                      <Edit size={12} />
+                      <Edit size={11} />
                       編集
                     </button>
                   </div>
-                  {template.label && (
-                    <div className="flex items-center gap-2">
-                      <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-xs text-gray-600 cursor-pointer">
-                        {template.label}
-                      </button>
+
+                  {/* Number */}
+                  <div className="text-center text-[13px] text-gray-800">
+                    {idx + 1}
+                  </div>
+
+                  {/* Image */}
+                  <div className="flex justify-center items-center">
+                    <div className="w-[60px] h-10 bg-gray-200 rounded-sm flex items-center justify-center">
+                      <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[9px]">
+                        画像
+                      </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* Template Name */}
+                  <div className="text-[13px] text-gray-800 pl-2 font-normal">
+                    {template.name}
+                  </div>
+
+                  {/* Woman Column */}
+                  <div className="flex items-center justify-center text-[13px] text-gray-800">
+                    {/* Empty for now */}
+                  </div>
+
+                  {/* Label Column */}
+                  <div className="flex items-center justify-center">
+                    {template.label && (
+                      <span className="py-0.5 px-2 bg-transparent border border-green-500 rounded-sm text-[11px] text-green-600">
+                        {template.label}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Setting Count Column */}
+                  <div className="flex items-center justify-center text-[13px] text-blue-600 underline cursor-pointer">
+                    0
+                  </div>
+
+                  {/* Memo Column */}
+                  <div className="flex items-center justify-center text-[13px] text-gray-800">
+                    {/* Empty */}
+                  </div>
+
+                  {/* Empty spacer */}
+                  <div></div>
+                </div>
+
+                {/* Mobile Card Layout */}
+                <div className="md:hidden p-4 border-b border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-8 bg-gray-200 rounded-sm flex items-center justify-center mb-2">
+                        <div className="bg-gray-600 text-white py-0.5 px-1 rounded-sm text-[8px]">
+                          画像
+                        </div>
+                      </div>
+                      <div className="text-center text-xs text-gray-600">
+                        No.{idx + 1}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="text-sm text-gray-800 font-normal">
+                          {template.name}
+                        </div>
+                        <button
+                          onClick={() => router.push(`/template/edit?id=${encodeURIComponent(template.id)}&folderType=${encodeURIComponent(folderType)}`)}
+                          className="flex items-center gap-0.5 py-1 px-2 bg-transparent text-blue-700 border-none rounded-sm text-xs cursor-pointer font-normal ml-2"
+                        >
+                          <Edit size={12} />
+                          編集
+                        </button>
+                      </div>
+                      {template.label && (
+                        <div className="flex items-center gap-2">
+                          <button className="py-0.5 px-2 bg-transparent border border-gray-200 rounded-sm text-xs text-gray-600 cursor-pointer">
+                            {template.label}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
+            ))}
+          </>
+        )}
       </div>
 
       {/* Template Settings Modal */}

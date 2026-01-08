@@ -35,6 +35,7 @@ export function convertToFlowItem(
     category: {
       label: getTypeName(primaryType),
       backgroundColor: typeColor.bg,
+      textColor: typeColor.text,
     },
   };
 }
@@ -62,4 +63,25 @@ export function getPaidFlowItems(page: PageType): FlowItem[] {
  */
 export function getFreeFlowItems(page: PageType): FlowItem[] {
   return getFlowItemsByPage(page).filter(item => !item.isPaid);
+}
+
+/**
+ * ページ別の総件数を取得
+ */
+export function getFlowCountByPage(page: PageType): number {
+  return getFlowItemsByPage(page).length;
+}
+
+/**
+ * ページネーション用: 特定ページのフローを取得（50件刻み）
+ */
+export function getFlowItemsByPagePaginated(
+  page: PageType,
+  currentPage: number,
+  itemsPerPage: number = 50
+): FlowItem[] {
+  const allItems = getFlowItemsByPage(page);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return allItems.slice(startIndex, endIndex);
 }

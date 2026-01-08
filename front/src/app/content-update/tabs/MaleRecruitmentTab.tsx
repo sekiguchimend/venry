@@ -2,11 +2,16 @@
 
 import React from 'react';
 import ContentRow from '../components/ContentRow';
-import { getFlowItemsByPage } from '../utils/flowUtils';
+import { getFlowItemsByPagePaginated } from '../utils/flowUtils';
 
-const MaleRecruitmentTab: React.FC = () => {
-  // JSON設定からmale-recruitmentページのフローを取得
-  const flowItems = getFlowItemsByPage('male-recruitment');
+interface MaleRecruitmentTabProps {
+  currentPage?: number;
+  selectedGroupId?: string | null;
+}
+
+const MaleRecruitmentTab: React.FC<MaleRecruitmentTabProps> = ({ currentPage = 1, selectedGroupId = null }) => {
+  // JSON設定からmale-recruitmentページのフローを取得（ページネーション対応）
+  const flowItems = getFlowItemsByPagePaginated('male-recruitment', currentPage);
 
   return (
     <>

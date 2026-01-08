@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, ArrowLeft } from 'lucide-react';
 import TemplateEditHeader from './components/TemplateEditHeader';
 import TemplateContentTab from './components/TemplateContentTab';
 import TemplateCategoryTab, { type CategoryMappingRow } from './components/TemplateCategoryTab';
@@ -200,6 +200,17 @@ const TemplateEditClient: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {/* 戻るボタン */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <button
+          onClick={() => router.push('/template')}
+          className="flex items-center gap-2 text-[#323232] text-sm hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-none"
+        >
+          <ArrowLeft size={18} />
+          <span>テンプレート一覧に戻る</span>
+        </button>
+      </div>
+
       {/* Top Notice Bar - グレー背景 */}
       <div className="bg-[#f5f5f5] px-4 py-2 border-b border-gray-200">
         <p className="text-[13px] text-[#323232] leading-relaxed">

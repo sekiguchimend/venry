@@ -63,6 +63,20 @@ func main() {
 	mux.Handle("/api/content-schedules", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentSchedules)))
 	mux.Handle("/api/content-schedules/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveContentSchedules)))
 
+	// コンテンツグループエンドポイント
+	mux.Handle("/api/content-groups", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentGroups)))
+	mux.Handle("/api/content-groups/create", middleware.AuthMiddleware(http.HandlerFunc(handlers.CreateContentGroup)))
+	mux.Handle("/api/content-groups/update", middleware.AuthMiddleware(http.HandlerFunc(handlers.UpdateContentGroup)))
+	mux.Handle("/api/content-groups/items", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetContentGroupItems)))
+	mux.Handle("/api/content-groups/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteContentGroup)))
+
+	// テンプレートグループエンドポイント
+	mux.Handle("/api/template-groups", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateGroups)))
+	mux.Handle("/api/template-groups/create", middleware.AuthMiddleware(http.HandlerFunc(handlers.CreateTemplateGroup)))
+	mux.Handle("/api/template-groups/update", middleware.AuthMiddleware(http.HandlerFunc(handlers.UpdateTemplateGroup)))
+	mux.Handle("/api/template-groups/items", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateGroupItems)))
+	mux.Handle("/api/template-groups/delete", middleware.AuthMiddleware(http.HandlerFunc(handlers.DeleteTemplateGroup)))
+
 	// テンプレートエンドポイント
 	mux.Handle("/api/template-folders", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateFolders)))
 	mux.Handle("/api/templates", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplates)))
@@ -70,6 +84,9 @@ func main() {
 	mux.Handle("/api/templates/upload-image", middleware.AuthMiddleware(http.HandlerFunc(handlers.UploadTemplateImage)))
 	mux.Handle("/api/templates/flow-mappings", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetTemplateFlowMappings)))
 	mux.Handle("/api/templates/flow-mappings/save", middleware.AuthMiddleware(http.HandlerFunc(handlers.SaveTemplateFlowMappings)))
+
+	// 更新履歴エンドポイント
+	mux.Handle("/api/update-history", middleware.AuthMiddleware(http.HandlerFunc(handlers.GetUpdateHistory)))
 
 	// ミドルウェアチェーン
 	handler := middleware.LoggerMiddleware(corsMiddleware.Handler(mux))

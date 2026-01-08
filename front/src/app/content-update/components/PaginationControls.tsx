@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ContentTabKey } from '../../../types/content-update';
+import { getTotalPages } from '../utils/tabContentFactory';
 
 interface PaginationControlsProps {
   activeTab: ContentTabKey;
@@ -10,10 +11,16 @@ interface PaginationControlsProps {
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
+  activeTab,
   currentPage,
   setCurrentPage
 }) => {
-  const totalPages = 3;
+  const totalPages = getTotalPages(activeTab);
+
+  // 1ページ以下の場合はページネーションを表示しない
+  if (totalPages <= 1) {
+    return null;
+  }
 
   return (
     <div className="flex items-center gap-1 md:gap-2">

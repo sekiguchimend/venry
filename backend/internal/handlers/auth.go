@@ -105,19 +105,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 
 // Login はログイン処理
 func Login(w http.ResponseWriter, r *http.Request) {
-	log.Println("========================================")
-	log.Println("[LOGIN-1] リクエスト受信")
-	log.Printf("[LOGIN-2] RemoteAddr: %s", r.RemoteAddr)
-	log.Printf("[LOGIN-3] Method: %s", r.Method)
-	log.Printf("[LOGIN-4] URL: %s", r.URL.String())
-	log.Printf("[LOGIN-5] Host: %s", r.Host)
-	log.Printf("[LOGIN-6] Content-Type: %s", r.Header.Get("Content-Type"))
-	log.Printf("[LOGIN-7] User-Agent: %s", r.Header.Get("User-Agent"))
-	log.Printf("[LOGIN-8] Origin: %s", r.Header.Get("Origin"))
-	log.Printf("[LOGIN-9] Referer: %s", r.Header.Get("Referer"))
-
 	if r.Method != http.MethodPost {
-		log.Printf("[LOGIN-ERR] Method not allowed: %s", r.Method)
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -125,35 +113,27 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	// リクエストボディを読み取り
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Printf("[LOGIN-ERR] Body読み取り失敗: %v", err)
+		log.Printf("[LOGIN] Body読み取り失敗")
 		sendError(w, "Failed to read body", http.StatusBadRequest)
 		return
 	}
-	log.Printf("[LOGIN-10] RequestBody: %s", string(bodyBytes))
 
 	var req LoginRequest
 	if err := json.Unmarshal(bodyBytes, &req); err != nil {
-		log.Printf("[LOGIN-ERR] JSONパース失敗: %v", err)
+		log.Printf("[LOGIN] JSONパース失敗")
 		sendError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	log.Printf("[LOGIN-11] Email: %s", req.Email)
-	log.Printf("[LOGIN-12] Password長: %d", len(req.Password))
-
 	if req.Email == "" || req.Password == "" {
-		log.Printf("[LOGIN-ERR] Email or password empty")
 		sendError(w, "Email and password are required", http.StatusBadRequest)
 		return
 	}
 
 	// Supabase設定確認
 	url, key := getAuthConfig()
-	log.Printf("[LOGIN-13] SUPABASE_URL: %s", url)
-	log.Printf("[LOGIN-14] SUPABASE_ANON_KEY長: %d", len(key))
-
 	if url == "" || key == "" {
-		log.Printf("[LOGIN-ERR] Supabase設定が空")
+		log.Printf("[LOGIN] Supabase設定が空")
 		sendError(w, "Supabase not configured", http.StatusInternalServerError)
 		return
 	}
@@ -164,46 +144,32 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		"password": req.Password,
 	}
 
-	log.Println("[LOGIN-15] Supabase呼び出し開始")
-	supabaseEndpoint := url + "/auth/v1/token?grant_type=password"
-	log.Printf("[LOGIN-16] Supabase URL: %s", supabaseEndpoint)
-
 	resp, err := callSupabaseAuth("POST", "/auth/v1/token?grant_type=password", supabaseBody)
 	if err != nil {
-		log.Printf("[LOGIN-ERR] Supabase呼び出し失敗: %v", err)
-		sendError(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("[LOGIN] Supabase呼び出し失敗")
+		sendError(w, "Authentication failed", http.StatusInternalServerError)
 		return
 	}
 	defer resp.Body.Close()
 
-	log.Printf("[LOGIN-17] Supabaseステータス: %d", resp.StatusCode)
-
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("[LOGIN-ERR] Supabaseレスポンス読み取り失敗: %v", err)
+		log.Printf("[LOGIN] Supabaseレスポンス読み取り失敗")
 		sendError(w, "Failed to read supabase response", http.StatusInternalServerError)
 		return
 	}
 
-	log.Printf("[LOGIN-18] Supabaseレスポンス長: %d bytes", len(respBody))
-	log.Printf("[LOGIN-19] Supabaseレスポンス: %s", string(respBody))
-
 	if resp.StatusCode >= 400 {
-		log.Printf("[LOGIN-20] Supabaseエラーを返却: %d", resp.StatusCode)
+		log.Printf("[LOGIN] 認証失敗: status=%d", resp.StatusCode)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(resp.StatusCode)
-		n, err := w.Write(respBody)
-		log.Printf("[LOGIN-21] Write結果: n=%d, err=%v", n, err)
+		w.Write(respBody)
 		return
 	}
 
-	log.Println("[LOGIN-22] 成功レスポンス返却開始")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
-	n, err := w.Write(respBody)
-	log.Printf("[LOGIN-23] Write結果: n=%d, err=%v", n, err)
-	log.Println("[LOGIN-24] === 完了 ===")
-	log.Println("========================================")
+	w.Write(respBody)
 }
 
 // Logout はログアウト処理

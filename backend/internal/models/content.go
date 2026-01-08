@@ -120,7 +120,15 @@ func GetContentBySiteAndFlow(siteID string, flowName string, token string) (*Con
 
 	siteUUID := sites[0].ID
 
-	// site_idとnameでコンテンツを検索（flowNameがnameに含まれるか、完全一致）
+	var contents []Content
+
+	// まず完全一致で検索
+	exactEndpoint := fmt.Sprintf("contents?site_id=eq.%s&name=eq.%s&order=updated_at.desc,created_at.desc&limit=1", url.QueryEscape(siteUUID), url.QueryEscape(flowName))
+	if err := SupabaseGet(exactEndpoint, &contents, token); err == nil && len(contents) > 0 {
+		return &contents[0], nil
+	}
+
+	// 完全一致で見つからない場合、部分一致で検索
 	// PostgRESTのilikeでは%をワイルドカードとして使用
 	// 日本語を含むflowNameは url.PathEscape でエスケープする（空白は%20に変換される）
 	escapedFlowName := url.PathEscape(flowName)
@@ -129,7 +137,6 @@ func GetContentBySiteAndFlow(siteID string, flowName string, token string) (*Con
 	// PostgRESTでは%がワイルドカード、URLエンコードで%25になる
 	contentEndpoint := fmt.Sprintf("contents?site_id=eq.%s&name=ilike.%s%s%s&order=updated_at.desc,created_at.desc&limit=1", url.QueryEscape(siteUUID), "%25", escapedFlowName, "%25")
 
-	var contents []Content
 	if err := SupabaseGet(contentEndpoint, &contents, token); err != nil {
 		return nil, err
 	}

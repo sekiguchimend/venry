@@ -280,14 +280,16 @@ const ContentEditPageInner: React.FC = () => {
       await saveContentSchedules({
         content_id: contentId,
         items: scheduleItems.map((it) => ({
-          time: it.time,
+          // サーバー/DB側はHH:MM形式を要求するため、最低限ここで整形する
+          time: (it.time || '').trim().slice(0, 5),
           template_id: it.templateId || '',
         })),
       });
       await loadSchedulesWithContentId(contentId);
     } catch (error) {
       console.error('Failed to save content schedules:', error);
-      alert('時刻指定更新の保存に失敗しました');
+      const msg = error instanceof Error ? error.message : String(error);
+      alert(`時刻指定更新の保存に失敗しました\n${msg}`);
     } finally {
       setIsSavingSchedules(false);
     }

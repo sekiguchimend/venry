@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 	"time"
 )
@@ -53,6 +54,7 @@ func ReplaceContentSchedules(companyID string, contentID string, schedules []Con
 		}
 		var result []ContentSchedule
 		if err := SupabasePost("content_schedules", body, &result, token); err != nil {
+			log.Printf("ReplaceContentSchedules insert failed: content_id=%s sort_order=%d time=%q template_id=%v err=%v", contentID, s.SortOrder, s.Time, s.TemplateID, err)
 			return nil, err
 		}
 		if len(result) > 0 {

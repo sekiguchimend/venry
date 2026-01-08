@@ -23,6 +23,7 @@ export interface FlowItem {
   category?: {
     label: string;
     backgroundColor: string;
+    textColor: string;
   };
 }
 

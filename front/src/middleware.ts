@@ -3,11 +3,20 @@ import type { NextRequest } from 'next/server';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-// JWTのペイロードをデコード（署名検証なし - 期限チェックのみ）
+/**
+ * JWTのペイロードをデコード（期限チェック専用）
+ *
+ * セキュリティ注意:
+ * - この関数は署名検証を行いません
+ * - 署名検証はバックエンドAPI（middleware/auth.go）で行われます
+ * - フロントエンドではトークンの期限切れを事前チェックするためだけに使用
+ * - 改ざん検知はバックエンドに依存します
+ */
 function decodeJWT(token: string): { exp?: number } | null {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
+    // Base64デコードのみ（署名検証なし）
     const payload = JSON.parse(atob(parts[1]));
     return payload;
   } catch {
