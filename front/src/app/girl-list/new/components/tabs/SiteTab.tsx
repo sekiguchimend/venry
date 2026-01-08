@@ -143,56 +143,31 @@ export default function SiteTab() {
   const playOptionsSet = useCheckboxSet(playOptions.map((i) => i.id));
 
   // 風俗じゃぱん！
+  const [fjJobFilter, setFjJobFilter] = useState('未設定');
   const [fjXUrl, setFjXUrl] = useState('');
   const [fjNominationFee1, setFjNominationFee1] = useState('');
   const [fjNominationFee1Reflect, setFjNominationFee1Reflect] = useState('未選択');
   const [fjNominationFee2, setFjNominationFee2] = useState('');
   const [fjNominationFee2Reflect, setFjNominationFee2Reflect] = useState('未選択');
-
-  const fjTypeTags = useMemo(() => makeItems(['ロリ系', 'ギャル系', '人妻系', 'キレイ系', 'カワイイ系', 'モデル系', '美少女系', '癒し系', 'キャバ系', '清楚', 'アイドル系', 'OL系', 'お姉さん系', '萌え系', 'お嬢様']), []);
-  const fjPlayTags = useMemo(() => makeItems(['黄金', '聖水', 'マット', 'アナル', 'パイズリ', '潮吹き']), []);
-  const fjKodaTags = useMemo(() => makeItems(['AV女優', '母乳', 'ニューハーフ', '敏感', '感度抜群', '女子大生', 'スタイル抜群', 'ハーフ', 'タトゥー', '素人', '変態', '痴女', 'アニメ声', '未経験', '顔出し', '禁煙', 'テクニシャン']), []);
-
-  const fjTypeSet = useCheckboxSet(fjTypeTags.map((i) => i.id), 1);
-  const fjPlaySet = useCheckboxSet(fjPlayTags.map((i) => i.id));
-  const fjKodaSet = useCheckboxSet(fjKodaTags.map((i) => i.id), 2);
-
-  const [fjSmCheck, setFjSmCheck] = useState('未選択');
-  const [fjTrialSetting, setFjTrialSetting] = useState('未選択');
-
-  const fjGenres = useMemo(
-    () =>
-      makeItems([
-        // デリヘル、ホテルヘルス、ヘルス、風俗エステ
-        'av女優', 'パイパン', '妊婦プレイ', '敏感', '攻め好き', '受身好き',
-        '痴女', '濃厚サービス', '潮吹き', 'ドM(ドエム)', 'ドS(ドエス)', '母乳プレイ',
-        'パイズリ', 'AF可', 'イラマチオ可', '3P可', 'ごっくん', 'アジアン',
-        'ブロンド・金髪', 'ニューハーフ', '熟女系', '巨乳', '爆乳', '貧乳',
-        '美乳', '巨尻', '美尻', '人妻系', 'イヤイヤ好き', '賢乳',
-        // ソープ、ピンサロ
-        'アジアン(ソープ/ピンサロ)', '貧乳(ソープ/ピンサロ)', 'ブロンド・金髪(ソープ/ピンサロ)', '美乳(ソープ/ピンサロ)',
-        'ニューハーフ(ソープ/ピンサロ)', '巨尻(ソープ/ピンサロ)', '熟女系(ソープ/ピンサロ)', '巨乳(ソープ/ピンサロ)',
-        '美尻(ソープ/ピンサロ)', '爆乳(ソープ/ピンサロ)', '人妻系(ソープ/ピンサロ)', 'イヤイヤ好き(ソープ/ピンサロ)',
-        // メンズエステ
-        'エステ経験者', 'エステ未経験', '資格あり', 'インテリ', 'ツンデレ', '話し上手',
-        '聞き上手', 'リピート高確率', '好感度抜群', '礼儀正しい', '好奇心旺盛', '真面目',
-        'マッサージが得意', '極液施術可', 'バリエーション豊富', '出張サービス可能', '丁寧な施術',
-      ]),
-    [],
-  );
-  const fjGenresSet = useCheckboxSet(fjGenres.map((i) => i.id), 19);
-
   const [fjHeight, setFjHeight] = useState('タグを表示');
   const [fjBustSize, setFjBustSize] = useState('タグを表示');
   const [fjSmAttr, setFjSmAttr] = useState('タグを表示');
   const [fjGirlTag1, setFjGirlTag1] = useState('未選択');
   const [fjGirlTag2, setFjGirlTag2] = useState('未選択');
+  const [fjSmCheck, setFjSmCheck] = useState('未選択');
+  const [fjTrialSetting, setFjTrialSetting] = useState('未選択');
 
-  const fjLooks = useMemo(() => makeItems(['美乳', 'セクシー', '色黒', '乳輪大きい', 'グラマー', 'パイパン', '乳首ピンク', 'ぽっちゃり', '黒髪', '美尻', 'メガぽっちゃり', '美肌', '美脚', '巨尻', 'スレンダー', '色白']), []);
-  const fjPersonality = useMemo(() => makeItems(['明るい', 'しっかり者', 'イヤイヤ好き', '甘えん坊', '話し好き', '聞き上手', 'ツンデレ', '恥ずかしがり屋', '天然', '人懐っこい', 'オタク', '愛嬌抜群', 'おっとり']), []);
+  const fjLooks = useMemo(() => makeItems(['美乳', '乳輪大きい', '乳首ピンク', '美尻', '巨尻', 'スレンダー', 'セクシー', 'グラマー', 'ぽっちゃり', 'メガぽっちゃり', '美肌', '色白', '色黒', 'パイパン', '黒髪', '美脚']), []);
+  const fjPersonality = useMemo(() => makeItems(['明るい', '甘えん坊', 'ツンデレ', '恥ずかしがり屋', '人懐っこい', '愛嬌抜群', 'しっかり者', '話し好き', '聞き上手', '天然', 'オタク', 'おっとり', 'イヤイヤ好き']), []);
+  const fjTypeTags = useMemo(() => makeItems(['ロリ系', 'ギャル系', '人妻系', 'キレイ系', 'カワイイ系', 'モデル系', '美少女系', '癒し系', 'キャバ系', '清楚', 'アイドル系', 'OL系', 'お姉さん系', '萌え系', 'お嬢様']), []);
+  const fjPlayTags = useMemo(() => makeItems(['黄金', '聖水', 'マット', 'アナル', 'パイズリ', '潮吹き']), []);
+  const fjKodaTags = useMemo(() => makeItems(['AV女優', '母乳', 'ニューハーフ', '敏感', '感度抜群', '女子大生', 'スタイル抜群', 'ハーフ', 'タトゥー', '素人', '変態', '痴女', 'アニメ声', '未経験', '顔出し', '禁煙', 'テクニシャン']), []);
 
   const fjLooksSet = useCheckboxSet(fjLooks.map((i) => i.id), 5);
   const fjPersonalitySet = useCheckboxSet(fjPersonality.map((i) => i.id), 2);
+  const fjTypeSet = useCheckboxSet(fjTypeTags.map((i) => i.id), 1);
+  const fjPlaySet = useCheckboxSet(fjPlayTags.map((i) => i.id));
+  const fjKodaSet = useCheckboxSet(fjKodaTags.map((i) => i.id), 2);
 
   return (
     <div className="space-y-6">
@@ -490,7 +465,16 @@ export default function SiteTab() {
       </Section>
 
 
-      <Section badge={{ variant: 'recommended', label: '推奨' }} title="風俗じゃぱん！">
+      <Section
+        badge={{ variant: 'required', label: '必須' }}
+        title="風俗じゃぱん！"
+        right={
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-700">業種絞り込み:</span>
+            <Select value={fjJobFilter} onChange={setFjJobFilter} options={['未設定']} />
+          </div>
+        }
+      >
         <div className="max-w-[1200px] mx-auto space-y-10">
           <div className="max-w-[980px]">
             <FormRow label="X(Twitter)URL">
@@ -520,76 +504,6 @@ export default function SiteTab() {
             </FormRow>
           </div>
 
-          <div>
-            <div className="text-sm text-gray-700 mb-4">女の子タグ(その他)</div>
-            <div className="space-y-10">
-              <div>
-                <div className="text-base font-semibold text-gray-800 mb-4">タイプ(1個まで)</div>
-                <CheckboxGrid
-                  items={fjTypeTags}
-                  selectedIds={fjTypeSet.selected}
-                  onToggle={fjTypeSet.toggle}
-                  onSelectAll={fjTypeSet.selectAll}
-                  onClear={fjTypeSet.clear}
-                  columnsClassName="grid-cols-6"
-                  maxSelected={1}
-                />
-              </div>
-
-              <div>
-                <div className="text-base font-semibold text-gray-800 mb-4">プレイ</div>
-                <CheckboxGrid
-                  items={fjPlayTags}
-                  selectedIds={fjPlaySet.selected}
-                  onToggle={fjPlaySet.toggle}
-                  onSelectAll={fjPlaySet.selectAll}
-                  onClear={fjPlaySet.clear}
-                  columnsClassName="grid-cols-6"
-                />
-              </div>
-
-              <div>
-                <div className="text-base font-semibold text-gray-800 mb-4">こだわり・特徴・個性(2個まで)</div>
-                <CheckboxGrid
-                  items={fjKodaTags}
-                  selectedIds={fjKodaSet.selected}
-                  onToggle={fjKodaSet.toggle}
-                  onSelectAll={fjKodaSet.selectAll}
-                  onClear={fjKodaSet.clear}
-                  columnsClassName="grid-cols-6"
-                  maxSelected={2}
-                />
-              </div>
-
-              <div className="max-w-[520px] space-y-4">
-                <FormRow label="S・M度チェック">
-                  <Select value={fjSmCheck} onChange={setFjSmCheck} options={['未選択']} />
-                </FormRow>
-                <FormRow label="体験入店設定">
-                  <Select value={fjTrialSetting} onChange={setFjTrialSetting} options={['未選択']} />
-                </FormRow>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Section>
-
-      <Section badge={{ variant: 'recommended', label: '推奨' }} title="風俗じゃぱん！">
-        <div className="max-w-[1200px] mx-auto">
-          <CheckboxGrid
-            items={fjGenres}
-            selectedIds={fjGenresSet.selected}
-            onToggle={fjGenresSet.toggle}
-            onSelectAll={fjGenresSet.selectAll}
-            onClear={fjGenresSet.clear}
-            columnsClassName="grid-cols-6"
-            maxSelected={19}
-          />
-        </div>
-      </Section>
-
-      <Section badge={{ variant: 'required', label: '必須' }} title="風俗じゃぱん！">
-        <div className="max-w-[980px] mx-auto space-y-8">
           <div className="max-w-[520px] space-y-4">
             <FormRow label="身長">
               <Select value={fjHeight} onChange={setFjHeight} options={['タグを表示']} />
@@ -616,7 +530,7 @@ export default function SiteTab() {
               onToggle={fjLooksSet.toggle}
               onSelectAll={fjLooksSet.selectAll}
               onClear={fjLooksSet.clear}
-              columnsClassName="grid-cols-6"
+              columnsClassName="grid-cols-7"
               maxSelected={5}
             />
           </div>
@@ -632,6 +546,58 @@ export default function SiteTab() {
               columnsClassName="grid-cols-6"
               maxSelected={2}
             />
+          </div>
+
+          <div>
+            <div className="text-sm text-gray-700 mb-4">女の子タグ(その他)</div>
+            <div className="space-y-10">
+              <div>
+                <div className="text-base font-semibold text-gray-800 mb-4">タイプ(1個まで)</div>
+                <CheckboxGrid
+                  items={fjTypeTags}
+                  selectedIds={fjTypeSet.selected}
+                  onToggle={fjTypeSet.toggle}
+                  onSelectAll={fjTypeSet.selectAll}
+                  onClear={fjTypeSet.clear}
+                  columnsClassName="grid-cols-7"
+                  maxSelected={1}
+                />
+              </div>
+
+              <div>
+                <div className="text-base font-semibold text-gray-800 mb-4">プレイ</div>
+                <CheckboxGrid
+                  items={fjPlayTags}
+                  selectedIds={fjPlaySet.selected}
+                  onToggle={fjPlaySet.toggle}
+                  onSelectAll={fjPlaySet.selectAll}
+                  onClear={fjPlaySet.clear}
+                  columnsClassName="grid-cols-6"
+                />
+              </div>
+
+              <div>
+                <div className="text-base font-semibold text-gray-800 mb-4">こだわり・特徴・個性(2個まで)</div>
+                <CheckboxGrid
+                  items={fjKodaTags}
+                  selectedIds={fjKodaSet.selected}
+                  onToggle={fjKodaSet.toggle}
+                  onSelectAll={fjKodaSet.selectAll}
+                  onClear={fjKodaSet.clear}
+                  columnsClassName="grid-cols-7"
+                  maxSelected={2}
+                />
+              </div>
+
+              <div className="max-w-[520px] space-y-4">
+                <FormRow label="S・M度チェック">
+                  <Select value={fjSmCheck} onChange={setFjSmCheck} options={['未選択']} />
+                </FormRow>
+                <FormRow label="体験入店設定">
+                  <Select value={fjTrialSetting} onChange={setFjTrialSetting} options={['未選択']} />
+                </FormRow>
+              </div>
+            </div>
           </div>
         </div>
       </Section>
